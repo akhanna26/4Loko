@@ -478,7 +478,7 @@ export default function AuctionConsole({
                           className={`px-2 py-1.5 sm:py-2 text-xs border transition-all ${
                             isHighBidder
                               ? 'bg-[color:var(--green-deep)] text-[color:var(--cream)] border-[color:var(--green-deep)]'
-                              : 'bg-[color:var(--cream-tint)]/60 text-[color:var(--green-deep)] border-[color:var(--green-forest)]/20 hover:bg-[color:var(--cream-tint)] hover:border-[color:var(--green-forest)]/40'
+                              : 'bg-[color:var(--cream-tint)] text-[color:var(--green-deep)] border-[color:var(--green-forest)]/20 hover:bg-[color:var(--cream-tint)] hover:border-[color:var(--green-forest)]/40'
                           }`}>
                           <div className="flex items-center justify-center gap-1 mb-1">
                             <RankBadge rank={rankByOwner.get(o.id)} />
@@ -539,7 +539,7 @@ export default function AuctionConsole({
 
           {/* TICKER STRIP */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-5">
-            <div className="bg-[color:var(--cream-tint)]/40 px-3 sm:px-4 py-2.5 sm:py-3 border border-[color:var(--green-forest)]/15 md:col-span-2 max-h-32 overflow-y-auto"
+            <div className="bg-white/80 px-3 sm:px-4 py-2.5 sm:py-3 border border-[color:var(--green-forest)]/15 md:col-span-2 max-h-32 overflow-y-auto"
               style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)' }}>
               <p className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] mb-1.5" style={{ letterSpacing: '0.18em' }}>Drafted</p>
               {bids.filter(b => b.is_active).length === 0 ? (
@@ -571,7 +571,7 @@ export default function AuctionConsole({
                 </div>
               )}
             </div>
-            <div className="bg-[color:var(--cream-tint)]/40 px-3 sm:px-4 py-2.5 sm:py-3 border border-[color:var(--green-forest)]/15 flex items-center justify-end gap-1.5 sm:gap-2 flex-wrap"
+            <div className="bg-white/80 px-3 sm:px-4 py-2.5 sm:py-3 border border-[color:var(--green-forest)]/15 flex items-center justify-end gap-1.5 sm:gap-2 flex-wrap"
               style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)' }}>
               {isDriver && (
                 <>
@@ -613,12 +613,12 @@ export default function AuctionConsole({
           {/* MOBILE-ONLY TOGGLES for snake + rosters */}
           <div className="lg:hidden flex gap-2 mb-3">
             <button onClick={() => setShowSnake((v) => !v)}
-              className="flex-1 text-[10px] uppercase text-[color:var(--green-deep)] border border-[color:var(--green-forest)]/30 px-3 py-2 bg-white/50 hover:bg-[color:var(--cream-tint)]/40"
+              className="flex-1 text-[10px] uppercase text-[color:var(--green-deep)] border border-[color:var(--green-forest)]/30 px-3 py-2 bg-white/50 hover:bg-white/80"
               style={{ letterSpacing: '0.18em' }}>
               {showSnake ? 'Hide snake' : 'Show snake'} ▾
             </button>
             <button onClick={() => setShowRosters((v) => !v)}
-              className="flex-1 text-[10px] uppercase text-[color:var(--green-deep)] border border-[color:var(--green-forest)]/30 px-3 py-2 bg-white/50 hover:bg-[color:var(--cream-tint)]/40"
+              className="flex-1 text-[10px] uppercase text-[color:var(--green-deep)] border border-[color:var(--green-forest)]/30 px-3 py-2 bg-white/50 hover:bg-white/80"
               style={{ letterSpacing: '0.18em' }}>
               {showRosters ? 'Hide rosters' : 'Show rosters'} ▾
             </button>
@@ -641,7 +641,7 @@ export default function AuctionConsole({
           <div className="overflow-x-auto mb-2">
             <div className="grid gap-px bg-[color:var(--green-deep)]/15 min-w-[900px]"
                  style={{ gridTemplateColumns: `220px repeat(${owners.length}, minmax(60px, 1fr))` }}>
-              <div className="bg-[color:var(--cream-tint)]/60">
+              <div className="bg-[color:var(--cream-tint)]">
                 <input type="text" value={poolFilter} onChange={(e) => setPoolFilter(e.target.value)}
                   placeholder="filter golfers…"
                   className="w-full px-2 py-1 bg-white border border-[color:var(--green-forest)]/20 text-xs rounded-sm" />
@@ -653,7 +653,7 @@ export default function AuctionConsole({
                 const theme = getOwnerTheme(o.name);
                 return (
                  <div key={o.id}
-                    className={`p-2 ${isNominator ? 'bg-[color:var(--cream-deep)]' : 'bg-[color:var(--cream-tint)]/60'}`}>
+                    className={`p-2 ${isNominator ? 'bg-[color:var(--cream-deep)]' : 'bg-[color:var(--cream-tint)]'}`}>
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <RankBadge rank={rankByOwner.get(o.id)} />
                       <span className="serif text-[10px] sm:text-[11px] text-[color:var(--green-deep)] font-semibold">{colHeader(o.name)}</span>
@@ -683,8 +683,8 @@ export default function AuctionConsole({
                       className={`p-2 flex items-baseline justify-between gap-2 text-left transition-colors ${
                         isNominated ? 'bg-[color:var(--gold-masters)]/30 ring-1 ring-[color:var(--gold-masters)]' :
                         isSold ? 'bg-[#2a4636]/[.08] opacity-60' :
-                        isClickable ? 'bg-[color:var(--cream-tint)]/50 hover:bg-[color:var(--cream-deep)] cursor-pointer' :
-                        'bg-[color:var(--cream-tint)]/50 cursor-default'
+                        isClickable ? 'bg-[color:var(--cream-tint)] hover:bg-[color:var(--cream-deep)] cursor-pointer' :
+                        'bg-[color:var(--cream-tint)] cursor-default'
                       }`}>
                       <span className={`serif text-xs truncate ${isSold ? 'text-[color:var(--green-moss)] line-through' : 'text-[color:var(--green-deep)]'}`}>
                         {g.full_name}
@@ -836,7 +836,7 @@ function RostersColumn({ orderedOwners, ownerStateById, bidsByOwner, currentNomi
             const theme = getOwnerTheme(o.name);
             return (
              <div key={o.id}
-                className="p-2 bg-[color:var(--cream-tint)]/40 border"
+                className="p-2 bg-white/80 border"
                 style={{
                   borderColor: isNominator ? 'var(--gold-masters)' : 'rgba(42, 70, 54, 0.15)',
                   background: isNominator ? 'rgba(253, 181, 21, 0.08)' : undefined,
