@@ -77,6 +77,15 @@ export async function saveKeeperDeclaration(
   keeper_price: number,
   keeper_stage: number,
 ) {
+  // Single atomic upsert — replaces existing declaration in one operation
+  const { error } = await supabase
+    .from('keeper_declarations')
+    .upsert(
+      { flight_id, owner_id, golfer_id, keeper_price, keeper_stage },
+      { onConflict: 'flight_id,owner_id' }
+    );
+  if (error) throw error;
+}
   // Delete existing first (in case they're switching)
   await supabase.from('keeper_declarations').delete().eq('flight_id', flight_id).eq('owner_id', owner_id);
   const { error } = await supabase.from('keeper_declarations').insert({
