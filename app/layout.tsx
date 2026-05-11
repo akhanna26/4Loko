@@ -54,17 +54,18 @@ export default function RootLayout({
                 <span className="chi-star" aria-hidden="true" />
               </span>
             </a>
-            <nav className="flex items-center gap-4 text-[11px] uppercase text-[color:var(--green-forest)]" style={{ letterSpacing: '0.18em' }}>
-  <a href="/" className="hover:text-[color:var(--green-deep)] transition-colors">2026 Season</a>
-  <span className="text-[color:var(--green-forest)]/30">|</span>
-  <a href="/hall-of-fame" className="hover:text-[color:var(--green-deep)] transition-colors">Hall of Fame</a>
-  <span className="text-[color:var(--green-forest)]/30">|</span>
-  <a href="/keepers" className="hover:text-[color:var(--green-deep)] transition-colors">Keepers</a>
-  <span className="text-[color:var(--green-forest)]/30">|</span>
-  <a href="/draft" className="hover:text-[color:var(--green-deep)] transition-colors">Draft</a>
-  <span className="text-[color:var(--green-forest)]/30">|</span>
-<a href="/info" className="hover:text-[color:var(--green-deep)] transition-colors">Info</a>
-</nav>
+           <nav className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-[11px] uppercase text-[color:var(--green-forest)] flex-wrap justify-end" style={{ letterSpacing: '0.1em' }}>
+              <a href="/" className="hover:text-[color:var(--green-deep)] transition-colors">Season</a>
+              <span className="text-[color:var(--green-forest)]/30 hidden sm:inline">|</span>
+              <a href="/draft" className="hover:text-[color:var(--green-deep)] transition-colors">Draft</a>
+              <span className="text-[color:var(--green-forest)]/30 hidden sm:inline">|</span>
+              <a href="/keepers" className="hover:text-[color:var(--green-deep)] transition-colors">Keepers</a>
+              <span className="text-[color:var(--green-forest)]/30 hidden sm:inline">|</span>
+              <a href="/hall-of-fame" className="hover:text-[color:var(--green-deep)] transition-colors hidden sm:inline">Hall of Fame</a>
+              <a href="/hall-of-fame" className="hover:text-[color:var(--green-deep)] transition-colors sm:hidden">HOF</a>
+              <span className="text-[color:var(--green-forest)]/30 hidden sm:inline">|</span>
+              <a href="/info" className="hover:text-[color:var(--green-deep)] transition-colors">Info</a>
+            </nav>
           </div>
         </header>
         {children}
