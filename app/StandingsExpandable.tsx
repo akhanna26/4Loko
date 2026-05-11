@@ -104,7 +104,7 @@ export default function StandingsExpandable({
 
   return (
     <section className="mb-14">
-      <div className="flex items-baseline justify-between mb-5">
+   <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-5 sm:p-6 shadow-sm">
         <h2 className="serif text-3xl text-[color:var(--green-deep)] font-semibold">Standings</h2>
         <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
           Live · click owners to expand
