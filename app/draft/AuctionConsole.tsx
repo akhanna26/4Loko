@@ -9,7 +9,7 @@ import {
   getCurrentNominator, getUpcomingNominators,
   applyKeepersToAuction, shortName,
   getFullSnakeOrder,
-} from '../../lib/auction';ƒ√
+} from '../../lib/auction';
 import { getFlight } from '../../lib/draft';
 import { getOwnerTheme } from '../../lib/owner-themes';
 
