@@ -14,7 +14,7 @@ export default async function HallOfFame() {
   for (const m of allMajors) {
     majorTally.set(m.owner_name, (majorTally.get(m.owner_name) ?? 0) + 1);
   }
-  const tallyRanked = [...majorTally.entries()].sort((a, b) => b[1] - a[1]);
+  const tallyRanked = Array.from(majorTally.entries()).sort((a, b) => b[1] - a[1]);
 
   return (
     <main className="max-w-5xl mx-auto px-6 pt-10 pb-16">
@@ -96,7 +96,7 @@ export default async function HallOfFame() {
         { year: 2025, standings: majors2025, events: events2025 },
         { year: 2024, standings: majors2024, events: events2024 },
       ].map(({ year, standings, events }) => {
-        const eventNames = [...new Set(events.map((e) => e.tournament_name))];
+        const eventNames = Array.from(new Set(events.map((e) => e.tournament_name)));
         const ownerEventScore = new Map<string, Map<string, number>>();
         for (const e of events) {
           if (!ownerEventScore.has(e.owner_name)) ownerEventScore.set(e.owner_name, new Map());
