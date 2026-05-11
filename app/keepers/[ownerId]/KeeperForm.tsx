@@ -55,8 +55,8 @@ export default function KeeperForm({
   const keeperInfo = selectedGolfer ? computeKeeperPrice(selectedGolfer.was_keeper ? selectedGolfer.keeper_stage : 0) : null;
 
   return (
-    <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm overflow-hidden">
-      <div className="bg-[color:var(--cream-tint)]/60 px-4 sm:px-5 py-3 border-b border-[color:var(--green-forest)]/15 flex items-baseline justify-between">
+    <div className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/15 shadow-sm overflow-hidden">
+      <div className="bg-[color:var(--cream-deep)]/40 px-4 sm:px-5 py-3 border-b border-[color:var(--green-forest)]/15 flex items-baseline justify-between">
         <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.18em' }}>
           Masters Roster
         </p>
@@ -70,16 +70,15 @@ export default function KeeperForm({
           const isSelected = selected === g.golfer_id;
           const { price } = computeKeeperPrice(g.was_keeper ? g.keeper_stage : 0);
           return (
-            <label
+           <label
               key={g.golfer_id}
-              className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 cursor-pointer border-b border-[color:var(--green-forest)]/10 transition-all last:border-b-0 hover:bg-[color:var(--cream-tint)]/40"
+              className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 cursor-pointer border-b border-[color:var(--green-forest)]/10 transition-all last:border-b-0 hover:shadow-sm"
               style={{
                 background: isSelected
-                  ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.18) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(253, 181, 21, 0.18) 100%)'
-                  : 'transparent',
-                border: isSelected ? '1px solid rgba(253, 181, 21, 0.4)' : '1px solid transparent',
-                borderBottom: isSelected ? '1px solid rgba(253, 181, 21, 0.4)' : '1px solid rgba(42, 70, 54, 0.1)',
-                borderLeft: isSelected ? '3px solid var(--gold-masters)' : '3px solid transparent',
+                  ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.18) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(253, 181, 21, 0.18) 100%)'
+                  : 'rgba(255, 255, 255, 0.6)',
+                border: isSelected ? '1px solid rgba(253, 181, 21, 0.4)' : '1px solid rgba(42, 70, 54, 0.08)',
+                borderLeft: isSelected ? '3px solid var(--gold-masters)' : '3px solid rgba(42, 70, 54, 0.08)',
                 boxShadow: isSelected ? '0 2px 8px rgba(253, 181, 21, 0.15)' : 'none',
               }}
             >
@@ -115,7 +114,7 @@ export default function KeeperForm({
         </div>
       )}
 
-      <div className="bg-[color:var(--cream-tint)]/60 px-4 sm:px-5 py-3 sm:py-4 border-t border-[color:var(--green-forest)]/15 flex items-center gap-3 justify-end flex-wrap">
+      <div className="bg-[color:var(--cream-deep)]/40 px-4 sm:px-5 py-3 sm:py-4 border-t border-[color:var(--green-forest)]/15 flex items-center gap-3 justify-end flex-wrap">
         {currentDeclaration && (
           <button
             onClick={handleClear}
