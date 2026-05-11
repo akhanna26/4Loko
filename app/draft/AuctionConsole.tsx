@@ -435,13 +435,52 @@ export default function AuctionConsole({
                   </button>
                 )}
               </div>
-              <div className="flex items-baseline gap-3 sm:gap-4 flex-wrap mb-3 sm:mb-5">
+             <div className="flex items-baseline gap-3 sm:gap-4 flex-wrap mb-3 sm:mb-5">
                 <h2 className="serif text-3xl sm:text-5xl md:text-6xl font-semibold text-[color:var(--green-deep)] leading-none">
                   {nominatedGolfer.full_name}
                 </h2>
                 {nominatedGolfer.odds && (
                   <span className="text-lg sm:text-2xl tabular text-[color:var(--gold-masters)]">{nominatedGolfer.odds}</span>
                 )}
+                {(() => {
+                  // Compute golfer's rank in the odds-sorted pool
+                  const oddsToNum = (o?: string) => o ? parseInt(o.replace('+', '')) : 999999;
+                  const sortedByOdds = [...pool].sort((a, b) => oddsToNum(a.odds) - oddsToNum(b.odds));
+                  const rankIdx = sortedByOdds.findIndex(g => g.golfer_id === nominatedGolfer.golfer_id);
+                  if (rankIdx < 0) return null;
+                  const totalPool = pool.length;
+                  const rankNum = rankIdx + 1;
+                  const pct = (rankIdx / Math.max(1, totalPool - 1)) * 100;
+                  // Tier-based color
+                  const tierColor =
+                    rankNum <= 15 ? 'var(--gold-masters)' :
+                    rankNum <= 50 ? 'var(--green-forest)' :
+                    rankNum <= 100 ? 'var(--green-moss)' :
+                    'var(--chicago-red)';
+                  return (
+                    <div className="flex items-center gap-2 ml-auto shrink-0">
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="text-[9px] sm:text-[10px] uppercase tabular text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
+                          Rank
+                        </span>
+                        <span className="text-sm sm:text-base tabular font-semibold leading-none" style={{ color: tierColor }}>
+                          #{rankNum}<span className="text-[color:var(--green-moss)]/50">/{totalPool}</span>
+                        </span>
+                      </div>
+                      {/* Position indicator bar */}
+                      <div className="relative w-1 h-10 bg-[color:var(--green-forest)]/15 rounded-full overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full rounded-full"
+                          style={{
+                            background: tierColor,
+                            height: '4px',
+                            top: `${pct}%`,
+                            transform: 'translateY(-50%)',
+                            boxShadow: `0 0 4px ${tierColor}`,
+                          }} />
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
               <div className="flex items-baseline gap-3 mb-4 sm:mb-5 flex-wrap">
                 <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.24em' }}>
