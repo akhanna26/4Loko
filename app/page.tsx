@@ -95,7 +95,7 @@ export default async function SeasonPage() {
           </span>
         </div>
 
-        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-5 sm:p-6 space-y-3 shadow-sm">
+      <div className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/20 p-5 sm:p-6 space-y-3 shadow-sm">
           {flightPairs.map((pair, idx) => {
             const accent = getMajorAccent(pair.major.tournament_name);
             const flightNum = idx + 1;
@@ -134,7 +134,7 @@ export default async function SeasonPage() {
           </span>
         </div>
 
-        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-5 sm:p-6 shadow-sm">
+     <div className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/20 p-5 sm:p-6 shadow-sm">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-3">
             {owners.map((o) => (
               <div key={o.id} className="flex items-center gap-3 py-1">
@@ -160,7 +160,7 @@ export default async function SeasonPage() {
 
 function BrandHero({ nextUpcoming, accent }: { nextUpcoming: any; accent: any }) {
   return (
-    <div className="text-center pt-6 pb-10 border-b border-[color:var(--green-forest)]/15">
+    <div className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/20 shadow-sm text-center pt-8 pb-10 px-6">
       <p className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.32em' }}>
         Volume IV · The 2026 Season
       </p>
