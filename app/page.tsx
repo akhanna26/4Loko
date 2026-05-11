@@ -197,10 +197,9 @@ function DraftWeekHero({ tournament, accent }: { tournament: any; accent: any })
   const days = Math.max(0, daysUntil(tournament.start_date));
   const primary = accent?.primary ?? 'var(--green-deep)';
   return (
-    <div className="bg-[color:var(--cream-deep)]/40 p-8 md:p-10 relative"
+    <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm p-8 md:p-10 relative"
       style={{
         borderTop: `3px solid ${primary}`,
-        boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)',
       }}>
       <p className="text-[10px] uppercase mb-3" style={{ letterSpacing: '0.32em', color: primary }}>
         Draft Week · Bidding Wednesday
@@ -212,13 +211,26 @@ function DraftWeekHero({ tournament, accent }: { tournament: any; accent: any })
         {tournament.venue} · tees off in {days} {days === 1 ? 'day' : 'days'}
       </p>
       <div className="flex flex-wrap items-center gap-3 mt-6">
-        <Link href="/keepers" className="text-[10px] uppercase border-2 px-4 py-2.5 hover:bg-[color:var(--cream-deep)] transition-colors"
-          style={{ letterSpacing: '0.18em', color: primary, borderColor: primary }}>
-          Declare keeper →
+        <Link href="/keepers"
+          className="group text-[10px] uppercase px-5 py-3 transition-all flex items-center gap-2"
+          style={{
+            letterSpacing: '0.18em',
+            color: 'white',
+            background: primary,
+            boxShadow: `0 2px 8px ${primary}40`,
+          }}>
+          Declare keeper
+          <span className="transition-transform group-hover:translate-x-0.5">→</span>
         </Link>
-        <Link href="/draft" className="text-[10px] uppercase border-2 px-4 py-2.5 hover:bg-[color:var(--cream-deep)] transition-colors"
-          style={{ letterSpacing: '0.18em', color: primary, borderColor: primary }}>
-          Open auction arena →
+        <Link href="/draft"
+          className="group text-[10px] uppercase px-5 py-3 transition-all flex items-center gap-2 border-2"
+          style={{
+            letterSpacing: '0.18em',
+            color: primary,
+            borderColor: primary,
+          }}>
+          Open auction arena
+          <span className="transition-transform group-hover:translate-x-0.5">→</span>
         </Link>
       </div>
     </div>
@@ -228,10 +240,9 @@ function DraftWeekHero({ tournament, accent }: { tournament: any; accent: any })
 function LiveHero({ tournament, accent }: { tournament: any; accent: any }) {
   const primary = accent?.primary ?? 'var(--gold-masters)';
   return (
-    <div className="bg-[color:var(--cream-deep)]/40 p-8 md:p-10 relative"
+    <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm p-8 md:p-10 relative"
       style={{
         borderTop: `3px solid ${primary}`,
-        boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)',
       }}>
       <div className="flex items-center gap-2 mb-3">
         <span className="w-2 h-2 rounded-full bg-[color:var(--chicago-red)] live-pulse" />
@@ -245,9 +256,16 @@ function LiveHero({ tournament, accent }: { tournament: any; accent: any }) {
       <p className="serif italic text-sm text-[color:var(--green-moss)] mt-4">
         {tournament.venue}
       </p>
-      <Link href={`/tournament/${tournament.id}`} className="inline-block mt-6 text-[10px] uppercase border-2 px-4 py-2.5 hover:bg-[color:var(--cream-deep)] transition-colors"
-        style={{ letterSpacing: '0.18em', color: primary, borderColor: primary }}>
-        Open leaderboard →
+      <Link href={`/tournament/${tournament.id}`}
+        className="group inline-flex items-center gap-2 mt-6 text-[10px] uppercase px-5 py-3 transition-all"
+        style={{
+          letterSpacing: '0.18em',
+          color: 'white',
+          background: primary,
+          boxShadow: `0 2px 8px ${primary}40`,
+        }}>
+        Open leaderboard
+        <span className="transition-transform group-hover:translate-x-0.5">→</span>
       </Link>
     </div>
   );
