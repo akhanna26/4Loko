@@ -73,13 +73,13 @@ export default function StandingsExpandable({
 
   const renderCell = (eventName: string, score: number | undefined, isElev: boolean) => {
     const status = tournamentStatusByName[eventName];
-    if (status === 'upcoming') return <span className="board-num-pending">tbd</span>;
+   if (status === 'upcoming') return <span className="text-[10px] text-[color:var(--green-moss)]/40 italic serif" style={{ letterSpacing: '0.05em' }}>—</span>;
     if (score === undefined || score === null) return <span className="board-num-pending">—</span>;
     if (score === 0) return <span style={{ color: 'var(--green-moss)' }}>E</span>;
     const style = tieredScoreStyle(score, quartilesByEvent[eventName]);
     return (
       <span
-        className={isElev ? 'board-num-elev' : 'board-num-major'}
+        className="text-xs tabular"
         style={{ color: style.color, fontWeight: style.weight }}>
         {score > 0 ? `+${score}` : score}
       </span>
@@ -89,10 +89,17 @@ export default function StandingsExpandable({
   const renderTotal = (total: number, isLeader: boolean) => {
     if (isLeader) {
       return (
-        <span className="board-num-leader" style={{ fontWeight: 700 }}>
+        <span className="text-sm tabular text-[color:var(--green-deep)]" style={{ fontWeight: 700 }}>
           {total > 0 ? `+${total}` : total === 0 ? 'E' : total}
         </span>
       );
+    }
+    const style = tieredScoreStyle(total, totalQuartiles);
+    return (
+      <span className="text-sm tabular" style={{ color: style.color, fontWeight: Math.max(style.weight, 600) }}>
+        {total > 0 ? `+${total}` : total === 0 ? 'E' : total}
+      </span>
+    );
     }
     const style = tieredScoreStyle(total, totalQuartiles);
     return (
