@@ -178,7 +178,7 @@ export default function AuctionConsole({
       if (!m.has(b.owner_id)) m.set(b.owner_id, []);
       m.get(b.owner_id)!.push(b);
     }
-    for (const arr of m.values()) {
+    for (const arr of Array.from(m.values())) {
       arr.sort((a, b) => Number(b.amount) - Number(a.amount));
     }
     return m;
