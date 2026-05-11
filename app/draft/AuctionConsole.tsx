@@ -9,7 +9,7 @@ import {
   getCurrentNominator, getUpcomingNominators,
   applyKeepersToAuction, shortName,
   getFullSnakeOrder,
-} from '../../lib/auction';
+} from '../../lib/auction';ƒ√
 import { getFlight } from '../../lib/draft';
 import { getOwnerTheme } from '../../lib/owner-themes';
 
@@ -712,34 +712,43 @@ export default function AuctionConsole({
           <div className="overflow-x-auto">
             <div className="bg-[color:var(--green-forest)]/15 grid gap-px min-w-[900px]"
                  style={{ gridTemplateColumns: `220px repeat(${owners.length}, minmax(60px, 1fr))` }}>
-              {filteredPool.map((g) => {
-                const bid = bidByGolfer.get(g.golfer_id);
-                const isSold = !!bid;
-                const isNominated = nominatedGolferId === g.golfer_id;
-                const isClickable = isDriver && g.is_available && !isNominated;
-                return (
-                  <div key={`golfer-${g.golfer_id}`} className="contents">
-                    <button
-                      onClick={() => handleNominate(g.golfer_id)}
-                      disabled={!isClickable}
-                      className={`p-2 flex items-baseline justify-between gap-2 text-left transition-colors ${
-                        isNominated ? 'bg-[color:var(--gold-masters)]/30 ring-1 ring-[color:var(--gold-masters)]' :
-                        isSold ? 'bg-[#2a4636]/[.08] opacity-60' :
-                        isClickable ? 'bg-[color:var(--cream-tint)] hover:bg-[color:var(--cream-deep)] cursor-pointer' :
-                        'bg-[color:var(--cream-tint)] cursor-default'
-                      }`}>
-                      <span className={`serif text-xs truncate ${isSold ? 'text-[color:var(--green-moss)] line-through' : 'text-[color:var(--green-deep)]'}`}>
-                        {g.full_name}
-                      </span>
-                      {isSold && bid ? (
-                        <span className="text-[10px] tabular shrink-0 flex items-baseline gap-1">
-                          <span className="text-[color:var(--green-deep)] font-semibold">${bid.amount}</span>
-                          <span className="text-[color:var(--green-moss)]">{shortName(bid.owner_name)}</span>
+              {(() => {
+                // Compute rank for all golfers in the pool, once per render
+                const oddsToNum = (o?: string) => o ? parseInt(o.replace('+', '')) : 999999;
+                const sortedByOdds = [...pool].sort((a, b) => oddsToNum(a.odds) - oddsToNum(b.odds));
+                const rankMap = new Map(sortedByOdds.map((g, i) => [g.golfer_id, i + 1]));
+                return filteredPool.map((g) => {
+                  const bid = bidByGolfer.get(g.golfer_id);
+                  const isSold = !!bid;
+                  const isNominated = nominatedGolferId === g.golfer_id;
+                  const isClickable = isDriver && g.is_available && !isNominated;
+                  const rank = rankMap.get(g.golfer_id) ?? 0;
+                  return (
+                    <div key={`golfer-${g.golfer_id}`} className="contents">
+                      <button
+                        onClick={() => handleNominate(g.golfer_id)}
+                        disabled={!isClickable}
+                        className={`p-2 flex items-baseline gap-2 text-left transition-colors ${
+                          isNominated ? 'bg-[color:var(--gold-masters)]/30 ring-1 ring-[color:var(--gold-masters)]' :
+                          isSold ? 'bg-[#2a4636]/[.08] opacity-60' :
+                          isClickable ? 'bg-[color:var(--cream-tint)] hover:bg-[color:var(--cream-deep)] cursor-pointer' :
+                          'bg-[color:var(--cream-tint)] cursor-default'
+                        }`}>
+                        <span className="text-[9px] tabular text-[color:var(--green-moss)]/60 shrink-0 w-7 text-right">
+                          #{rank}
                         </span>
-                      ) : g.odds ? (
-                        <span className="text-[10px] tabular text-[color:var(--green-moss)]/60 shrink-0">{g.odds}</span>
-                      ) : null}
-                    </button>
+                        <span className={`serif text-xs truncate flex-1 ${isSold ? 'text-[color:var(--green-moss)] line-through' : 'text-[color:var(--green-deep)]'}`}>
+                          {g.full_name}
+                        </span>
+                        {isSold && bid ? (
+                          <span className="text-[10px] tabular shrink-0 flex items-baseline gap-1">
+                            <span className="text-[color:var(--green-deep)] font-semibold">${bid.amount}</span>
+                            <span className="text-[color:var(--green-moss)]">{shortName(bid.owner_name)}</span>
+                          </span>
+                        ) : g.odds ? (
+                          <span className="text-[10px] tabular text-[color:var(--green-moss)]/60 shrink-0">{g.odds}</span>
+                        ) : null}
+                      </button>
                     {orderedOwners.map((o) => {
                       const isBuyer = bid?.owner_id === o.id;
                       const cellKey = `${g.golfer_id}-${o.id}`;
@@ -774,8 +783,9 @@ export default function AuctionConsole({
                       );
                     })}
                   </div>
-                );
-              })}
+                  );
+                });
+              })()}
               {filteredPool.length === 0 && (
                 <div className="bg-white p-4 text-xs text-[color:var(--green-moss)] italic" style={{ gridColumn: `span ${owners.length + 1}` }}>
                   No golfers in pool.
