@@ -209,10 +209,6 @@ export default function StandingsExpandable({
           </div>
         </div>
       </div>
-
-      <p className="text-[10px] uppercase text-[color:var(--green-moss)] mt-3 text-right" style={{ letterSpacing: '0.18em' }}>
-        Top 25% saturated · upper half forest · zero moss · negatives red
-      </p>
     </section>
   );
 }
