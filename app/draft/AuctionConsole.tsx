@@ -418,10 +418,12 @@ export default function AuctionConsole({
 
           {/* HERO */}
           {nominatedGolfer ? (
-            <section className="bg-white/75 border border-[color:var(--green-forest)]/15 p-4 sm:p-6 mb-4 sm:mb-5"
+            <section className="p-4 sm:p-6 mb-4 sm:mb-5"
               style={{
-                borderTop: `3px solid var(--gold-masters)`,
-                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6), 0 1px 2px rgba(0,0,0,0.04)',
+                background: 'linear-gradient(135deg, rgba(253, 181, 21, 0.05) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(253, 181, 21, 0.05) 100%)',
+                border: '1px solid rgba(253, 181, 21, 0.4)',
+                borderTop: '3px solid var(--gold-masters)',
+                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6), 0 2px 8px rgba(253, 181, 21, 0.15)',
               }}>
               <div className="flex items-baseline justify-between mb-2 flex-wrap gap-2">
                 <p className="text-[9px] sm:text-[10px] uppercase text-[#1a3a6e]" style={{ letterSpacing: '0.24em' }}>
@@ -542,10 +544,12 @@ export default function AuctionConsole({
               {error && <p className="text-xs text-[color:var(--chicago-red)] mt-3 serif italic">{error}</p>}
             </section>
           ) : (
-            <section className="bg-white/75 border border-[color:var(--green-forest)]/15 p-4 sm:p-6 mb-4 sm:mb-5"
+            <section className="p-4 sm:p-6 mb-4 sm:mb-5"
               style={{
+                background: 'linear-gradient(135deg, rgba(14, 42, 74, 0.04) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(14, 42, 74, 0.04) 100%)',
+                border: '1px solid rgba(14, 42, 74, 0.25)',
                 borderTop: '3px solid var(--pga-navy)',
-                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6), 0 1px 2px rgba(0,0,0,0.04)',
+                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6), 0 2px 8px rgba(14, 42, 74, 0.08)',
               }}>
               <div className="flex items-baseline justify-between flex-wrap gap-3 sm:gap-4">
                 <div>
