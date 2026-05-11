@@ -72,10 +72,15 @@ export default function KeeperForm({
           return (
             <label
               key={g.golfer_id}
-              className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 cursor-pointer border-b border-[color:var(--green-forest)]/10 transition-colors last:border-b-0"
+              className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 cursor-pointer border-b border-[color:var(--green-forest)]/10 transition-all last:border-b-0 hover:bg-[color:var(--cream-tint)]/40"
               style={{
-                background: isSelected ? 'rgba(253, 181, 21, 0.12)' : 'transparent',
+                background: isSelected
+                  ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.18) 0%, rgba(255, 255, 255, 0.85) 50%, rgba(253, 181, 21, 0.18) 100%)'
+                  : 'transparent',
+                border: isSelected ? '1px solid rgba(253, 181, 21, 0.4)' : '1px solid transparent',
+                borderBottom: isSelected ? '1px solid rgba(253, 181, 21, 0.4)' : '1px solid rgba(42, 70, 54, 0.1)',
                 borderLeft: isSelected ? '3px solid var(--gold-masters)' : '3px solid transparent',
+                boxShadow: isSelected ? '0 2px 8px rgba(253, 181, 21, 0.15)' : 'none',
               }}
             >
               <input
@@ -124,8 +129,15 @@ export default function KeeperForm({
         <button
           onClick={handleSave}
           disabled={selected === null || isPending}
-          className="group px-5 sm:px-6 py-2.5 sm:py-3 bg-[color:var(--green-deep)] text-white text-[10px] sm:text-xs uppercase disabled:opacity-40 hover:bg-[color:var(--green-forest)] transition-colors flex items-center gap-2"
-          style={{ letterSpacing: '0.18em', boxShadow: '0 2px 8px rgba(26, 48, 34, 0.25)' }}
+          className="group px-5 sm:px-6 py-2.5 sm:py-3 text-white text-[10px] sm:text-xs uppercase disabled:opacity-40 transition-all flex items-center gap-2"
+          style={{
+            letterSpacing: '0.18em',
+            background: selected === null
+              ? 'var(--green-moss)'
+              : 'linear-gradient(135deg, var(--green-deep) 0%, var(--green-forest) 100%)',
+            border: '1px solid var(--green-deep)',
+            boxShadow: selected === null ? 'none' : '0 2px 12px rgba(26, 48, 34, 0.3)',
+          }}
         >
           {isPending ? 'Saving…' : currentDeclaration ? 'Update keeper' : `Confirm ${keeperInfo ? `· $${keeperInfo.price}` : ''}`}
           {!isPending && <span className="transition-transform group-hover:translate-x-0.5">→</span>}
