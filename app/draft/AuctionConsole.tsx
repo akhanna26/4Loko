@@ -418,7 +418,7 @@ export default function AuctionConsole({
 
           {/* HERO */}
           {nominatedGolfer ? (
-            <section className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/15 p-4 sm:p-6 mb-4 sm:mb-5"
+            <section className="bg-white/75 border border-[color:var(--green-forest)]/15 p-4 sm:p-6 mb-4 sm:mb-5"
               style={{
                 borderTop: `3px solid var(--gold-masters)`,
                 boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6), 0 1px 2px rgba(0,0,0,0.04)',
@@ -542,7 +542,7 @@ export default function AuctionConsole({
               {error && <p className="text-xs text-[color:var(--chicago-red)] mt-3 serif italic">{error}</p>}
             </section>
           ) : (
-            <section className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/15 p-4 sm:p-6 mb-4 sm:mb-5"
+            <section className="bg-white/75 border border-[color:var(--green-forest)]/15 p-4 sm:p-6 mb-4 sm:mb-5"
               style={{
                 borderTop: '3px solid var(--pga-navy)',
                 boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6), 0 1px 2px rgba(0,0,0,0.04)',
