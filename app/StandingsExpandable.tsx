@@ -111,7 +111,8 @@ export default function StandingsExpandable({
         </span>
       </div>
 
-      <div className="bg-[#fdfcf7]/85 border border-[color:var(--green-forest)]/15 p-3 sm:p-5 shadow-sm overflow-x-auto">
+      <div className="bg-[#fdfcf7]/85 border border-[color:var(--green-forest)]/15 shadow-sm overflow-x-auto">
+  <div className="bg-[color:var(--cream-tint)]/60 p-3 sm:p-5">
         <div className="min-w-[800px]">
           <div className="board-row board-header" style={{ gridTemplateColumns: colTemplate, background: 'var(--cream-deep)', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
             <div className="board-cell">Pos</div>
@@ -196,9 +197,9 @@ export default function StandingsExpandable({
               </div>
             );
           })}
-        </div>
-      </div>
-
+       </div>  
+</div>  
+</div> 
       <p className="text-[10px] uppercase text-[color:var(--green-moss)] mt-3 text-right" style={{ letterSpacing: '0.18em' }}>
         Top 25% saturated · upper half forest · zero in moss · negatives in red
       </p>
