@@ -55,62 +55,80 @@ export default function KeeperForm({
   const keeperInfo = selectedGolfer ? computeKeeperPrice(selectedGolfer.was_keeper ? selectedGolfer.keeper_stage : 0) : null;
 
   return (
-    <div>
-      <div className="border-t-2 border-[color:var(--green-deep)]">
+    <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm overflow-hidden">
+      <div className="bg-[color:var(--cream-tint)]/60 px-4 sm:px-5 py-3 border-b border-[color:var(--green-forest)]/15 flex items-baseline justify-between">
+        <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.18em' }}>
+          Masters Roster
+        </p>
+        <p className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
+          {sortedRoster.length} golfers
+        </p>
+      </div>
+
+      <div>
         {sortedRoster.map((g, i) => {
           const isSelected = selected === g.golfer_id;
           const { price } = computeKeeperPrice(g.was_keeper ? g.keeper_stage : 0);
           return (
             <label
               key={g.golfer_id}
-              className={`flex items-center gap-4 p-4 cursor-pointer border-b border-[color:var(--green-forest)]/10 transition-colors ${
-                isSelected ? 'bg-[color:var(--cream-deep)]' : 'hover:bg-[color:var(--cream-deep)]/40'
-              }`}
+              className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 cursor-pointer border-b border-[color:var(--green-forest)]/10 transition-colors last:border-b-0"
+              style={{
+                background: isSelected ? 'rgba(253, 181, 21, 0.12)' : 'transparent',
+                borderLeft: isSelected ? '3px solid var(--gold-masters)' : '3px solid transparent',
+              }}
             >
               <input
                 type="radio"
                 name="keeper"
                 checked={isSelected}
                 onChange={() => setSelected(g.golfer_id)}
-                className="w-4 h-4 accent-[color:var(--green-deep)]"
+                className="w-4 h-4 accent-[color:var(--green-deep)] shrink-0"
               />
-              <div className="flex-1">
-                <div className="serif text-base text-[color:var(--green-deep)]">{g.full_name}</div>
-                <div className="text-xs text-[color:var(--green-moss)] mt-0.5 tabular">
+              <div className="flex-1 min-w-0">
+                <div className="serif text-sm sm:text-base text-[color:var(--green-deep)] font-semibold truncate">
+                  {g.full_name}
+                </div>
+                <div className="text-[10px] sm:text-xs text-[color:var(--green-moss)] mt-0.5 tabular">
                   Drafted ${g.purchase_price}{g.was_keeper && ` · was keeper (stage ${g.keeper_stage})`}
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-xs uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
-                  Keeper fee
+              <div className="text-right shrink-0">
+                <div className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.14em' }}>
+                  Fee
                 </div>
-                <div className="serif text-lg text-[color:var(--green-deep)] tabular">${price}</div>
+                <div className="serif text-base sm:text-lg text-[color:var(--green-deep)] tabular font-semibold">${price}</div>
               </div>
             </label>
           );
         })}
       </div>
 
-      {error && <p className="mt-4 text-sm text-[color:var(--chicago-red)]">{error}</p>}
+      {error && (
+        <div className="px-4 sm:px-5 py-3 border-t border-[color:var(--green-forest)]/15 bg-[color:var(--chicago-red)]/5">
+          <p className="text-xs sm:text-sm text-[color:var(--chicago-red)] serif italic">{error}</p>
+        </div>
+      )}
 
-      <div className="mt-6 flex items-center gap-3 justify-end">
+      <div className="bg-[color:var(--cream-tint)]/60 px-4 sm:px-5 py-3 sm:py-4 border-t border-[color:var(--green-forest)]/15 flex items-center gap-3 justify-end flex-wrap">
         {currentDeclaration && (
           <button
             onClick={handleClear}
             disabled={isPending}
-            className="px-4 py-2 text-xs uppercase text-[color:var(--green-moss)] hover:text-[color:var(--chicago-red)] transition-colors disabled:opacity-50"
+            className="px-3 sm:px-4 py-2 text-[10px] sm:text-xs uppercase text-[color:var(--green-moss)] hover:text-[color:var(--chicago-red)] transition-colors disabled:opacity-50"
             style={{ letterSpacing: '0.18em' }}
           >
-            Clear declaration
+            Clear
           </button>
         )}
         <button
           onClick={handleSave}
           disabled={selected === null || isPending}
-          className="px-6 py-3 bg-[color:var(--green-deep)] text-[color:var(--cream)] text-xs uppercase disabled:opacity-40 hover:bg-[color:var(--green-forest)] transition-colors"
-          style={{ letterSpacing: '0.18em' }}
+          className="group px-5 sm:px-6 py-2.5 sm:py-3 bg-[color:var(--green-deep)] text-white text-[10px] sm:text-xs uppercase disabled:opacity-40 hover:bg-[color:var(--green-forest)] transition-colors flex items-center gap-2"
+          style={{ letterSpacing: '0.18em', boxShadow: '0 2px 8px rgba(26, 48, 34, 0.25)' }}
         >
           {isPending ? 'Saving…' : currentDeclaration ? 'Update keeper' : `Confirm ${keeperInfo ? `· $${keeperInfo.price}` : ''}`}
+          {!isPending && <span className="transition-transform group-hover:translate-x-0.5">→</span>}
         </button>
       </div>
     </div>
