@@ -246,34 +246,53 @@ function DraftWeekHero({ tournament, accent }: { tournament: any; accent: any })
 function LiveHero({ tournament, accent }: { tournament: any; accent: any }) {
   const primary = accent?.primary ?? 'var(--gold-masters)';
   return (
-    <div className="bg-[#fdfcf7]/85 border border-[color:var(--green-forest)]/15 shadow-sm p-8 md:p-10 relative"
+    <Link
+      href={`/tournament/${tournament.id}`}
+      className="block group transition-all hover:shadow-lg"
       style={{
+        background: `linear-gradient(135deg, ${primary}10 0%, rgba(255,255,255,0.95) 50%, ${primary}10 100%)`,
+        border: `1px solid ${primary}40`,
         borderTop: `3px solid ${primary}`,
+        boxShadow: `inset 0 0 0 1px rgba(255,255,255,0.6), 0 4px 16px ${primary}15`,
       }}>
-      <div className="flex items-center gap-2 mb-3">
-        <span className="w-2 h-2 rounded-full bg-[color:var(--chicago-red)] live-pulse" />
-        <span className="text-[10px] uppercase tabular text-[color:var(--chicago-red)]" style={{ letterSpacing: '0.32em' }}>
-          Live · Round In Progress
-        </span>
+      <div className="p-6 sm:p-8 md:p-10">
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-3 sm:mb-4">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-[color:var(--chicago-red)] live-pulse" />
+            <span className="text-[10px] sm:text-[11px] uppercase tabular text-[color:var(--chicago-red)] font-semibold" style={{ letterSpacing: '0.32em' }}>
+              Live Now
+            </span>
+          </div>
+          <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.2em' }}>
+            Tap for full leaderboard →
+          </span>
+        </div>
+
+        <h1 className="font-light leading-none text-4xl sm:text-6xl md:text-7xl text-[color:var(--green-deep)] mb-3 sm:mb-4" style={{ letterSpacing: '-0.02em' }}>
+          {tournament.name.toUpperCase()}
+        </h1>
+
+        <p className="serif italic text-sm sm:text-base text-[color:var(--green-moss)] mb-5 sm:mb-6">
+          {tournament.venue}
+        </p>
+
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 text-[10px] sm:text-[11px] uppercase font-semibold transition-all group-hover:gap-3"
+            style={{
+              letterSpacing: '0.2em',
+              color: 'white',
+              background: primary,
+              boxShadow: `0 2px 12px ${primary}50`,
+            }}>
+            View live scoreboard
+            <span className="transition-transform group-hover:translate-x-0.5">→</span>
+          </div>
+          <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] italic" style={{ letterSpacing: '0.15em' }}>
+            updated in real time
+          </span>
+        </div>
       </div>
-      <h1 className="font-light leading-none text-5xl md:text-7xl text-[color:var(--green-deep)]" style={{ letterSpacing: '-0.02em' }}>
-        {tournament.name.toUpperCase()}
-      </h1>
-      <p className="serif italic text-sm text-[color:var(--green-moss)] mt-4">
-        {tournament.venue}
-      </p>
-      <Link href={`/tournament/${tournament.id}`}
-        className="group inline-flex items-center gap-2 mt-6 text-[10px] uppercase px-5 py-3 transition-all"
-        style={{
-          letterSpacing: '0.18em',
-          color: 'white',
-          background: primary,
-          boxShadow: `0 2px 8px ${primary}40`,
-        }}>
-        Open leaderboard
-        <span className="transition-transform group-hover:translate-x-0.5">→</span>
-      </Link>
-    </div>
+    </Link>
   );
 }
 
