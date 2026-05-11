@@ -111,8 +111,12 @@ export default function AuctionConsole({
   const [flashCell, setFlashCell] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const [poolFilter, setPoolFilter] = useState('');
 
+  const [poolFilter, setPoolFilter] = useState('');
+  const [meetingDraft, setMeetingDraft] = useState(initialSession.meeting_url ?? '');
+  const [showMeetingEdit, setShowMeetingEdit] = useState(false);
+
+  // Mobile collapse states
   // Mobile collapse states
   const [showSnake, setShowSnake] = useState(false);
   const [showRosters, setShowRosters] = useState(false);
@@ -330,6 +334,16 @@ export default function AuctionConsole({
       } catch (e: any) { setError(e.message); }
     });
   };
+  const handleSaveMeeting = () => {
+    if (!isDriver) return;
+    startTransition(async () => {
+      try {
+        await setMeetingUrl(sessionId, meetingDraft.trim());
+        setSession((s) => ({ ...s, meeting_url: meetingDraft.trim() || null }));
+        setShowMeetingEdit(false);
+      } catch (e: any) { setError(e.message); }
+    });
+  };
   const handleSkipNomination = () => {
     if (!isDriver) return;
     if (!confirm(`Skip ${currentNominator ? shortName(currentNominator.name) : 'this nominator'}? Order will advance.`)) return;
@@ -384,13 +398,53 @@ const handleResetDraft = () => {
           </p>
           <h1 className="serif text-2xl sm:text-3xl font-semibold text-[color:var(--green-deep)] mt-1">The Auction Arena</h1>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3">
-          {session.meeting_url && (
-            <a href={session.meeting_url} target="_blank" rel="noreferrer"
-               className="text-[9px] sm:text-[10px] uppercase text-[color:var(--gold-masters)] bg-[color:var(--green-deep)] px-2 sm:px-3 py-1.5 sm:py-2 hover:bg-[color:var(--green-forest)]"
-               style={{ letterSpacing: '0.18em' }}>
-              Join call →
-            </a>
+       <div className="flex items-center gap-2 sm:gap-3">
+          {/* Meeting URL: shows Join button when set, edit field in driver mode */}
+          {showMeetingEdit ? (
+            <div className="flex items-center gap-1.5">
+              <input
+                type="url"
+                value={meetingDraft}
+                onChange={(e) => setMeetingDraft(e.target.value)}
+                placeholder="paste meet URL…"
+                className="px-2 py-1.5 text-[10px] sm:text-xs border border-[color:var(--green-forest)]/30 bg-white focus:border-[color:var(--green-deep)] outline-none w-44 sm:w-64"
+                autoFocus
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSaveMeeting(); if (e.key === 'Escape') setShowMeetingEdit(false); }}
+              />
+              <button onClick={handleSaveMeeting}
+                className="text-[9px] sm:text-[10px] uppercase bg-[color:var(--green-deep)] text-white px-2 py-1.5"
+                style={{ letterSpacing: '0.18em' }}>
+                Save
+              </button>
+              <button onClick={() => { setShowMeetingEdit(false); setMeetingDraft(session.meeting_url ?? ''); }}
+                className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] px-1"
+                style={{ letterSpacing: '0.18em' }}>
+                ×
+              </button>
+            </div>
+          ) : (
+            <>
+              {session.meeting_url ? (
+                <a href={session.meeting_url} target="_blank" rel="noreferrer"
+                   className="text-[9px] sm:text-[10px] uppercase text-[color:var(--gold-masters)] bg-[color:var(--green-deep)] px-2 sm:px-3 py-1.5 sm:py-2 hover:bg-[color:var(--green-forest)]"
+                   style={{ letterSpacing: '0.18em' }}>
+                  Join call →
+                </a>
+              ) : isDriver ? (
+                <button onClick={() => setShowMeetingEdit(true)}
+                  className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] hover:text-[color:var(--green-deep)] italic"
+                  style={{ letterSpacing: '0.18em' }}>
+                  + add meet url
+                </button>
+              ) : null}
+              {session.meeting_url && isDriver && (
+                <button onClick={() => setShowMeetingEdit(true)}
+                  className="text-[10px] text-[color:var(--green-moss)] hover:text-[color:var(--green-deep)]"
+                  title="Edit meeting URL">
+                  ✎
+                </button>
+              )}
+            </>
           )}
           {isDriver ? (
             <button onClick={exitDriverMode}
