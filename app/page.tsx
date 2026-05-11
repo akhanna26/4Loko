@@ -65,7 +65,6 @@ export default async function SeasonPage() {
       }
     }
   }
-  if (pendingMajor) flightPairs.push({ major: pendingMajor, elevated: null });
 
   return (
     <main className="max-w-5xl mx-auto px-6 pt-10 pb-16">
