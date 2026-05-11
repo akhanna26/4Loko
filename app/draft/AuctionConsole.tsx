@@ -503,8 +503,11 @@ export default function AuctionConsole({
               {error && <p className="text-xs text-[color:var(--chicago-red)] mt-3 serif italic">{error}</p>}
             </section>
           ) : (
-            <section className="bg-[#fdfcf7]/85 border border-[color:var(--green-forest)]/15 p-4 sm:p-6 mb-4 sm:mb-5"
-              style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6), 0 1px 2px rgba(0,0,0,0.04)' }}>
+            <section className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/15 p-4 sm:p-6 mb-4 sm:mb-5"
+              style={{
+                borderTop: '3px solid var(--pga-navy)',
+                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6), 0 1px 2px rgba(0,0,0,0.04)',
+              }}>
               <div className="flex items-baseline justify-between flex-wrap gap-3 sm:gap-4">
                 <div>
                   <p className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] mb-1" style={{ letterSpacing: '0.24em' }}>
