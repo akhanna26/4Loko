@@ -60,8 +60,9 @@ export default function RootLayout({
               <a href="/draft" className="hover:text-[color:var(--green-deep)] transition-colors">Draft</a>
               <span className="text-[color:var(--green-forest)]/30">·</span>
               <a href="/keepers" className="hover:text-[color:var(--green-deep)] transition-colors">Keepers</a>
-              <span className="text-[color:var(--green-forest)]/30 hidden sm:inline">·</span>
+              <span className="text-[color:var(--green-forest)]/30">·</span>
               <a href="/hall-of-fame" className="hover:text-[color:var(--green-deep)] transition-colors hidden sm:inline">Hall of Fame</a>
+              <a href="/hall-of-fame" className="hover:text-[color:var(--green-deep)] transition-colors sm:hidden">HOF</a>
               <span className="text-[color:var(--green-forest)]/30">·</span>
               <a href="/info" className="hover:text-[color:var(--green-deep)] transition-colors">Info</a>
             </nav>
