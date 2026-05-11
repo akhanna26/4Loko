@@ -714,7 +714,7 @@ export default function AuctionConsole({
                  style={{ gridTemplateColumns: `220px repeat(${owners.length}, minmax(60px, 1fr))` }}>
               {(() => {
                 // Compute rank for all golfers in the pool, once per render
-                const oddsToNum = (o?: string) => o ? parseInt(o.replace('+', '')) : 999999;
+                const oddsToNum = (o: string | null | undefined) => o ? parseInt(o.replace('+', '')) : 999999;
                 const sortedByOdds = [...pool].sort((a, b) => oddsToNum(a.odds) - oddsToNum(b.odds));
                 const rankMap = new Map(sortedByOdds.map((g, i) => [g.golfer_id, i + 1]));
                 return filteredPool.map((g) => {
