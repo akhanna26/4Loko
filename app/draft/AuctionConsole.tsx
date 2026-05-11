@@ -418,7 +418,7 @@ export default function AuctionConsole({
 
           {/* HERO */}
           {nominatedGolfer ? (
-            <section className="bg-[#fdfcf7]/85 border border-[color:var(--green-forest)]/15 p-4 sm:p-6 mb-4 sm:mb-5"
+            <section className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/15 p-4 sm:p-6 mb-4 sm:mb-5"
               style={{
                 borderTop: `3px solid var(--gold-masters)`,
                 boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6), 0 1px 2px rgba(0,0,0,0.04)',
@@ -542,7 +542,7 @@ export default function AuctionConsole({
 
           {/* TICKER STRIP */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-5">
-            <div className="bg-[#fdfcf7]/85 px-3 sm:px-4 py-2.5 sm:py-3 border border-[color:var(--green-forest)]/15 md:col-span-2 max-h-32 overflow-y-auto"
+            <div className="bg-[color:var(--cream-tint)]/70 px-3 sm:px-4 py-2.5 sm:py-3 border border-[color:var(--green-forest)]/15 md:col-span-2 max-h-32 overflow-y-auto"
               style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)' }}>
               <p className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] mb-1.5" style={{ letterSpacing: '0.18em' }}>Drafted</p>
               {bids.filter(b => b.is_active).length === 0 ? (
@@ -574,7 +574,7 @@ export default function AuctionConsole({
                 </div>
               )}
             </div>
-            <div className="bg-[#fdfcf7]/85 px-3 sm:px-4 py-2.5 sm:py-3 border border-[color:var(--green-forest)]/15 flex items-center justify-end gap-1.5 sm:gap-2 flex-wrap"
+            <div className="bg-[color:var(--cream-tint)]/70 px-3 sm:px-4 py-2.5 sm:py-3 border border-[color:var(--green-forest)]/15 flex items-center justify-end gap-1.5 sm:gap-2 flex-wrap"
               style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)' }}>
               {isDriver && (
                 <>
@@ -616,12 +616,12 @@ export default function AuctionConsole({
           {/* MOBILE-ONLY TOGGLES for snake + rosters */}
           <div className="lg:hidden flex gap-2 mb-3">
             <button onClick={() => setShowSnake((v) => !v)}
-              className="flex-1 text-[10px] uppercase text-[color:var(--green-deep)] border border-[color:var(--green-forest)]/30 px-3 py-2 bg-white/50 hover:bg-[#fdfcf7]/85"
+              className="flex-1 text-[10px] uppercase text-[color:var(--green-deep)] border border-[color:var(--green-forest)]/30 px-3 py-2 bg-white/50 hover:bg-[color:var(--cream-tint)]/70"
               style={{ letterSpacing: '0.18em' }}>
               {showSnake ? 'Hide snake' : 'Show snake'} ▾
             </button>
             <button onClick={() => setShowRosters((v) => !v)}
-              className="flex-1 text-[10px] uppercase text-[color:var(--green-deep)] border border-[color:var(--green-forest)]/30 px-3 py-2 bg-white/50 hover:bg-[#fdfcf7]/85"
+              className="flex-1 text-[10px] uppercase text-[color:var(--green-deep)] border border-[color:var(--green-forest)]/30 px-3 py-2 bg-white/50 hover:bg-[color:var(--cream-tint)]/70"
               style={{ letterSpacing: '0.18em' }}>
               {showRosters ? 'Hide rosters' : 'Show rosters'} ▾
             </button>
@@ -773,7 +773,7 @@ export default function AuctionConsole({
 
 function SnakeColumn({ fullSnake, session, ownerById }: any) {
   return (
-    <div className="bg-[#fdfcf7]/85 border border-[color:var(--green-forest)]/15 flex flex-col h-full lg:max-h-[calc(100vh-2rem)]"
+    <div className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/15 flex flex-col h-full lg:max-h-[calc(100vh-2rem)]"
       style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)' }}>
       <div className="px-2 py-2 border-b border-[color:var(--green-forest)]/15 flex items-baseline justify-between">
         <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.18em' }}>Snake</p>
@@ -821,7 +821,7 @@ function SnakeColumn({ fullSnake, session, ownerById }: any) {
 
 function RostersColumn({ orderedOwners, ownerStateById, bidsByOwner, currentNominatorId, rankByOwner, startingBudget, bids }: any) {
   return (
-    <div className="bg-[#fdfcf7]/85 border border-[color:var(--green-forest)]/15 flex flex-col h-full lg:max-h-[calc(100vh-2rem)]"
+    <div className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/15 flex flex-col h-full lg:max-h-[calc(100vh-2rem)]"
       style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)' }}>
       <div className="px-3 py-2 border-b border-[color:var(--green-forest)]/15 flex items-baseline justify-between">
         <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.18em' }}>Rosters</p>
@@ -839,7 +839,7 @@ function RostersColumn({ orderedOwners, ownerStateById, bidsByOwner, currentNomi
             const theme = getOwnerTheme(o.name);
             return (
              <div key={o.id}
-                className="p-2 bg-[#fdfcf7]/85 border"
+                className="p-2 bg-[color:var(--cream-tint)]/70 border"
                 style={{
                   borderColor: isNominator ? 'var(--gold-masters)' : 'rgba(42, 70, 54, 0.15)',
                   background: isNominator ? 'rgba(253, 181, 21, 0.08)' : undefined,
