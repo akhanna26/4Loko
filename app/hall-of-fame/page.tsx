@@ -96,7 +96,7 @@ export default async function HallOfFame() {
         { year: 2025, standings: majors2025, events: events2025 },
         { year: 2024, standings: majors2024, events: events2024 },
       ].map(({ year, standings, events }) => {
-        const eventNames = Array.from(new Set(events.map((e) => e.tournament_name)));
+        const eventNames = [...new Set(events.map((e) => e.tournament_name))];
         const ownerEventScore = new Map<string, Map<string, number>>();
         for (const e of events) {
           if (!ownerEventScore.has(e.owner_name)) ownerEventScore.set(e.owner_name, new Map());
