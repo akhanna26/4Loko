@@ -323,8 +323,14 @@ function EventCard({ event, tournament, accent, isMajor }: any) {
 
   return (
     <Link href={`/tournament/${event.tournament_id}`}
-      className="block bg-[color:var(--cream)] border border-[color:var(--green-forest)]/15 hover:shadow-md transition-shadow"
-      style={isMajor && accent ? { borderLeft: `4px solid ${accent.primary}` } : {}}>
+      className="block bg-[color:var(--cream)] border border-[color:var(--green-forest)]/15 hover:shadow-md transition-all"
+      style={{
+        ...(isMajor && accent ? { borderLeft: `4px solid ${accent.primary}` } : {}),
+        ...(isLive ? {
+          background: `linear-gradient(135deg, ${accent?.primary ?? 'var(--chicago-red)'}08 0%, var(--cream) 50%, ${accent?.primary ?? 'var(--chicago-red)'}08 100%)`,
+          boxShadow: `0 0 0 2px ${accent?.primary ?? 'var(--chicago-red)'}40, 0 4px 16px ${accent?.primary ?? 'var(--chicago-red)'}15`,
+        } : {}),
+      }}>
       <div className="px-5 py-4">
         <div className="flex items-baseline justify-between gap-4 mb-2">
           <div className="flex-1 min-w-0">
