@@ -112,11 +112,19 @@ export default function StandingsExpandable({
 
   return (
     <section className="mb-14">
-      <div className="flex items-baseline justify-between mb-4 sm:mb-6 gap-2">
+      <div className="flex items-baseline justify-between mb-4 sm:mb-6 gap-2 flex-wrap">
         <h2 className="serif text-2xl sm:text-3xl text-[color:var(--green-deep)] font-semibold">Standings</h2>
-        <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
-          Live · tap to expand
-        </span>
+        <div className="flex items-baseline gap-3">
+          {hasLive && (
+            <span className="flex items-center gap-1.5 text-[9px] sm:text-[10px] uppercase tabular text-[color:var(--chicago-red)] font-semibold" style={{ letterSpacing: '0.2em' }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-[color:var(--chicago-red)] live-pulse" />
+              Live scoring
+            </span>
+          )}
+          <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
+            Tap rows to expand
+          </span>
+        </div>
       </div>
 
       <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm overflow-x-auto">
