@@ -36,9 +36,9 @@ export default function RootLayout({
     <html lang="en" className={`${interTight.variable} ${sourceSerif.variable}`}>
       <body className="sans-tight">
         <header className="border-b border-[color:var(--green-forest)]/15 bg-[color:var(--cream)]">
-          <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
-            <a href="/" className="flex flex-col items-start group">
-              <span className="serif text-2xl font-semibold tracking-tight text-[color:var(--green-deep)] leading-none flex items-baseline">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between gap-3">
+            <a href="/" className="flex items-center sm:flex-col sm:items-start gap-2 sm:gap-0 group shrink-0">
+              <span className="serif text-xl sm:text-2xl font-semibold tracking-tight text-[color:var(--green-deep)] leading-none flex items-baseline whitespace-nowrap">
                 F
                 <svg viewBox="0 0 24 24" className="inline-block" style={{ width: '0.78em', height: '0.78em', verticalAlign: '-0.08em', margin: '0 0.02em' }}>
                   <circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
@@ -47,23 +47,22 @@ export default function RootLayout({
                 </svg>
                 RE Lokos
               </span>
-              <span className="chi-star-rule mt-1.5">
+              <span className="chi-star-rule sm:mt-1.5 scale-75 sm:scale-100 origin-left">
                 <span className="chi-star" aria-hidden="true" />
                 <span className="chi-star" aria-hidden="true" />
                 <span className="chi-star" aria-hidden="true" />
                 <span className="chi-star" aria-hidden="true" />
               </span>
             </a>
-           <nav className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-[11px] uppercase text-[color:var(--green-forest)] flex-wrap justify-end" style={{ letterSpacing: '0.1em' }}>
+            <nav className="flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[11px] uppercase text-[color:var(--green-forest)] justify-end" style={{ letterSpacing: '0.08em' }}>
               <a href="/" className="hover:text-[color:var(--green-deep)] transition-colors">Season</a>
-              <span className="text-[color:var(--green-forest)]/30 hidden sm:inline">|</span>
+              <span className="text-[color:var(--green-forest)]/30">·</span>
               <a href="/draft" className="hover:text-[color:var(--green-deep)] transition-colors">Draft</a>
-              <span className="text-[color:var(--green-forest)]/30 hidden sm:inline">|</span>
+              <span className="text-[color:var(--green-forest)]/30">·</span>
               <a href="/keepers" className="hover:text-[color:var(--green-deep)] transition-colors">Keepers</a>
-              <span className="text-[color:var(--green-forest)]/30 hidden sm:inline">|</span>
+              <span className="text-[color:var(--green-forest)]/30 hidden sm:inline">·</span>
               <a href="/hall-of-fame" className="hover:text-[color:var(--green-deep)] transition-colors hidden sm:inline">Hall of Fame</a>
-              <a href="/hall-of-fame" className="hover:text-[color:var(--green-deep)] transition-colors sm:hidden">HOF</a>
-              <span className="text-[color:var(--green-forest)]/30 hidden sm:inline">|</span>
+              <span className="text-[color:var(--green-forest)]/30">·</span>
               <a href="/info" className="hover:text-[color:var(--green-deep)] transition-colors">Info</a>
             </nav>
           </div>
