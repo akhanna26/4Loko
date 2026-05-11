@@ -319,6 +319,13 @@ export type TournamentDetail = {
   major_winner: { owner_name: string; golfer_name: string } | null;
 };
 
+const ROUND_TO_DAY: Record<number, 'Th' | 'Fr' | 'Sa' | 'Su'> = {
+  1: 'Th', 2: 'Fr', 3: 'Sa', 4: 'Su',
+};
+const DAY_TO_ROUND: Record<'Th' | 'Fr' | 'Sa' | 'Su', number> = {
+  Th: 1, Fr: 2, Sa: 3, Su: 4,
+};
+
 export async function getTournamentDetail(tournamentId: number): Promise<TournamentDetail | null> {
   const { data: tdata, error: terr } = await supabase
     .from('tournaments')
@@ -328,7 +335,6 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
   if (terr || !tdata) return null;
   const tournament = tdata as Tournament & { flight_id: number };
 
-  // Get rosters for this flight (rosters carry across the flight)
   const { data: rosterData } = await supabase
     .from('rosters')
     .select('owner_id, golfer_id, purchase_price, is_keeper')
@@ -343,64 +349,71 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
     .from('golfers')
     .select('id, full_name');
 
-  // Get raw scores for all rostered golfers in this tournament
   const golferIds = [...new Set((rosterData ?? []).map((r: any) => r.golfer_id))];
+
+  // Convention: scores stored as raw strokes vs par (negative = good).
+  // The site displays POINTS (positive = good), so we invert at read time.
   const { data: scoresData } = golferIds.length > 0 ? await supabase
     .from('scores')
-    .select('golfer_id, day_of_week, score')
+    .select('golfer_id, round_number, strokes_vs_par')
     .eq('tournament_id', tournamentId)
     .in('golfer_id', golferIds) : { data: [] };
 
-  // Get owner tournament totals from view
   const { data: tScores } = await supabase
     .from('v_owner_tournament_score')
     .select('owner_id, owner_name, total_score')
     .eq('tournament_id', tournamentId);
 
-  // Get bonuses for this tournament
   const { data: bonusData } = await supabase
     .from('bonuses')
-    .select('owner_id, golfer_id, bonus_kind, points, day_of_week')
+    .select('owner_id, golfer_id, bonus_kind, points, round_number')
     .eq('tournament_id', tournamentId);
 
-  // Get adjusted scores per golfer per day (the "counted" or funnel logic)
-  const { data: adjData } = await supabase
-    .from('v_adjusted_scores')
-    .select('owner_id, golfer_id, day_of_week, adjusted_score, is_counted')
-    .eq('tournament_id', tournamentId);
+  // adjusted scores view — if it exists, use it; if not, fall back to computing counted via funnel logic
+  let adjData: any[] = [];
+  try {
+    const { data: adj } = await supabase
+      .from('v_adjusted_scores')
+      .select('owner_id, golfer_id, round_number, is_counted')
+      .eq('tournament_id', tournamentId);
+    adjData = adj ?? [];
+  } catch (e) {
+    adjData = [];
+  }
 
-  // ---- Build the per-owner roster detail ----
   const ownerMap = new Map((ownersData ?? []).map((o: any) => [o.id, o]));
   const golferMap = new Map((golfersData ?? []).map((g: any) => [g.id, g]));
 
-  // Group rosters by owner
   const rostersByOwner = new Map<number, any[]>();
   for (const r of rosterData ?? []) {
     if (!rostersByOwner.has(r.owner_id)) rostersByOwner.set(r.owner_id, []);
     rostersByOwner.get(r.owner_id)!.push(r);
   }
 
-  // Day-by-day raw scores per golfer
-  const scoresByGolferDay = new Map<string, number>();
+  // Per-golfer-per-day raw strokes vs par
+  const strokesByGolferRound = new Map<string, number>();
   for (const s of scoresData ?? []) {
-    scoresByGolferDay.set(`${s.golfer_id}-${s.day_of_week}`, s.score);
+    const sa = s as any;
+    strokesByGolferRound.set(`${sa.golfer_id}-${sa.round_number}`, sa.strokes_vs_par);
   }
 
-  // Counted-flag per (owner, golfer, day)
+  // Counted-flag per (owner, golfer, round) from view
   const countedFlag = new Map<string, boolean>();
-  for (const a of adjData ?? []) {
-    countedFlag.set(`${a.owner_id}-${a.golfer_id}-${a.day_of_week}`, a.is_counted);
+  for (const a of adjData) {
+    countedFlag.set(`${a.owner_id}-${a.golfer_id}-${a.round_number}`, a.is_counted);
   }
 
   // Bonuses per owner
   const bonusesByOwner = new Map<number, { kind: string; points: number; detail: string }[]>();
-  for (const b of bonusData ?? []) {
+  for (const b of (bonusData ?? []) as any[]) {
     if (!bonusesByOwner.has(b.owner_id)) bonusesByOwner.set(b.owner_id, []);
     const golfer = b.golfer_id ? golferMap.get(b.golfer_id) : null;
-    const detail = b.bonus_kind === 'CHAMPION' ? `Champion: ${golfer?.full_name ?? '—'}` :
-                   b.bonus_kind === 'DAILY_LOW' ? `${b.day_of_week} daily low${golfer ? `: ${golfer.full_name}` : ''}` :
-                   b.bonus_kind === 'HIO' ? `Hole-in-one${golfer ? `: ${golfer.full_name}` : ''}` :
-                   b.bonus_kind;
+    const dayLabel = b.round_number ? ROUND_TO_DAY[b.round_number] : null;
+    const detail =
+      b.bonus_kind === 'CHAMPION' ? `Champion: ${(golfer as any)?.full_name ?? '—'}` :
+      b.bonus_kind === 'DAILY_LOW' ? `${dayLabel ?? 'Daily'} low${golfer ? `: ${(golfer as any).full_name}` : ''}` :
+      b.bonus_kind === 'HIO' ? `Hole-in-one${golfer ? `: ${(golfer as any).full_name}` : ''}` :
+      b.bonus_kind;
     bonusesByOwner.get(b.owner_id)!.push({
       kind: b.bonus_kind,
       points: Number(b.points) || 0,
@@ -410,19 +423,55 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
 
   const days: ('Th' | 'Fr' | 'Sa' | 'Su')[] = ['Th', 'Fr', 'Sa', 'Su'];
 
+  // Helper: compute counted-set when no v_adjusted_scores view exists.
+  // Top N golfers per day based on POINTS (= -strokes_vs_par). N=4 for Th/Fr, N=2 for Sa/Su.
+  const computeCountedFallback = (
+    ownerId: number,
+    roster: any[],
+  ): Map<string, boolean> => {
+    const result = new Map<string, boolean>();
+    for (const day of days) {
+      const roundNum = DAY_TO_ROUND[day];
+      const candidates = roster
+        .map((r: any) => {
+          const strokes = strokesByGolferRound.get(`${r.golfer_id}-${roundNum}`);
+          if (strokes === null || strokes === undefined) return null;
+          return { golfer_id: r.golfer_id, points: -strokes };
+        })
+        .filter((x: any) => x !== null)
+        .sort((a: any, b: any) => b!.points - a!.points);
+      const topN = day === 'Sa' || day === 'Su' ? 2 : 4;
+      candidates.slice(0, topN).forEach((c: any) => {
+        result.set(`${ownerId}-${c!.golfer_id}-${roundNum}`, true);
+      });
+    }
+    return result;
+  };
+
+  const useFallback = adjData.length === 0;
+
   const allOwnerIds = [...rostersByOwner.keys()];
   const rostersOut = allOwnerIds.map((oid) => {
-    const owner = ownerMap.get(oid);
+    const owner = ownerMap.get(oid) as any;
     const ownerRoster = rostersByOwner.get(oid) ?? [];
 
+    const fallbackCounted = useFallback ? computeCountedFallback(oid, ownerRoster) : null;
+
     const golfers = ownerRoster.map((r: any) => {
-      const golfer = golferMap.get(r.golfer_id);
+      const golfer = golferMap.get(r.golfer_id) as any;
       const day_scores = days.map((d) => {
-        const raw = scoresByGolferDay.get(`${r.golfer_id}-${d}`) ?? null;
-        const counted = countedFlag.get(`${oid}-${r.golfer_id}-${d}`) ?? false;
-        return { day: d, raw_score: raw, counted };
+        const roundNum = DAY_TO_ROUND[d];
+        const strokes = strokesByGolferRound.get(`${r.golfer_id}-${roundNum}`);
+        // Convert strokes to POINTS for display (negate strokes_vs_par)
+        const points = strokes === undefined ? null : -strokes;
+        const counted = useFallback
+          ? (fallbackCounted!.get(`${oid}-${r.golfer_id}-${roundNum}`) ?? false)
+          : (countedFlag.get(`${oid}-${r.golfer_id}-${roundNum}`) ?? false);
+        return { day: d, raw_score: points, counted };
       });
-      const best_round_total = day_scores.filter(d => d.counted).reduce((s, d) => s + (d.raw_score ?? 0), 0);
+      const best_round_total = day_scores
+        .filter((d) => d.counted)
+        .reduce((s, d) => s + (d.raw_score ?? 0), 0);
       return {
         golfer_id: r.golfer_id,
         full_name: golfer?.full_name ?? 'Unknown',
@@ -433,17 +482,16 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
       };
     });
 
-    // Compute daily team totals (sum of counted rounds for that day)
     const daily_scores = days.map((d) => {
-      const scores = golfers
-        .map(g => {
-          const ds = g.day_scores.find(ds => ds.day === d);
+      const dayPoints = golfers
+        .map((g) => {
+          const ds = g.day_scores.find((ds: any) => ds.day === d);
           return ds && ds.counted && ds.raw_score !== null ? ds.raw_score : null;
         })
         .filter((s): s is number => s !== null);
       return {
         day: d,
-        score: scores.length > 0 ? scores.reduce((a, b) => a + b, 0) : null,
+        score: dayPoints.length > 0 ? dayPoints.reduce((a, b) => a + b, 0) : null,
       };
     });
 
@@ -460,16 +508,13 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
       daily_scores,
       bonuses,
       bonus_total,
-      total_score: ownerScore ? Number(ownerScore.total_score) : 0,
+      total_score: ownerScore ? Number((ownerScore as any).total_score) : 0,
       golfers,
     };
   });
 
-  // Sort by total_score asc (golf: lower is better when scoring positive = better here, depends on convention)
-  // Per league: total_score is "points" — higher = better
   rostersOut.sort((a, b) => b.total_score - a.total_score);
 
-  // Compute ranks with ties
   let currentRank = 0;
   let prevScore: number | null = null;
   for (let i = 0; i < rostersOut.length; i++) {
@@ -479,17 +524,15 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
     prevScore = rostersOut[i].total_score;
     rostersOut[i].rank = currentRank;
   }
-  // Mark ties
   const rankCounts = new Map<number, number>();
   for (const r of rostersOut) rankCounts.set(r.rank, (rankCounts.get(r.rank) ?? 0) + 1);
   for (const r of rostersOut) r.is_tied = (rankCounts.get(r.rank) ?? 0) > 1;
 
-  // Major winner
-  const champBonus = (bonusData ?? []).find((b: any) => b.bonus_kind === 'CHAMPION');
+  const champBonus = (bonusData ?? []).find((b: any) => b.bonus_kind === 'CHAMPION') as any;
   const major_winner = champBonus
     ? {
-        owner_name: ownerMap.get(champBonus.owner_id)?.name ?? '',
-        golfer_name: golferMap.get(champBonus.golfer_id)?.full_name ?? '',
+        owner_name: (ownerMap.get(champBonus.owner_id) as any)?.name ?? '',
+        golfer_name: (golferMap.get(champBonus.golfer_id) as any)?.full_name ?? '',
       }
     : null;
 
