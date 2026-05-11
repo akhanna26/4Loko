@@ -444,7 +444,7 @@ export default function AuctionConsole({
                 )}
                 {(() => {
                   // Compute golfer's rank in the odds-sorted pool
-                  const oddsToNum = (o?: string) => o ? parseInt(o.replace('+', '')) : 999999;
+                  const oddsToNum = (o: string | null | undefined) => o ? parseInt(o.replace('+', '')) : 999999;
                   const sortedByOdds = [...pool].sort((a, b) => oddsToNum(a.odds) - oddsToNum(b.odds));
                   const rankIdx = sortedByOdds.findIndex(g => g.golfer_id === nominatedGolfer.golfer_id);
                   if (rankIdx < 0) return null;
