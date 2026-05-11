@@ -177,8 +177,8 @@ export default function TournamentView({ detail }: { detail: TournamentDetail })
                 Click to sort
               </span>
             </div>
-            <div className="bg-[color:var(--cream-deep)]/30 overflow-x-auto" style={{ borderTop: `2px solid ${primary}` }}>
-              <div className="min-w-[800px]">
+            <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm overflow-x-auto" style={{ borderTop: `2px solid ${primary}` }}>
+              <div className="bg-[color:var(--cream-tint)]/60 min-w-[800px]">
                 <div className="grid gap-2 px-4 py-2 border-b border-[color:var(--green-forest)]/15"
                   style={{ gridTemplateColumns: '40px minmax(180px, 1fr) repeat(4, 60px) 60px 80px' }}>
                   <SortHeader k="rank" label="#" />
@@ -231,7 +231,7 @@ export default function TournamentView({ detail }: { detail: TournamentDetail })
                 const rankLabel = r.is_tied ? `T${r.rank}` : r.rank;
                 const isLeader = r.rank === 1 && r.total_score > 0;
                 return (
-                  <div key={r.owner_id} className="bg-[color:var(--cream)] border border-[color:var(--green-forest)]/15 p-5"
+                  <div key={r.owner_id} className="bg-white/80 border border-[color:var(--green-forest)]/15 p-5 shadow-sm"
                     style={isLeader ? { borderLeft: `3px solid ${secondary}` } : {}}>
                     <div className="flex items-baseline justify-between mb-4 pb-3 border-b border-[color:var(--green-forest)]/15 flex-wrap gap-2">
                       <div className="flex items-baseline gap-3">
