@@ -103,7 +103,6 @@ export default function StandingsExpandable({
   };
 
   return (
-    <section className="mb-14">
   <section className="mb-14">
       <div className="flex items-baseline justify-between mb-4 sm:mb-6 gap-2">
         <h2 className="serif text-2xl sm:text-3xl text-[color:var(--green-deep)] font-semibold">Standings</h2>
