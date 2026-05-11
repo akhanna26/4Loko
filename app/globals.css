@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root {
+  /* Core palette — the institutional system */
+  --cream: #f5f1e6;
+  --cream-deep: #ebe6d4;
+  --cream-tint: #f0eadb;
+  --green-deep: #1a3022;
+  --green-forest: #2a4636;
+  --green-moss: #6b7e6b;
+  --green-faint: rgba(42, 70, 54, 0.04);
+  --gold-masters: #fdb515;
+  --chicago-red: #b3322f;
+
+  /* Masters palette */
+  --masters-green: #1a4d2e;
+  --masters-pine: #2c5530;
+  --masters-azalea: #e8849a;
+  --masters-gold: #fdb515;
+
+  /* PGA Championship palette */
+  --pga-navy: #0e2a4a;
+  --pga-silver: #c8c5b8;
+  --pga-red: #9b2226;
+
+  /* US Open palette */
+  --usopen-navy: #1a3a6e;
+  --usopen-red: #a4161a;
+  --usopen-iron: #4a4a4a;
+
+  /* Open Championship palette */
+  --open-claret: #5e1a1d;
+  --open-gold: #c9a961;
+  --open-stone: #8a8a85;
+
+  /* Medal accents */
+  --silver: #b0b0b0;
+  --bronze: #b08a3e;
+}
+
+html, body {
+  background: var(--cream);
+  color: var(--green-deep);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(42, 70, 54, 0.035), transparent),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(42, 70, 54, 0.025), transparent);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+.serif { font-family: 'Source Serif 4', 'Source Serif Pro', Georgia, serif; }
+.sans-tight { font-family: 'Inter Tight', 'Inter', system-ui, sans-serif; font-feature-settings: "ss01", "kern", "liga"; }
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* Six-pointed Chicago star */
+.chi-star {
+  display: inline-block;
+  width: 0.7em; height: 0.7em;
+  background: var(--chicago-red);
+  clip-path: polygon(
+    50% 0%, 65% 25%, 95% 25%, 75% 50%, 95% 75%, 65% 75%,
+    50% 100%, 35% 75%, 5% 75%, 25% 50%, 5% 25%, 35% 25%
+  );
+}
+.chi-star-rule { display: inline-flex; gap: 0.4em; align-items: center; }
+
+.divider-rule {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--green-moss), transparent);
+}
+
+@keyframes pulse-soft { 0%,100% { opacity:1 } 50% { opacity:0.5 } }
+.live-pulse { animation: pulse-soft 2s ease-in-out infinite; }
+
+/* === Editorial scoreboard (light) === */
+.board-light {
+  background: var(--cream-tint);
+  border: 1px solid rgba(42, 70, 54, 0.15);
+  border-top: 2px solid var(--green-deep);
+  position: relative;
+}
+.board-row {
+  display: grid;
+  align-items: center;
+  border-bottom: 1px solid rgba(42, 70, 54, 0.08);
+  position: relative;
+}
+.board-row:last-child { border-bottom: 0; }
+.board-row-leader { background: rgba(253, 181, 21, 0.06); }
+.board-cell { padding: 0.65rem 0.7rem; font-variant-numeric: tabular-nums; }
+.board-name { font-family: 'Source Serif 4','Source Serif Pro',Georgia,serif; }
+.board-num { font-family: 'Inter Tight','Inter',system-ui,sans-serif; font-weight: 500; }
+.board-num-major { color: var(--green-deep); font-weight: 600; }
+.board-num-elev { color: var(--green-moss); font-weight: 400; font-size: 12px; opacity: 0.85; }
+.board-num-pos { color: var(--chicago-red); }
+.board-num-neg { color: var(--green-moss); }
+.board-num-zero { color: var(--green-moss); opacity: 0.5; }
+.board-num-pending { color: var(--green-moss); font-style: italic; opacity: 0.4; }
+.board-num-leader { color: var(--gold-masters); font-weight: 600; }
+.board-header {
+  font-family: 'Inter Tight','Inter',system-ui,sans-serif;
+  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--green-moss);
+  border-bottom: 1px solid rgba(42, 70, 54, 0.15);
+}
+.board-header .board-cell { padding-top: 0.6rem; padding-bottom: 0.6rem; }
+.board-col-elev { background: var(--green-faint); }
+/* === Major emblems === */
+.emblem {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  color: var(--green-deep);
+  vertical-align: -0.25em;
+}
+
+.emblem-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 0.55em;
+  vertical-align: 0.05em;
+}
+
+/* signature accents — used as inline-style backgrounds via CSS vars */
+.dot-masters { background: #006633; }   /* Augusta green */
+.dot-pga     { background: #1a3a6e; }   /* PGA navy */
+.dot-uso     { background: #002868; }   /* USGA navy */
+.dot-open    { background: #6e1f2c; }   /* Claret burgundy */
