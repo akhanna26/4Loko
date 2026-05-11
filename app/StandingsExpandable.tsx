@@ -66,7 +66,12 @@ export default function StandingsExpandable({
     });
   };
 
-  const colTemplate = '40px minmax(170px, 1fr) ' + eventOrder.map((e) => (e.type === 'MAJOR' ? '52px' : '46px')).join(' ') + ' 64px 28px';
+  // Detect if any tournament is currently live
+  const hasLive = Object.values(tournamentStatusByName).some((s) => s === 'live');
+
+  const colTemplate = hasLive
+    ? '40px minmax(170px, 1fr) ' + eventOrder.map((e) => (e.type === 'MAJOR' ? '52px' : '46px')).join(' ') + ' 64px 28px'
+    : '40px minmax(170px, 1fr) 64px ' + eventOrder.map((e) => (e.type === 'MAJOR' ? '52px' : '46px')).join(' ') + ' 28px';
 
   const renderCell = (eventName: string, score: number | undefined, isElev: boolean) => {
     const status = tournamentStatusByName[eventName];
@@ -120,12 +125,13 @@ export default function StandingsExpandable({
             <div className="board-row board-header" style={{ gridTemplateColumns: colTemplate, background: 'var(--cream-deep)', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
               <div className="board-cell">Pos</div>
               <div className="board-cell">Owner</div>
+              {!hasLive && <div className="board-cell text-right" style={{ color: 'var(--green-deep)', fontWeight: 700 }}>Total</div>}
               {eventOrder.map((e) => (
                 <div key={e.short} className={`board-cell text-right ${e.type === 'PGA' ? 'board-col-elev' : ''}`}>
                   {e.short}
                 </div>
               ))}
-              <div className="board-cell text-right">Total</div>
+              {hasLive && <div className="board-cell text-right">Total</div>}
               <div className="board-cell" />
             </div>
 
@@ -149,12 +155,13 @@ export default function StandingsExpandable({
                       <span>{s.owner_name}</span>
                       <MedalDot rank={rank} />
                     </div>
+                    {!hasLive && <div className="board-cell text-right">{renderTotal(s.total, isLeader)}</div>}
                     {eventOrder.map((e) => (
                       <div key={e.short} className={`board-cell text-right ${e.type === 'PGA' ? 'board-col-elev' : ''}`}>
                         {renderCell(e.name, s.per_event[e.name], e.type === 'PGA')}
                       </div>
                     ))}
-                    <div className="board-cell text-right">{renderTotal(s.total, isLeader)}</div>
+                    {hasLive && <div className="board-cell text-right">{renderTotal(s.total, isLeader)}</div>}
                     <div className="board-cell text-right text-[10px] text-[color:var(--green-moss)]">
                       {isExpanded ? '▾' : '▸'}
                     </div>
