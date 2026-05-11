@@ -344,7 +344,27 @@ export default function AuctionConsole({
       } catch (e: any) { setError(e.message); }
     });
   };
-
+const handleResetDraft = () => {
+    if (!isDriver) return;
+    if (!confirm('RESET ENTIRE DRAFT? This clears all picks, frees all golfers, and sets pick counter back to 0. Cannot be undone.')) return;
+    if (!confirm('Are you SURE? All draft data will be wiped.')) return;
+    startTransition(async () => {
+      try {
+        const { supabase } = await import('../../lib/supabase');
+        await supabase.from('auction_bids').update({ is_active: false }).eq('flight_id', flightId).eq('is_active', true);
+        await supabase.from('flight_pools').update({ is_available: true }).eq('flight_id', flightId);
+        await supabase.from('auction_sessions').update({ current_pick: 0, current_golfer_id: null, nomination_order: null }).eq('id', sessionId);
+        setBids((prev) => prev.map((b) => ({ ...b, is_active: false })));
+        setSession((s) => ({ ...s, current_pick: 0, current_golfer_id: null, nomination_order: null }));
+        setPool((prev) => prev.map((g) => ({ ...g, is_available: true })));
+        setNominatedGolferId(null);
+        setCurrentBid('');
+        setCurrentBidderId(null);
+        setInfo('Draft fully reset.');
+        setTimeout(() => setInfo(null), 4000);
+      } catch (e: any) { setError(e.message); }
+    });
+  };
   const hasKeepersApplied = bids.some((b) => b.is_keeper && b.is_active);
   const startingBudget = Number(session.starting_budget) || 75;
   const currentRoundLabel = (() => {
@@ -650,6 +670,12 @@ export default function AuctionConsole({
                     className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] hover:text-[color:var(--chicago-red)] disabled:opacity-30"
                     style={{ letterSpacing: '0.18em' }}>
                     undo
+                  </button>
+                  <span className="text-[color:var(--green-forest)]/30">·</span>
+                  <button onClick={handleResetDraft}
+                    className="text-[9px] sm:text-[10px] uppercase text-[color:var(--chicago-red)]/60 hover:text-[color:var(--chicago-red)] font-semibold"
+                    style={{ letterSpacing: '0.18em' }}>
+                    reset all
                   </button>
                 </>
               )}
