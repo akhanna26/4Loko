@@ -7,7 +7,7 @@ import {
 import { getMajorAccent } from '../components/Emblems';
 import Link from 'next/link';
 import StandingsExpandable from './StandingsExpandable';
-
+import { getOwnerTheme } from '../lib/owner-themes';
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
 }
@@ -134,19 +134,25 @@ export default async function SeasonPage() {
           </span>
         </div>
 
-        <div className="bg-[#fdfcf7]/85 border border-[color:var(--green-forest)]/15 p-5 sm:p-6 shadow-sm">
+        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-5 sm:p-6 shadow-sm">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-3">
-            {owners.map((o) => (
-              <div key={o.id} className="flex items-center gap-3 py-1">
-                <div
-                  className="w-10 h-10 rounded-full bg-[color:var(--green-deep)] text-[color:var(--cream)] flex items-center justify-center text-xs tabular font-semibold border-2 border-white shadow-sm shrink-0"
-                  style={{ letterSpacing: '0.05em' }}
-                >
-                  {initials(o.name)}
+            {owners.map((o) => {
+              const theme = getOwnerTheme(o.name);
+              return (
+                <div key={o.id} className="flex items-center gap-3 py-1">
+                  <div
+                    className="w-10 h-10 rounded-full text-white flex items-center justify-center text-xs tabular font-semibold border-2 border-white shadow-sm shrink-0"
+                    style={{
+                      letterSpacing: '0.05em',
+                      background: theme.primary,
+                    }}
+                  >
+                    {initials(o.name)}
+                  </div>
+                  <span className="serif text-sm text-[color:var(--green-deep)] truncate">{o.name}</span>
                 </div>
-                <span className="serif text-sm text-[color:var(--green-deep)] truncate">{o.name}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
