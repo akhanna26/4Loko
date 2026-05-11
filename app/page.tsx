@@ -65,6 +65,7 @@ export default async function SeasonPage() {
       }
     }
   }
+  if (pendingMajor) flightPairs.push({ major: pendingMajor, elevated: null });
 
   return (
     <main className="max-w-5xl mx-auto px-6 pt-10 pb-16">
@@ -86,7 +87,7 @@ export default async function SeasonPage() {
         tournamentStatusByName={Object.fromEntries(tournaments.map((t) => [t.name, t.status]))}
       />
 
-<section className="mb-16 mt-16">
+      <section className="mb-16 mt-16">
         <div className="flex items-baseline justify-between mb-6">
           <h2 className="serif text-3xl text-[color:var(--green-deep)] font-semibold">Calendar</h2>
           <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
@@ -94,7 +95,7 @@ export default async function SeasonPage() {
           </span>
         </div>
 
-      <div className="<div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-5 sm:p-6 space-y-3 shadow-sm"> p-5 sm:p-6 space-y-3 shadow-sm">
+        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-5 sm:p-6 space-y-3 shadow-sm">
           {flightPairs.map((pair, idx) => {
             const accent = getMajorAccent(pair.major.tournament_name);
             const flightNum = idx + 1;
@@ -133,7 +134,7 @@ export default async function SeasonPage() {
           </span>
         </div>
 
-     <div className="<div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-5 sm:p-6 space-y-3 shadow-sm"> p-5 sm:p-6 shadow-sm">
+        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-5 sm:p-6 shadow-sm">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-3">
             {owners.map((o) => (
               <div key={o.id} className="flex items-center gap-3 py-1">
@@ -159,7 +160,7 @@ export default async function SeasonPage() {
 
 function BrandHero({ nextUpcoming, accent }: { nextUpcoming: any; accent: any }) {
   return (
-    <div className="<div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-5 sm:p-6 space-y-3 shadow-sm"> shadow-sm text-center pt-8 pb-10 px-6">
+    <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm text-center pt-8 pb-10 px-6">
       <p className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.32em' }}>
         Volume IV · The 2026 Season
       </p>
