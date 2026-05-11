@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useTransition, useMemo } from 'react';
-import { StandingRank } from '../../lib/queries';
+import { Owner, StandingRank } from '../../lib/queries'; // Combined here
 import {
   AuctionSession, AuctionBid, OwnerState, GolferPoolEntry,
   getAuctionBids, getOwnerStates, getGolferPool, getAuctionSession,
@@ -11,7 +11,8 @@ import {
   getFullSnakeOrder,
 } from '../../lib/auction';
 import { getFlight } from '../../lib/draft';
-import { Owner } from '../../lib/queries';
+
+// Remove the standalone import { Owner } from '../../lib/queries'; that was at the bottom
 function RankBadge({ rank }: { rank: StandingRank | undefined }) {
   if (!rank || rank.rank === null) {
     return (
