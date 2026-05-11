@@ -203,22 +203,22 @@ function DraftWeekHero({ tournament, accent }: { tournament: any; accent: any })
   const days = Math.max(0, daysUntil(tournament.start_date));
   const primary = accent?.primary ?? 'var(--green-deep)';
   return (
-    <div className="bg-[#fdfcf7]/85 border border-[color:var(--green-forest)]/15 shadow-sm p-8 md:p-10 relative"
+    <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm p-6 sm:p-8 md:p-10 relative"
       style={{
         borderTop: `3px solid ${primary}`,
       }}>
-      <p className="text-[10px] uppercase mb-3" style={{ letterSpacing: '0.32em', color: primary }}>
+      <p className="text-[9px] sm:text-[10px] uppercase mb-3" style={{ letterSpacing: '0.32em', color: primary }}>
         Draft Week · Bidding Wednesday
       </p>
-      <h1 className="font-light leading-none text-5xl md:text-7xl text-[color:var(--green-deep)]" style={{ letterSpacing: '-0.02em' }}>
+      <h1 className="font-light leading-[0.95] text-4xl sm:text-6xl md:text-7xl text-[color:var(--green-deep)] break-words" style={{ letterSpacing: '-0.02em' }}>
         {tournament.name.toUpperCase()}
       </h1>
       <p className="serif italic text-sm text-[color:var(--green-moss)] mt-4">
         {tournament.venue} · tees off in {days} {days === 1 ? 'day' : 'days'}
       </p>
-      <div className="flex flex-wrap items-center gap-3 mt-6">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mt-6">
         <Link href="/keepers"
-          className="group text-[10px] uppercase px-5 py-3 transition-all flex items-center gap-2"
+          className="group text-[10px] uppercase px-5 py-3 transition-all flex items-center justify-center sm:justify-start gap-2"
           style={{
             letterSpacing: '0.18em',
             color: 'white',
@@ -229,11 +229,11 @@ function DraftWeekHero({ tournament, accent }: { tournament: any; accent: any })
           <span className="transition-transform group-hover:translate-x-0.5">→</span>
         </Link>
         <Link href="/draft"
-          className="group text-[10px] uppercase px-5 py-3 transition-all flex items-center gap-2 border-2"
+          className="group text-[10px] uppercase px-5 py-3 transition-all flex items-center justify-center sm:justify-start gap-2 border-2"
           style={{
             letterSpacing: '0.18em',
-            color: primary,
-            borderColor: primary,
+            color: 'var(--green-deep)',
+            borderColor: 'var(--green-deep)',
           }}>
           Open auction arena
           <span className="transition-transform group-hover:translate-x-0.5">→</span>
