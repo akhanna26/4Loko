@@ -36,6 +36,9 @@ const shortName = (name: string) => {
   return `${parts[0][0]}. ${parts[parts.length - 1]}`;
 };
 
+const HEADING_CLASS = "serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none";
+const HEADING_STYLE = { letterSpacing: '-0.02em' };
+
 export default async function SeasonPage() {
   const [tournaments, owners, standings, eventScores] = await Promise.all([
     getTournaments(),
@@ -68,8 +71,8 @@ export default async function SeasonPage() {
   if (pendingMajor) flightPairs.push({ major: pendingMajor, elevated: null });
 
   return (
-    <main className="max-w-5xl mx-auto px-6 pt-10 pb-16">
-      <section className="mb-14">
+    <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10 pb-12 sm:pb-16">
+      <section className="mb-10 sm:mb-14">
         {isLive ? (
           <LiveHero tournament={liveTournament} accent={heroAccent} />
         ) : isDraftWeek ? (
@@ -87,72 +90,76 @@ export default async function SeasonPage() {
         tournamentStatusByName={Object.fromEntries(tournaments.map((t) => [t.name, t.status]))}
       />
 
-      <section className="mb-16 mt-16">
-        <div className="flex items-baseline justify-between mb-6">
-          <h2 className="serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none mb-4 sm:mb-6" style={{ letterSpacing: '-0.02em' }}">Calendar</h2>
-          <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
+      <section className="mb-12 sm:mb-16 mt-12 sm:mt-16">
+        <div className="flex items-baseline justify-between mb-4 sm:mb-6 gap-2">
+          <h2 className={HEADING_CLASS} style={HEADING_STYLE}>Calendar</h2>
+          <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
             {tournaments.length} events · 4 flights
           </span>
         </div>
 
-        <div className="bg-[#fdfcf7]/85 border border-[color:var(--green-forest)]/15 p-5 sm:p-6 space-y-3 shadow-sm">
-          {flightPairs.map((pair, idx) => {
-            const accent = getMajorAccent(pair.major.tournament_name);
-            const flightNum = idx + 1;
-            const bracketColor = accent?.bracket ?? 'var(--green-deep)';
-            const tournamentMajor = tournaments.find((t) => t.id === pair.major.tournament_id);
-            const tournamentElevated = pair.elevated ? tournaments.find((t) => t.id === pair.elevated!.tournament_id) : null;
+        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-4 sm:p-6 space-y-3 shadow-sm">
+          <div className="bg-[color:var(--cream-tint)]/60 p-3 sm:p-5 space-y-3">
+            {flightPairs.map((pair, idx) => {
+              const accent = getMajorAccent(pair.major.tournament_name);
+              const flightNum = idx + 1;
+              const bracketColor = accent?.bracket ?? 'var(--green-deep)';
+              const tournamentMajor = tournaments.find((t) => t.id === pair.major.tournament_id);
+              const tournamentElevated = pair.elevated ? tournaments.find((t) => t.id === pair.elevated!.tournament_id) : null;
 
-            return (
-              <div key={pair.major.tournament_id} className="relative pl-8 md:pl-10"
-                style={{ borderLeft: `3px solid ${bracketColor}` }}>
-                <div className="absolute -left-[3px] top-3 w-3 h-px" style={{ background: bracketColor }} />
-                <div className="absolute -left-[3px] bottom-3 w-3 h-px" style={{ background: bracketColor }} />
-                <p className="text-[9px] uppercase mb-2 mt-1"
-                  style={{ letterSpacing: '0.32em', color: bracketColor }}>
-                  Flight {flightNum}
-                </p>
+              return (
+                <div key={pair.major.tournament_id} className="relative pl-6 sm:pl-10"
+                  style={{ borderLeft: `3px solid ${bracketColor}` }}>
+                  <div className="absolute -left-[3px] top-3 w-3 h-px" style={{ background: bracketColor }} />
+                  <div className="absolute -left-[3px] bottom-3 w-3 h-px" style={{ background: bracketColor }} />
+                  <p className="text-[9px] uppercase mb-2 mt-1"
+                    style={{ letterSpacing: '0.32em', color: bracketColor }}>
+                    Flight {flightNum}
+                  </p>
 
-                <EventCard event={pair.major} tournament={tournamentMajor} accent={accent} isMajor />
+                  <EventCard event={pair.major} tournament={tournamentMajor} accent={accent} isMajor />
 
-                {pair.elevated && (
-                  <div className="ml-4 mt-1 mb-3">
-                    <EventCard event={pair.elevated} tournament={tournamentElevated} accent={accent} isMajor={false} />
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  {pair.elevated && (
+                    <div className="ml-2 sm:ml-4 mt-1 mb-3">
+                      <EventCard event={pair.elevated} tournament={tournamentElevated} accent={accent} isMajor={false} />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
       <section>
-        <div className="flex items-baseline justify-between mb-5">
-          <h2 className="serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none mb-4 sm:mb-6" style={{ letterSpacing: '-0.02em' }} Field</h2>
-          <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
+        <div className="flex items-baseline justify-between mb-4 sm:mb-5 gap-2">
+          <h2 className={HEADING_CLASS} style={HEADING_STYLE}>Field</h2>
+          <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
             {owners.length} owners
           </span>
         </div>
 
-        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-5 sm:p-6 shadow-sm">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-3">
-            {owners.map((o) => {
-              const theme = getOwnerTheme(o.name);
-              return (
-                <div key={o.id} className="flex items-center gap-3 py-1">
-                  <div
-                    className="w-10 h-10 rounded-full text-white flex items-center justify-center text-xs tabular font-semibold border-2 border-white shadow-sm shrink-0"
-                    style={{
-                      letterSpacing: '0.05em',
-                      background: theme.primary,
-                    }}
-                  >
-                    {initials(o.name)}
+        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-4 sm:p-6 shadow-sm">
+          <div className="bg-[color:var(--cream-tint)]/60 p-3 sm:p-5">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-3 sm:gap-x-4 gap-y-3">
+              {owners.map((o) => {
+                const theme = getOwnerTheme(o.name);
+                return (
+                  <div key={o.id} className="flex items-center gap-3 py-1">
+                    <div
+                      className="w-9 h-9 sm:w-10 sm:h-10 rounded-full text-white flex items-center justify-center text-[10px] sm:text-xs tabular font-semibold border-2 border-white shadow-sm shrink-0"
+                      style={{
+                        letterSpacing: '0.05em',
+                        background: theme.primary,
+                      }}
+                    >
+                      {initials(o.name)}
+                    </div>
+                    <span className="serif text-sm text-[color:var(--green-deep)] truncate">{o.name}</span>
                   </div>
-                  <span className="serif text-sm text-[color:var(--green-deep)] truncate">{o.name}</span>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
@@ -166,7 +173,7 @@ export default async function SeasonPage() {
 
 function BrandHero({ nextUpcoming, accent }: { nextUpcoming: any; accent: any }) {
   return (
-    <div className="bg-[#fdfcf7]/85 border border-[color:var(--green-forest)]/15 shadow-sm text-center pt-8 pb-10 px-6">
+    <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm text-center pt-8 pb-10 px-6">
       <p className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.32em' }}>
         Volume IV · The 2026 Season
       </p>
@@ -298,11 +305,11 @@ function LiveHero({ tournament, accent }: { tournament: any; accent: any }) {
 
 function SeasonConcludedHero({ lastFinal }: { lastFinal: any }) {
   return (
-    <div className="bg-[color:var(--cream-deep)]/40 border border-[color:var(--green-forest)]/25 p-6">
+    <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm p-6">
       <p className="text-[10px] uppercase text-[color:var(--green-moss)] mb-2" style={{ letterSpacing: '0.24em' }}>
         The Season Has Concluded
       </p>
-      <h2 className="serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none mb-4 sm:mb-6" style={{ letterSpacing: '-0.02em' }} </h2>Final</h2>
+      <h2 className={HEADING_CLASS} style={HEADING_STYLE}>Final</h2>
     </div>
   );
 }
