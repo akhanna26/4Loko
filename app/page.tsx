@@ -1,6 +1,7 @@
 import {
   getTournaments,
   getActiveOwners,
+  getAllOwners,
   getLiveYearlong,
   getEventScores,
 } from '../lib/queries';
@@ -42,7 +43,7 @@ const HEADING_STYLE = { letterSpacing: '-0.02em' };
 export default async function SeasonPage() {
   const [tournaments, owners, standings, eventScores] = await Promise.all([
     getTournaments(),
-    getActiveOwners(),
+    getAllOwners(),
     getLiveYearlong(),
     getEventScores(),
   ]);
@@ -142,28 +143,29 @@ export default async function SeasonPage() {
         <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-4 sm:p-6 shadow-sm">
           <div className="bg-[color:var(--cream-tint)]/60 p-3 sm:p-5">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-3 sm:gap-x-4 gap-y-3">
-              {owners.map((o) => {
+             {owners.map((o) => {
                 const theme = getOwnerTheme(o.name);
+                const isEmeritus = !o.is_active;
                 return (
-                  <div key={o.id} className="flex items-center gap-2.5 p-2.5 bg-white/70 border border-[color:var(--green-forest)]/10"
-                    style={{ borderLeft: `2px solid ${theme.primary}` }}>
+                  <div key={o.id} className="flex items-center gap-3 py-1" style={{ opacity: isEmeritus ? 0.7 : 1 }}>
                     <div
                       className="w-9 h-9 sm:w-10 sm:h-10 rounded-full text-white flex items-center justify-center text-[10px] sm:text-xs tabular font-semibold shadow-sm shrink-0"
                       style={{
                         letterSpacing: '0.05em',
                         background: theme.primary,
                         border: `2px solid ${theme.secondary}`,
+                        filter: isEmeritus ? 'grayscale(0.3)' : undefined,
                       }}
                     >
                       {initials(o.name)}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="serif text-xs sm:text-sm text-[color:var(--green-deep)] truncate font-semibold">
-                        {shortName(o.name)}
-                      </div>
-                      <div className="text-[9px] uppercase text-[color:var(--green-moss)] tabular" style={{ letterSpacing: '0.12em' }}>
-                        Owner
-                      </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="serif text-sm text-[color:var(--green-deep)] truncate block">{o.name}</span>
+                      {isEmeritus && (
+                        <span className="text-[8px] uppercase text-[color:var(--green-moss)] italic tabular" style={{ letterSpacing: '0.18em' }}>
+                          Emeritus
+                        </span>
+                      )}
                     </div>
                   </div>
                 );
