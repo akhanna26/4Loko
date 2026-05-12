@@ -89,7 +89,7 @@ export default async function SeasonPage() {
 
       <section className="mb-16 mt-16">
         <div className="flex items-baseline justify-between mb-6">
-          <h2 className="serif text-3xl text-[color:var(--green-deep)] font-semibold">Calendar</h2>
+          <h2 className="serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none mb-4 sm:mb-6" style={{ letterSpacing: '-0.02em' }}">Calendar</h2>
           <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
             {tournaments.length} events · 4 flights
           </span>
@@ -128,7 +128,7 @@ export default async function SeasonPage() {
 
       <section>
         <div className="flex items-baseline justify-between mb-5">
-          <h2 className="serif text-3xl text-[color:var(--green-deep)] font-semibold">Field</h2>
+          <h2 className="serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none mb-4 sm:mb-6" style={{ letterSpacing: '-0.02em' }} Field</h2>
           <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
             {owners.length} owners
           </span>
@@ -302,7 +302,7 @@ function SeasonConcludedHero({ lastFinal }: { lastFinal: any }) {
       <p className="text-[10px] uppercase text-[color:var(--green-moss)] mb-2" style={{ letterSpacing: '0.24em' }}>
         The Season Has Concluded
       </p>
-      <h2 className="serif text-3xl text-[color:var(--green-deep)]">{lastFinal.name} · Final</h2>
+      <h2 className="serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none mb-4 sm:mb-6" style={{ letterSpacing: '-0.02em' }} </h2>Final</h2>
     </div>
   );
 }
