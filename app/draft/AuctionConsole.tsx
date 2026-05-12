@@ -793,7 +793,7 @@ const handleResetDraft = () => {
           </div>
 
        {/* GRID */}
-          <div className="overflow-x-auto bg-[color:var(--cream-tint)]/60 border border-[color:var(--green-forest)]/15">
+          <div className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/15 shadow-sm overflow-x-auto">
             <div className="grid gap-0 min-w-[900px]"
                  style={{ gridTemplateColumns: `220px repeat(${owners.length}, minmax(60px, 1fr))` }}>
               {(() => {
