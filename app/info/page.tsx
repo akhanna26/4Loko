@@ -107,7 +107,7 @@ export default function RulesPage() {
         </p>
       </header>
 
-      {/* Payout structure widget */}
+      {/* Payouts widget */}
       <section className="mb-10 sm:mb-12">
         <div className="flex items-baseline justify-between mb-4 sm:mb-5 gap-2">
           <h2 className={HEADING_CLASS} style={HEADING_STYLE}>Payouts</h2>
@@ -115,6 +115,8 @@ export default function RulesPage() {
             12 owners · 2026
           </span>
         </div>
+
+        <div className="border-2 shadow-sm"
           style={{
             background: 'var(--cream-tint)',
             borderColor: 'rgba(14, 42, 74, 0.15)',
@@ -160,8 +162,7 @@ export default function RulesPage() {
           </span>
         </div>
 
-        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm">
-         <div className="border-2 shadow-sm"
+        <div className="border-2 shadow-sm"
           style={{
             background: 'var(--cream-tint)',
             borderColor: 'rgba(14, 42, 74, 0.15)',
@@ -200,7 +201,6 @@ export default function RulesPage() {
                 </p>
               )}
               {filtered.map((faq, i) => {
-                // Rotate through subtle cream shades by category
                 const categoryTint: Record<string, string> = {
                   'Format':   'white',
                   'Scoring':  'rgba(253, 181, 21, 0.12)',
@@ -211,24 +211,25 @@ export default function RulesPage() {
                 };
                 const bg = categoryTint[faq.category] ?? 'rgba(255, 255, 255, 0.9)';
                 return (
-                <details key={i} className="border border-[color:var(--green-forest)]/10 group mb-2" style={{ background: bg }}>
-                  <summary className="cursor-pointer p-3 sm:p-4 flex items-baseline justify-between gap-4 hover:bg-[color:var(--cream-tint)]/40 transition-colors list-none">
-                    <div className="flex items-baseline gap-3 min-w-0 flex-1">
-                      <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
-                        {faq.category}
-                      </span>
-                      <span className="serif text-sm sm:text-base text-[color:var(--green-deep)] font-semibold">{faq.question}</span>
+                  <details key={i} className="border border-[color:var(--green-forest)]/10 group mb-2" style={{ background: bg }}>
+                    <summary className="cursor-pointer p-3 sm:p-4 flex items-baseline justify-between gap-4 hover:bg-[color:var(--cream-tint)]/40 transition-colors list-none">
+                      <div className="flex items-baseline gap-3 min-w-0 flex-1">
+                        <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
+                          {faq.category}
+                        </span>
+                        <span className="serif text-sm sm:text-base text-[color:var(--green-deep)] font-semibold">{faq.question}</span>
+                      </div>
+                      <span className="text-[10px] sm:text-xs text-[color:var(--green-moss)] group-open:rotate-90 transition-transform shrink-0">+</span>
+                    </summary>
+                    <div className="px-3 sm:px-4 pb-3 sm:pb-4 pt-1 border-t border-[color:var(--green-forest)]/10">
+                      <p className="serif text-sm text-[color:var(--green-deep)] leading-relaxed">{faq.answer}</p>
                     </div>
-                    <span className="text-[10px] sm:text-xs text-[color:var(--green-moss)] group-open:rotate-90 transition-transform shrink-0">+</span>
-                  </summary>
-                  <div className="px-3 sm:px-4 pb-3 sm:pb-4 pt-1 border-t border-[color:var(--green-forest)]/10">
-                    <p className="serif text-sm text-[color:var(--green-deep)] leading-relaxed">{faq.answer}</p>
-                  </div>
-                </details>
-              );
+                  </details>
+                );
               })}
             </div>
           </div>
+        </div>
       </section>
     </main>
   );
