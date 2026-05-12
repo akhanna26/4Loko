@@ -107,7 +107,15 @@ export async function getActiveOwners(): Promise<Owner[]> {
   if (error) throw error;
   return (data ?? []) as Owner[];
 }
-
+export async function getAllOwners(): Promise<Owner[]> {
+  const { data, error } = await supabase
+    .from('owners')
+    .select('id, name, nickname, is_active')
+    .order('is_active', { ascending: false })
+    .order('name');
+  if (error) throw error;
+  return (data ?? []) as Owner[];
+}
 export async function getLiveYearlong(): Promise<{ owner_name: string; total: number; per_event: Record<string, number> }[]> {
   const { data, error } = await supabase
     .from('v_owner_tournament_score')
