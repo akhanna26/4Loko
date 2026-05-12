@@ -800,7 +800,7 @@ const handleResetDraft = () => {
           </div>
 
        {/* GRID */}
-          <div className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/15 shadow-sm overflow-x-auto">
+          <div className="bg-white border border-[color:var(--green-forest)]/20 shadow-sm overflow-x-auto">
             <div className="grid gap-0 min-w-[900px]"
                  style={{ gridTemplateColumns: `220px repeat(${owners.length}, minmax(60px, 1fr))` }}>
               {(() => {
@@ -822,13 +822,12 @@ const handleResetDraft = () => {
                         className="p-2 flex items-baseline gap-2 text-left transition-all"
                         style={{
                           background: isNominated
-                            ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.18) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(253, 181, 21, 0.18) 100%)'
+                            ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.18) 0%, rgba(255, 255, 255, 0.98) 50%, rgba(253, 181, 21, 0.18) 100%)'
                             : isSold
-                              ? 'rgba(255, 255, 255, 0.5)'
-                              : 'rgba(255, 255, 255, 0.75)',
-                          borderBottom: '1px solid rgba(42, 70, 54, 0.06)',
+                              ? 'rgba(42, 70, 54, 0.06)'
+                              : 'white',
+                          borderBottom: '1px solid rgba(42, 70, 54, 0.08)',
                           borderLeft: isNominated ? '3px solid var(--gold-masters)' : '3px solid transparent',
-                          opacity: isSold ? 0.55 : 1,
                           cursor: isClickable ? 'pointer' : 'default',
                           boxShadow: isNominated ? '0 1px 4px rgba(253, 181, 21, 0.15)' : 'none',
                         }}>
@@ -854,13 +853,13 @@ const handleResetDraft = () => {
                       const theme = getOwnerTheme(o.name);
                       return (
                         <div key={cellKey}
-                          className="p-2 text-center transition-all duration-500 border-b border-[color:var(--green-forest)]/8"
+                          className="p-2 text-center transition-all duration-500"
                           style={{
                             background: isFlashing ? 'var(--gold-masters)' :
                                        isBuyer ? theme.primaryAlpha :
-                                       isSold ? 'rgba(42, 70, 54, 0.03)' :
-                                       'transparent',
-                            opacity: !isBuyer && isSold ? 0.6 : 1,
+                                       isSold ? 'rgba(42, 70, 54, 0.06)' :
+                                       'white',
+                            borderBottom: '1px solid rgba(42, 70, 54, 0.08)',
                             boxShadow: isBuyer ? `inset 0 0 0 1.5px ${theme.primary}` : undefined,
                           }}>
                           {isBuyer && (
