@@ -919,7 +919,7 @@ const handleResetDraft = () => {
 
 function SnakeColumn({ fullSnake, session, ownerById }: any) {
   return (
-    <div className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/15 flex flex-col h-full lg:max-h-[calc(100vh-2rem)]"
+    <div className="bg-[color:var(--cream-deep)]/30 border border-[color:var(--green-forest)]/15 flex flex-col h-full lg:max-h-[calc(100vh-2rem)]"
       style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)' }}>
       <div className="px-2 py-2 border-b border-[color:var(--green-forest)]/15 flex items-baseline justify-between">
         <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.18em' }}>Snake</p>
@@ -967,7 +967,7 @@ function SnakeColumn({ fullSnake, session, ownerById }: any) {
 
 function RostersColumn({ orderedOwners, ownerStateById, bidsByOwner, currentNominatorId, rankByOwner, startingBudget, bids }: any) {
   return (
-    <div className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/15 flex flex-col h-full lg:max-h-[calc(100vh-2rem)]"
+    <div className="bg-[color:var(--cream-deep)]/30 border border-[color:var(--green-forest)]/15 flex flex-col h-full lg:max-h-[calc(100vh-2rem)]"
       style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)' }}>
       <div className="px-3 py-2 border-b border-[color:var(--green-forest)]/15 flex items-baseline justify-between">
         <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.18em' }}>Rosters</p>
@@ -984,8 +984,8 @@ function RostersColumn({ orderedOwners, ownerStateById, bidsByOwner, currentNomi
             const isNominator = currentNominatorId === o.id;
             const theme = getOwnerTheme(o.name);
             return (
-             <div key={o.id}
-                className="p-2 bg-[color:var(--cream-tint)]/70 border"
+            <div key={o.id}
+                className="p-2 bg-white border"
                 style={{
                   borderColor: isNominator ? 'var(--gold-masters)' : 'rgba(42, 70, 54, 0.15)',
                   background: isNominator ? 'rgba(253, 181, 21, 0.08)' : undefined,
