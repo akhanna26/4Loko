@@ -779,7 +779,7 @@ const handleResetDraft = () => {
                 const theme = getOwnerTheme(o.name);
                 return (
                  <div key={o.id}
-                    className={`p-2 ${isNominator ? 'bg-[color:var(--cream-deep)]' : 'bg-[color:var(--cream-tint)]'}`}>
+                    className={`p-2 border-b border-[color:var(--green-forest)]/15 ${isNominator ? 'bg-[color:var(--cream-deep)]' : 'bg-[color:var(--cream-tint)]/60'}`}>
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <RankBadge rank={rankByOwner.get(o.id)} />
                       <span className="serif text-[10px] sm:text-[11px] text-[color:var(--green-deep)] font-semibold">{colHeader(o.name)}</span>
@@ -792,9 +792,9 @@ const handleResetDraft = () => {
             </div>
           </div>
 
-          {/* GRID */}
-          <div className="overflow-x-auto">
-            <div className="bg-[color:var(--green-forest)]/15 grid gap-px min-w-[900px]"
+       {/* GRID */}
+          <div className="overflow-x-auto bg-[color:var(--cream-tint)]/60 border border-[color:var(--green-forest)]/15">
+            <div className="grid gap-0 min-w-[900px]"
                  style={{ gridTemplateColumns: `220px repeat(${owners.length}, minmax(60px, 1fr))` }}>
               {(() => {
                 // Compute rank for all golfers in the pool, once per render
@@ -812,11 +812,11 @@ const handleResetDraft = () => {
                       <button
                         onClick={() => handleNominate(g.golfer_id)}
                         disabled={!isClickable}
-                        className={`p-2 flex items-baseline gap-2 text-left transition-colors ${
+                        className={`p-2 flex items-baseline gap-2 text-left transition-colors border-b border-[color:var(--green-forest)]/8 ${
                           isNominated ? 'bg-[color:var(--gold-masters)]/30 ring-1 ring-[color:var(--gold-masters)]' :
-                          isSold ? 'bg-[#2a4636]/[.08] opacity-60' :
-                          isClickable ? 'bg-[color:var(--cream-tint)] hover:bg-[color:var(--cream-deep)] cursor-pointer' :
-                          'bg-[color:var(--cream-tint)] cursor-default'
+                          isSold ? 'bg-[#2a4636]/[.04] opacity-60' :
+                          isClickable ? 'hover:bg-white/40 cursor-pointer' :
+                          'cursor-default'
                         }`}>
                         <span className="text-[9px] tabular text-[color:var(--green-moss)]/60 shrink-0 w-7 text-right">
                           #{rank}
@@ -840,12 +840,12 @@ const handleResetDraft = () => {
                       const theme = getOwnerTheme(o.name);
                       return (
                         <div key={cellKey}
-                          className="p-2 text-center transition-all duration-500"
+                          className="p-2 text-center transition-all duration-500 border-b border-[color:var(--green-forest)]/8"
                           style={{
                             background: isFlashing ? 'var(--gold-masters)' :
                                        isBuyer ? theme.primaryAlpha :
-                                       isSold ? 'rgba(42, 70, 54, 0.05)' :
-                                       'var(--cream-tint)',
+                                       isSold ? 'rgba(42, 70, 54, 0.03)' :
+                                       'transparent',
                             opacity: !isBuyer && isSold ? 0.6 : 1,
                             boxShadow: isBuyer ? `inset 0 0 0 1.5px ${theme.primary}` : undefined,
                           }}>
