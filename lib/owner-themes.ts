@@ -35,9 +35,9 @@ const OWNER_THEMES: Record<string, OwnerTheme> = {
     secondary: '#000000',
     primaryAlpha: 'rgba(207, 184, 124, 0.18)',
   },
-  // DJ — Titans (navy/light-blue)
+  // DJ — Titans (white/light-blue)
   'Donald J. Dunn': {
-    primary: '#0c2340',
+    primary: '#cda077',
     secondary: '#4b92db',
     primaryAlpha: 'rgba(12, 35, 64, 0.12)',
   },
