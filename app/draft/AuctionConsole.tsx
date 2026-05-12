@@ -27,7 +27,7 @@ function RankBadge({ rank, ownerName }: { rank: StandingRank | undefined; ownerN
       </span>
     );
   }
-  const text = `${rank.is_tied ? 'T' : ''}${rank.rank}`;
+  const text = `${rank.is_tied ? 'T' : '#'}${rank.rank}`;
   const fontSize = text.length >= 3 ? 'text-[7px]' : 'text-[9px]';
   return (
     <span
