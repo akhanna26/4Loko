@@ -13,10 +13,16 @@ import {
 import { getFlight } from '../../lib/draft';
 import { getOwnerTheme } from '../../lib/owner-themes';
 
-function RankBadge({ rank }: { rank: StandingRank | undefined }) {
+function RankBadge({ rank, ownerName }: { rank: StandingRank | undefined; ownerName?: string }) {
+  const theme = ownerName ? getOwnerTheme(ownerName) : null;
+  const bg = theme?.primary ?? 'var(--green-deep)';
+  const borderColor = theme?.secondary ?? 'white';
+
   if (!rank || rank.rank === null) {
     return (
-      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-[color:var(--green-forest)]/30 border border-white text-white text-[9px] font-semibold shrink-0">
+      <span
+        className="inline-flex items-center justify-center w-5 h-5 rounded-full text-white text-[9px] font-semibold shrink-0"
+        style={{ background: bg, border: `1.5px solid ${borderColor}` }}>
         —
       </span>
     );
@@ -25,7 +31,8 @@ function RankBadge({ rank }: { rank: StandingRank | undefined }) {
   const fontSize = text.length >= 3 ? 'text-[7px]' : 'text-[9px]';
   return (
     <span
-      className={`inline-flex items-center justify-center w-5 h-5 rounded-full bg-[color:var(--green-deep)] border border-white text-white ${fontSize} font-bold tabular shrink-0`}
+      className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-white ${fontSize} font-bold tabular shrink-0`}
+      style={{ background: bg, border: `1.5px solid ${borderColor}` }}
       title={rank.is_fallback ? `Last season's rank` : `This year's rank`}
     >
       {text}
