@@ -145,7 +145,8 @@ export default async function SeasonPage() {
               {owners.map((o) => {
                 const theme = getOwnerTheme(o.name);
                 return (
-                 <div
+                  <div key={o.id} className="flex items-center gap-3 py-1">
+                    <div
                       className="w-9 h-9 sm:w-10 sm:h-10 rounded-full text-white flex items-center justify-center text-[10px] sm:text-xs tabular font-semibold shadow-sm shrink-0"
                       style={{
                         letterSpacing: '0.05em',
