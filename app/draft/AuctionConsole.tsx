@@ -819,12 +819,19 @@ const handleResetDraft = () => {
                       <button
                         onClick={() => handleNominate(g.golfer_id)}
                         disabled={!isClickable}
-                        className={`p-2 flex items-baseline gap-2 text-left transition-colors border-b border-[color:var(--green-forest)]/8 ${
-                          isNominated ? 'bg-[color:var(--gold-masters)]/30 ring-1 ring-[color:var(--gold-masters)]' :
-                          isSold ? 'bg-[#2a4636]/[.04] opacity-60' :
-                          isClickable ? 'hover:bg-white/40 cursor-pointer' :
-                          'cursor-default'
-                        }`}>
+                        className="p-2 flex items-baseline gap-2 text-left transition-all"
+                        style={{
+                          background: isNominated
+                            ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.18) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(253, 181, 21, 0.18) 100%)'
+                            : isSold
+                              ? 'rgba(255, 255, 255, 0.5)'
+                              : 'rgba(255, 255, 255, 0.75)',
+                          borderBottom: '1px solid rgba(42, 70, 54, 0.06)',
+                          borderLeft: isNominated ? '3px solid var(--gold-masters)' : '3px solid transparent',
+                          opacity: isSold ? 0.55 : 1,
+                          cursor: isClickable ? 'pointer' : 'default',
+                          boxShadow: isNominated ? '0 1px 4px rgba(253, 181, 21, 0.15)' : 'none',
+                        }}>
                         <span className="text-[9px] tabular text-[color:var(--green-moss)]/60 shrink-0 w-7 text-right">
                           #{rank}
                         </span>
