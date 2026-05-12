@@ -603,7 +603,7 @@ const handleResetDraft = () => {
                               : 'bg-[color:var(--cream-tint)] text-[color:var(--green-deep)] border-[color:var(--green-forest)]/20 hover:bg-[color:var(--cream-tint)] hover:border-[color:var(--green-forest)]/40'
                           }`}>
                           <div className="flex items-center justify-center gap-1 mb-1">
-                            <RankBadge rank={rankByOwner.get(o.id)} />
+                            <RankBadge rank={rankByOwner.get(o.id)} ownerName={o.name} />
                             <span className="serif font-semibold text-[11px] sm:text-xs">{shortName(o.name)}</span>
                           </div>
                           <BudgetMeter remaining={remain} starting={startingBudget} size="xs" />
@@ -771,8 +771,8 @@ const handleResetDraft = () => {
           )}
 
           {/* GRID HEADER */}
-          <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm overflow-x-auto mb-2">
-            <div className="bg-[color:var(--cream-tint)]/60 grid gap-px min-w-[900px]"
+          <div className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/15 shadow-sm overflow-x-auto mb-2">
+            <div className="grid gap-px min-w-[900px]"
                  style={{ gridTemplateColumns: `220px repeat(${owners.length}, minmax(60px, 1fr))` }}>
               <div className="bg-[color:var(--cream-tint)]">
                 <input type="text" value={poolFilter} onChange={(e) => setPoolFilter(e.target.value)}
@@ -788,7 +788,7 @@ const handleResetDraft = () => {
                  <div key={o.id}
                     className={`p-2 border-b border-[color:var(--green-forest)]/15 ${isNominator ? 'bg-[color:var(--cream-deep)]' : 'bg-[color:var(--cream-tint)]/60'}`}>
                     <div className="flex items-center justify-center gap-1 mb-1">
-                      <RankBadge rank={rankByOwner.get(o.id)} />
+                      <RankBadge rank={rankByOwner.get(o.id)} ownerName={o.name} />
                       <span className="serif text-[10px] sm:text-[11px] text-[color:var(--green-deep)] font-semibold">{colHeader(o.name)}</span>
                     </div>
                     <BudgetMeter remaining={remain} starting={startingBudget} size="xs" />
@@ -986,7 +986,7 @@ function RostersColumn({ orderedOwners, ownerStateById, bidsByOwner, currentNomi
                 }}>
                 <div className="flex items-baseline justify-between gap-2 mb-1.5">
                   <div className="flex items-baseline gap-1.5 min-w-0">
-                    <RankBadge rank={rankByOwner.get(o.id)} />
+                    <RankBadge rank={rankByOwner.get(o.id)} ownerName={o.name} />
                     <span className="serif text-xs text-[color:var(--green-deep)] font-semibold truncate">{shortName(o.name)}</span>
                     {isNominator && <span className="text-[7px] uppercase shrink-0 font-semibold" style={{ letterSpacing: '0.15em', color: theme.primary }}>nom</span>}
                   </div>
