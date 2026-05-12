@@ -597,11 +597,17 @@ const handleResetDraft = () => {
                       return (
                       <button key={o.id}
                           onClick={() => bumpBid(currentBid, o.id)}
-                          className={`px-2 py-1.5 sm:py-2 text-xs border transition-all ${
-                            isHighBidder
-                              ? 'bg-[color:var(--green-deep)] text-[color:var(--cream)] border-[color:var(--green-deep)]'
-                              : 'bg-[color:var(--cream-tint)] text-[color:var(--green-deep)] border-[color:var(--green-forest)]/20 hover:bg-[color:var(--cream-tint)] hover:border-[color:var(--green-forest)]/40'
-                          }`}>
+                          className="px-2 py-1.5 sm:py-2 text-xs border transition-all"
+                          style={{
+                            background: isHighBidder
+                              ? 'var(--green-deep)'
+                              : 'white',
+                            color: isHighBidder ? 'var(--cream)' : 'var(--green-deep)',
+                            borderColor: isHighBidder ? 'var(--green-deep)' : 'rgba(42, 70, 54, 0.2)',
+                            boxShadow: isHighBidder
+                              ? '0 2px 8px rgba(26, 48, 34, 0.25)'
+                              : '0 1px 2px rgba(42, 70, 54, 0.04)',
+                          }}>
                           <div className="flex items-center justify-center gap-1 mb-1">
                             <RankBadge rank={rankByOwner.get(o.id)} ownerName={o.name} />
                             <span className="serif font-semibold text-[11px] sm:text-xs">{shortName(o.name)}</span>
