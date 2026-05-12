@@ -35,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${interTight.variable} ${sourceSerif.variable}`}>
       <body className="sans-tight">
-        <header className="border-b border-[color:var(--green-forest)]/15 bg-[color:var(--cream)]">
+        <header className="border-b border-[color:var(--green-forest)]/15 bg-[color:var(--cream-tint)]/70">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between gap-3">
             <a href="/" className="flex items-center sm:flex-col sm:items-start gap-2 sm:gap-0 group shrink-0">
               <span className="serif text-xl sm:text-2xl font-semibold tracking-tight text-[color:var(--green-deep)] leading-none flex items-baseline whitespace-nowrap">
@@ -69,7 +69,7 @@ export default function RootLayout({
           </div>
         </header>
         {children}
-        <footer className="mt-24 border-t border-[color:var(--green-forest)]/15 bg-[color:var(--cream)]">
+        <footer className="mt-24 border-t border-[color:var(--green-forest)]/15 bg-[color:var(--cream-tint)]/70">
           <div className="max-w-5xl mx-auto px-6 py-6 flex justify-between items-baseline flex-wrap gap-2">
             <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
               FORE Lokos · Chicago · Vol. IV
