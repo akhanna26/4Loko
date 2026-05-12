@@ -72,6 +72,9 @@ const FAQS: FAQ[] = [
 
 const CATEGORIES = ['All', 'Format', 'Scoring', 'Draft', 'Keepers', 'Payouts', 'Bonuses'] as const;
 
+const HEADING_CLASS = "serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none";
+const HEADING_STYLE = { letterSpacing: '-0.02em' };
+
 export default function RulesPage() {
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('All');
@@ -87,107 +90,127 @@ export default function RulesPage() {
   }, [query, activeCategory]);
 
   return (
-    <main className="max-w-4xl mx-auto px-6 pt-10 pb-16">
+    <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10 pb-12 sm:pb-16">
       <Link href="/" className="text-[10px] uppercase text-[color:var(--green-moss)] hover:text-[color:var(--green-deep)] mb-6 inline-block" style={{ letterSpacing: '0.18em' }}>
-        \u2190 2026 Season
+        ← 2026 Season
       </Link>
 
-      <header className="mb-10">
+      <header className="mb-8 sm:mb-10">
         <p className="text-[10px] uppercase text-[color:var(--green-moss)] mb-2" style={{ letterSpacing: '0.32em' }}>
           The Book
         </p>
-        <h1 className="serif text-5xl md:text-6xl font-light text-[color:var(--green-deep)] leading-none" style={{ letterSpacing: '-0.02em' }}>
-          Rules &amp; Payouts
+        <h1 className="serif text-4xl sm:text-6xl font-light text-[color:var(--green-deep)] leading-none" style={{ letterSpacing: '-0.02em' }}>
+          Rules & Payouts
         </h1>
         <p className="serif italic text-sm text-[color:var(--green-moss)] mt-3">
           Everything that governs the FORE Loko Cup
         </p>
       </header>
 
-      <section className="mb-12 bg-white/50 border border-[color:var(--green-forest)]/15 p-6">
-        <h2 className="serif text-2xl font-semibold text-[color:var(--green-deep)] mb-4">Payout structure</h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <p className="text-[10px] uppercase text-[color:var(--green-moss)] mb-3" style={{ letterSpacing: '0.18em' }}>Per major</p>
-            <table className="w-full text-sm">
-              <tbody>
-                <tr><td className="serif py-1">Masters buy-in</td><td className="tabular text-right text-[color:var(--green-deep)] font-semibold">$125</td></tr>
-                <tr><td className="serif py-1">Other majors buy-in</td><td className="tabular text-right text-[color:var(--green-deep)] font-semibold">$100</td></tr>
-                <tr><td className="serif py-1">Major-winner pool entry</td><td className="tabular text-right text-[color:var(--green-deep)] font-semibold">$10</td></tr>
-                <tr className="border-t border-[color:var(--green-forest)]/20"><td className="serif py-1.5 font-semibold">Masters payout (1/2/3)</td><td className="tabular text-right text-[color:var(--gold-masters)] font-semibold">$1050 / $300 / $150</td></tr>
-                <tr><td className="serif py-1.5 font-semibold">Other majors (1/2/3)</td><td className="tabular text-right text-[color:var(--gold-masters)] font-semibold">$840 / $240 / $120</td></tr>
-                <tr><td className="serif py-1.5 font-semibold">Major winner pool</td><td className="tabular text-right text-[color:var(--gold-masters)] font-semibold">$120</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase text-[color:var(--green-moss)] mb-3" style={{ letterSpacing: '0.18em' }}>Year-long</p>
-            <table className="w-full text-sm">
-              <tbody>
-                <tr><td className="serif py-1">Buy-in</td><td className="tabular text-right text-[color:var(--green-deep)] font-semibold">$75</td></tr>
-                <tr><td className="serif py-1">Plus: keeper-fee escalation</td><td className="tabular text-right text-[color:var(--green-deep)]">+ $10/$20/$30</td></tr>
-                <tr className="border-t border-[color:var(--green-forest)]/20"><td className="serif py-1.5 font-semibold">Payout (1/2)</td><td className="tabular text-right text-[color:var(--gold-masters)] font-semibold">$675 / $225</td></tr>
-              </tbody>
-            </table>
-            <p className="text-[10px] uppercase text-[color:var(--green-moss)] mt-5 mb-2" style={{ letterSpacing: '0.18em' }}>Full season cost</p>
-            <p className="serif text-3xl font-light text-[color:var(--green-deep)] tabular leading-none">$540<span className="text-sm text-[color:var(--green-moss)] italic ml-2">base, before keepers</span></p>
-          </div>
+      {/* Payout structure widget */}
+      <section className="mb-10 sm:mb-12">
+        <div className="flex items-baseline justify-between mb-4 sm:mb-5 gap-2">
+          <h2 className={HEADING_CLASS} style={HEADING_STYLE}>Payouts</h2>
+          <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
+            12 owners · 2026
+          </span>
         </div>
-      </section>
-
-      <section className="mb-6">
-        <input
-          type="text"
-          placeholder="Search rules..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="w-full bg-white/70 border border-[color:var(--green-forest)]/20 px-4 py-3 text-sm serif text-[color:var(--green-deep)] placeholder-[color:var(--green-moss)] focus:outline-none focus:border-[color:var(--green-deep)] transition-colors"
-        />
-        <div className="flex flex-wrap gap-2 mt-3">
-          {CATEGORIES.map((cat) => (
-            <button key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className="text-[10px] uppercase tabular px-3 py-1.5 border transition-colors"
-              style={{
-                letterSpacing: '0.18em',
-                background: activeCategory === cat ? 'var(--green-deep)' : 'transparent',
-                color: activeCategory === cat ? 'var(--cream)' : 'var(--green-forest)',
-                borderColor: activeCategory === cat ? 'var(--green-deep)' : 'var(--green-forest)',
-                opacity: activeCategory === cat ? 1 : 0.5,
-              }}>
-              {cat}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-3">
-        {filtered.length === 0 && (
-          <p className="serif italic text-[color:var(--green-moss)] text-center py-12">
-            No rules match that search.
-          </p>
-        )}
-        {filtered.map((faq, i) => (
-          <details key={i} className="bg-white/50 border border-[color:var(--green-forest)]/15 group">
-            <summary className="cursor-pointer p-4 flex items-baseline justify-between gap-4 hover:bg-white/30 transition-colors">
-              <div className="flex items-baseline gap-3">
-                <span className="text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
-                  {faq.category}
-                </span>
-                <span className="serif text-base text-[color:var(--green-deep)] font-semibold">{faq.question}</span>
+        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm">
+          <div className="bg-[color:var(--cream-tint)]/60 p-4 sm:p-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold mb-3" style={{ letterSpacing: '0.18em' }}>Per major</p>
+                <table className="w-full text-sm">
+                  <tbody>
+                    <tr><td className="serif py-1">Masters buy-in</td><td className="tabular text-right text-[color:var(--green-deep)] font-semibold">$125</td></tr>
+                    <tr><td className="serif py-1">Other majors buy-in</td><td className="tabular text-right text-[color:var(--green-deep)] font-semibold">$100</td></tr>
+                    <tr><td className="serif py-1">Major-winner pool entry</td><td className="tabular text-right text-[color:var(--green-deep)] font-semibold">$10</td></tr>
+                    <tr style={{ borderTop: '1px solid rgba(0,0,0,0.08)' }}><td className="serif py-1.5 font-semibold">Masters payout (1/2/3)</td><td className="tabular text-right text-[color:var(--gold-masters)] font-semibold">$1050 / $300 / $150</td></tr>
+                    <tr><td className="serif py-1.5 font-semibold">Other majors (1/2/3)</td><td className="tabular text-right text-[color:var(--gold-masters)] font-semibold">$840 / $240 / $120</td></tr>
+                    <tr><td className="serif py-1.5 font-semibold">Major winner pool</td><td className="tabular text-right text-[color:var(--gold-masters)] font-semibold">$120</td></tr>
+                  </tbody>
+                </table>
               </div>
-              <span className="text-xs text-[color:var(--green-moss)] group-open:rotate-90 transition-transform">\u25b8</span>
-            </summary>
-            <div className="px-4 pb-4 pt-1 border-t border-[color:var(--green-forest)]/10">
-              <p className="serif text-sm text-[color:var(--green-deep)] leading-relaxed">{faq.answer}</p>
+              <div>
+                <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold mb-3" style={{ letterSpacing: '0.18em' }}>Year-long</p>
+                <table className="w-full text-sm">
+                  <tbody>
+                    <tr><td className="serif py-1">Buy-in</td><td className="tabular text-right text-[color:var(--green-deep)] font-semibold">$75</td></tr>
+                    <tr><td className="serif py-1">Plus: keeper-fee escalation</td><td className="tabular text-right text-[color:var(--green-deep)]">+ $10/$20/$30</td></tr>
+                    <tr style={{ borderTop: '1px solid rgba(0,0,0,0.08)' }}><td className="serif py-1.5 font-semibold">Payout (1/2)</td><td className="tabular text-right text-[color:var(--gold-masters)] font-semibold">$675 / $225</td></tr>
+                  </tbody>
+                </table>
+                <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold mt-5 mb-2" style={{ letterSpacing: '0.18em' }}>Full season cost</p>
+                <p className="serif text-3xl font-light text-[color:var(--green-deep)] tabular leading-none" style={{ letterSpacing: '-0.02em' }}>$540<span className="text-sm text-[color:var(--green-moss)] italic ml-2">base, before keepers</span></p>
+              </div>
             </div>
-          </details>
-        ))}
+          </div>
+        </div>
       </section>
 
-      <p className="text-[10px] uppercase text-[color:var(--green-moss)] mt-8 text-right italic" style={{ letterSpacing: '0.18em' }}>
-        {FAQS.length} entries \u00b7 {filtered.length} showing
-      </p>
+      {/* FAQ section */}
+      <section className="mb-10 sm:mb-12">
+        <div className="flex items-baseline justify-between mb-4 sm:mb-5 gap-2">
+          <h2 className={HEADING_CLASS} style={HEADING_STYLE}>FAQ</h2>
+          <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
+            {FAQS.length} entries · {filtered.length} showing
+          </span>
+        </div>
+
+        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm">
+          <div className="bg-[color:var(--cream-tint)]/60 p-4 sm:p-6">
+            {/* Search + filter */}
+            <input
+              type="text"
+              placeholder="Search rules..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="w-full bg-white border border-[color:var(--green-forest)]/20 px-4 py-3 text-sm serif text-[color:var(--green-deep)] placeholder-[color:var(--green-moss)] focus:outline-none focus:border-[color:var(--green-deep)] transition-colors"
+            />
+            <div className="flex flex-wrap gap-2 mt-3 mb-5">
+              {CATEGORIES.map((cat) => (
+                <button key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className="text-[10px] uppercase tabular px-3 py-1.5 border transition-colors"
+                  style={{
+                    letterSpacing: '0.18em',
+                    background: activeCategory === cat ? 'var(--green-deep)' : 'white',
+                    color: activeCategory === cat ? 'white' : 'var(--green-forest)',
+                    borderColor: activeCategory === cat ? 'var(--green-deep)' : 'rgba(42,70,54,0.2)',
+                    opacity: activeCategory === cat ? 1 : 0.7,
+                  }}>
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* FAQ items */}
+            <div className="space-y-2">
+              {filtered.length === 0 && (
+                <p className="serif italic text-[color:var(--green-moss)] text-center py-8">
+                  No rules match that search.
+                </p>
+              )}
+              {filtered.map((faq, i) => (
+                <details key={i} className="bg-white border border-[color:var(--green-forest)]/10 group">
+                  <summary className="cursor-pointer p-3 sm:p-4 flex items-baseline justify-between gap-4 hover:bg-[color:var(--cream-tint)]/40 transition-colors list-none">
+                    <div className="flex items-baseline gap-3 min-w-0 flex-1">
+                      <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
+                        {faq.category}
+                      </span>
+                      <span className="serif text-sm sm:text-base text-[color:var(--green-deep)] font-semibold">{faq.question}</span>
+                    </div>
+                    <span className="text-[10px] sm:text-xs text-[color:var(--green-moss)] group-open:rotate-90 transition-transform shrink-0">+</span>
+                  </summary>
+                  <div className="px-3 sm:px-4 pb-3 sm:pb-4 pt-1 border-t border-[color:var(--green-forest)]/10">
+                    <p className="serif text-sm text-[color:var(--green-deep)] leading-relaxed">{faq.answer}</p>
+                  </div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
