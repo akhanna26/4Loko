@@ -115,7 +115,6 @@ export default function RulesPage() {
             12 owners · 2026
           </span>
         </div>
-<div className="border-2 shadow-sm"
           style={{
             background: 'var(--cream-tint)',
             borderColor: 'rgba(14, 42, 74, 0.15)',
@@ -230,7 +229,6 @@ export default function RulesPage() {
               })}
             </div>
           </div>
-        </div>
       </section>
     </main>
   );
