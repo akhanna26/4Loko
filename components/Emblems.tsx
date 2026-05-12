@@ -2,17 +2,23 @@
 // referential not official — a flag, a trophy, a shield, a claret jug.
 
 export function MastersEmblem({ className = 'emblem' }: { className?: string }) {
-  // Pin flag — reads as "the green at Augusta"
+  // Green jacket — single-breasted with lapels, sleeves, and buttons
   return (
-   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-  <path d="M6 8 L6 22 L18 22 L18 8" />
-  <path d="M6 8 L9 4 L15 4 L18 8" />
-  <path d="M12 4 L12 12" />
-  <circle cx="10" cy="10" r="0.5" fill="currentColor" />
-  <circle cx="14" cy="10" r="0.5" fill="currentColor" />
-  <circle cx="10" cy="14" r="0.5" fill="currentColor" />
-  <circle cx="14" cy="14" r="0.5" fill="currentColor" />
-</svg>
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {/* Body */}
+      <path d="M8 7 L8 21 L16 21 L16 7" />
+      {/* Shoulders to collar */}
+      <path d="M8 7 L10 5 L12 7 L14 5 L16 7" />
+      {/* Lapel split */}
+      <path d="M10 5 L12 9 L14 5" />
+      {/* Sleeves */}
+      <path d="M8 7 L5 9 L5 16 L7 16" />
+      <path d="M16 7 L19 9 L19 16 L17 16" />
+      {/* Buttons */}
+      <circle cx="12" cy="12" r="0.4" fill="currentColor" />
+      <circle cx="12" cy="15" r="0.4" fill="currentColor" />
+      <circle cx="12" cy="18" r="0.4" fill="currentColor" />
+    </svg>
   );
 }
 
