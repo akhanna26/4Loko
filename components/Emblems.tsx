@@ -4,11 +4,15 @@
 export function MastersEmblem({ className = 'emblem' }: { className?: string }) {
   // Pin flag — reads as "the green at Augusta"
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <line x1="7" y1="3" x2="7" y2="20" />
-      <path d="M7 4 L17 6.5 L7 9 Z" fill="currentColor" stroke="none" />
-      <ellipse cx="11" cy="20.5" rx="6" ry="0.8" fill="currentColor" stroke="none" opacity="0.35" />
-    </svg>
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+  <path d="M6 8 L6 22 L18 22 L18 8" />
+  <path d="M6 8 L9 4 L15 4 L18 8" />
+  <path d="M12 4 L12 12" />
+  <circle cx="10" cy="10" r="0.5" fill="currentColor" />
+  <circle cx="14" cy="10" r="0.5" fill="currentColor" />
+  <circle cx="10" cy="14" r="0.5" fill="currentColor" />
+  <circle cx="14" cy="14" r="0.5" fill="currentColor" />
+</svg>
   );
 }
 
