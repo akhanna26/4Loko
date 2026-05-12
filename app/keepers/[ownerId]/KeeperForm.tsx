@@ -89,19 +89,19 @@ export default function KeeperForm({
                 onChange={() => setSelected(g.golfer_id)}
                 className="w-4 h-4 accent-[color:var(--green-deep)] shrink-0"
               />
-              <div className="flex-1 min-w-0">
+             <div className="flex-1 min-w-0">
                 <div className="serif text-sm sm:text-base text-[color:var(--green-deep)] font-semibold truncate">
                   {g.full_name}
                 </div>
                 <div className="text-[10px] sm:text-xs text-[color:var(--green-moss)] mt-0.5 tabular">
-                  Drafted ${g.purchase_price}{g.was_keeper && ` · was keeper (stage ${g.keeper_stage})`}
+                  Keeper fee: <span className="text-[color:var(--green-deep)] font-semibold">${price}</span>{g.was_keeper && ` · stage ${g.keeper_stage} keep`}
                 </div>
               </div>
               <div className="text-right shrink-0">
                 <div className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.14em' }}>
-                  Fee
+                  Drafted
                 </div>
-                <div className="serif text-base sm:text-lg text-[color:var(--green-deep)] tabular font-semibold">${price}</div>
+                <div className="serif text-base sm:text-lg text-[color:var(--green-moss)] tabular">${g.purchase_price}</div>
               </div>
             </label>
           );
