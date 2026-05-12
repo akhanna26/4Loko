@@ -764,8 +764,8 @@ const handleResetDraft = () => {
           )}
 
           {/* GRID HEADER */}
-          <div className="overflow-x-auto mb-2">
-            <div className="grid gap-px bg-[color:var(--green-deep)]/15 min-w-[900px]"
+          <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm overflow-x-auto mb-2">
+            <div className="bg-[color:var(--cream-tint)]/60 grid gap-px min-w-[900px]"
                  style={{ gridTemplateColumns: `220px repeat(${owners.length}, minmax(60px, 1fr))` }}>
               <div className="bg-[color:var(--cream-tint)]">
                 <input type="text" value={poolFilter} onChange={(e) => setPoolFilter(e.target.value)}
