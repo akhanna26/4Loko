@@ -149,13 +149,18 @@ export default function StandingsExpandable({
               const rank = i + 1;
               return (
                 <div key={s.owner_name}>
-                  <button
+                 <button
                     onClick={() => toggle(s.owner_name)}
-                    className={`board-row w-full text-left transition-colors hover:bg-white/30 ${isLeader ? 'board-row-leader' : ''}`}
+                    className={`board-row w-full text-left transition-all ${isLeader ? 'board-row-leader' : ''}`}
                     style={{
                       gridTemplateColumns: colTemplate,
                       display: 'grid',
-                      borderTop: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.7)',
+                      background: isLeader
+                        ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.06) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(253, 181, 21, 0.06) 100%)'
+                        : 'rgba(255, 255, 255, 0.7)',
+                      marginBottom: '2px',
+                      borderLeft: isLeader ? '3px solid var(--gold-masters)' : '3px solid transparent',
+                      boxShadow: isLeader ? '0 1px 4px rgba(253, 181, 21, 0.12)' : '0 1px 2px rgba(42, 70, 54, 0.04)',
                     }}
                   >
                     <div className="board-cell text-xs tabular" style={{ color: 'var(--green-moss)' }}>{rank}</div>
