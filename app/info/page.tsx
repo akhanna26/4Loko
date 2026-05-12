@@ -115,8 +115,12 @@ export default function RulesPage() {
             12 owners · 2026
           </span>
         </div>
-        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm">
-          <div className="bg-[color:var(--cream-tint)]/60 p-4 sm:p-6">
+<div className="border-2 shadow-sm"
+          style={{
+            background: 'var(--cream-tint)',
+            borderColor: 'rgba(14, 42, 74, 0.15)',
+          }}>
+          <div className="p-4 sm:p-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold mb-3" style={{ letterSpacing: '0.18em' }}>Per major</p>
@@ -158,7 +162,12 @@ export default function RulesPage() {
         </div>
 
         <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm">
-          <div className="bg-[color:var(--cream-tint)]/60 p-4 sm:p-6">
+         <div className="border-2 shadow-sm"
+          style={{
+            background: 'var(--cream-tint)',
+            borderColor: 'rgba(14, 42, 74, 0.15)',
+          }}>
+          <div className="p-4 sm:p-6">
             {/* Search + filter */}
             <input
               type="text"
