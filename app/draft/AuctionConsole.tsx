@@ -777,8 +777,9 @@ const handleResetDraft = () => {
           )}
 
           {/* GRID HEADER */}
-          <div className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/15 shadow-sm overflow-x-auto mb-2">
-            <div className="grid gap-px min-w-[900px]"
+          <div className="bg-white border-2 overflow-x-auto mb-2"
+               style={{ borderColor: 'rgba(14, 42, 74, 0.15)' }}>
+            <div className="bg-[color:var(--cream-tint)]/70 grid gap-px min-w-[900px]"
                  style={{ gridTemplateColumns: `220px repeat(${owners.length}, minmax(60px, 1fr))` }}>
               <div className="bg-[color:var(--cream-tint)]">
                 <input type="text" value={poolFilter} onChange={(e) => setPoolFilter(e.target.value)}
@@ -806,8 +807,12 @@ const handleResetDraft = () => {
           </div>
 
        {/* GRID */}
-          <div className="bg-white border border-[color:var(--green-forest)]/20 shadow-sm overflow-x-auto">
-            <div className="grid gap-0 min-w-[900px]"
+          <div className="bg-white border-2 overflow-x-auto"
+               style={{
+                 borderColor: 'rgba(14, 42, 74, 0.15)',
+                 boxShadow: '0 2px 12px rgba(14, 42, 74, 0.06)',
+               }}>
+            <div className="bg-[color:var(--cream-tint)]/70 grid gap-0 min-w-[900px]"
                  style={{ gridTemplateColumns: `220px repeat(${owners.length}, minmax(60px, 1fr))` }}>
               {(() => {
                 // Compute rank for all golfers in the pool, once per render
@@ -828,11 +833,11 @@ const handleResetDraft = () => {
                         className="p-2 flex items-baseline gap-2 text-left transition-all"
                         style={{
                           background: isNominated
-                            ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.18) 0%, rgba(255, 255, 255, 0.98) 50%, rgba(253, 181, 21, 0.18) 100%)'
+                            ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.18) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(253, 181, 21, 0.18) 100%)'
                             : isSold
-                              ? 'rgba(42, 70, 54, 0.06)'
-                              : 'white',
-                          borderBottom: '1px solid rgba(42, 70, 54, 0.08)',
+                              ? 'rgba(42, 70, 54, 0.08)'
+                              : 'transparent',
+                          borderBottom: '1px solid rgba(255, 255, 255, 0.6)',
                           borderLeft: isNominated ? '3px solid var(--gold-masters)' : '3px solid transparent',
                           cursor: isClickable ? 'pointer' : 'default',
                           boxShadow: isNominated ? '0 1px 4px rgba(253, 181, 21, 0.15)' : 'none',
@@ -863,9 +868,9 @@ const handleResetDraft = () => {
                           style={{
                             background: isFlashing ? 'var(--gold-masters)' :
                                        isBuyer ? theme.primaryAlpha :
-                                       isSold ? 'rgba(42, 70, 54, 0.06)' :
-                                       'white',
-                            borderBottom: '1px solid rgba(42, 70, 54, 0.08)',
+                                       isSold ? 'rgba(42, 70, 54, 0.08)' :
+                                       'transparent',
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.6)',
                             boxShadow: isBuyer ? `inset 0 0 0 1.5px ${theme.primary}` : undefined,
                           }}>
                           {isBuyer && (
@@ -925,8 +930,11 @@ const handleResetDraft = () => {
 
 function SnakeColumn({ fullSnake, session, ownerById }: any) {
   return (
-    <div className="bg-[color:var(--cream-deep)]/30 border border-[color:var(--green-forest)]/15 flex flex-col h-full lg:max-h-[calc(100vh-2rem)]"
-      style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)' }}>
+    <div className="bg-white border-2 flex flex-col h-full lg:max-h-[calc(100vh-2rem)]"
+      style={{
+        borderColor: 'rgba(14, 42, 74, 0.15)',
+        boxShadow: '0 2px 12px rgba(14, 42, 74, 0.06)',
+      }}>
       <div className="px-2 py-2 border-b border-[color:var(--green-forest)]/15 flex items-baseline justify-between">
         <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.18em' }}>Snake</p>
       </div>
@@ -973,8 +981,11 @@ function SnakeColumn({ fullSnake, session, ownerById }: any) {
 
 function RostersColumn({ orderedOwners, ownerStateById, bidsByOwner, currentNominatorId, rankByOwner, startingBudget, bids }: any) {
   return (
-    <div className="bg-[color:var(--cream-deep)]/30 border border-[color:var(--green-forest)]/15 flex flex-col h-full lg:max-h-[calc(100vh-2rem)]"
-      style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)' }}>
+    <div className="bg-white border-2 flex flex-col h-full lg:max-h-[calc(100vh-2rem)]"
+      style={{
+        borderColor: 'rgba(14, 42, 74, 0.15)',
+        boxShadow: '0 2px 12px rgba(14, 42, 74, 0.06)',
+      }}>
       <div className="px-3 py-2 border-b border-[color:var(--green-forest)]/15 flex items-baseline justify-between">
         <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.18em' }}>Rosters</p>
         <p className="text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.15em' }}>
@@ -991,10 +1002,12 @@ function RostersColumn({ orderedOwners, ownerStateById, bidsByOwner, currentNomi
             const theme = getOwnerTheme(o.name);
             return (
             <div key={o.id}
-                className="p-2 bg-white border"
+                className="p-2 border"
                 style={{
-                  borderColor: isNominator ? 'var(--gold-masters)' : 'rgba(42, 70, 54, 0.15)',
-                  background: isNominator ? 'rgba(253, 181, 21, 0.08)' : undefined,
+                  borderColor: isNominator ? 'var(--gold-masters)' : 'rgba(42, 70, 54, 0.1)',
+                  background: isNominator
+                    ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.15) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(253, 181, 21, 0.15) 100%)'
+                    : 'var(--cream-tint)',
                 }}>
                 <div className="flex items-baseline justify-between gap-2 mb-1.5">
                   <div className="flex items-baseline gap-1.5 min-w-0">
