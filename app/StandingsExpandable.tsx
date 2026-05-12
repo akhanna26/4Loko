@@ -70,8 +70,8 @@ export default function StandingsExpandable({
   const hasLive = Object.values(tournamentStatusByName).some((s) => s === 'live');
 
   const colTemplate = hasLive
-    ? '40px minmax(170px, 1fr) ' + eventOrder.map((e) => (e.type === 'MAJOR' ? '52px' : '46px')).join(' ') + ' 64px 28px'
-    : '40px minmax(170px, 1fr) 64px ' + eventOrder.map((e) => (e.type === 'MAJOR' ? '52px' : '46px')).join(' ') + ' 28px';
+    ? '28px minmax(140px, 1fr) ' + eventOrder.map((e) => (e.type === 'MAJOR' ? '46px' : '42px')).join(' ') + ' 58px 22px'
+    : '28px minmax(140px, 1fr) 58px ' + eventOrder.map((e) => (e.type === 'MAJOR' ? '46px' : '42px')).join(' ') + ' 22px';
 
   const renderCell = (eventName: string, score: number | undefined, isElev: boolean) => {
     const status = tournamentStatusByName[eventName];
@@ -129,7 +129,7 @@ export default function StandingsExpandable({
 
       <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm overflow-x-auto">
         <div className="bg-[color:var(--cream-tint)]/60 p-3 sm:p-5">
-          <div className="min-w-[800px]">
+          <div className="min-w-[640px]">
             <div className="board-row board-header" style={{ gridTemplateColumns: colTemplate, background: 'var(--cream-deep)', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
               <div className="board-cell">Pos</div>
               <div className="board-cell">Owner</div>
