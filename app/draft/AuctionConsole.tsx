@@ -776,9 +776,12 @@ const handleResetDraft = () => {
             </div>
           )}
 
-          {/* GRID HEADER */}
+         {/* GRID HEADER */}
           <div className="bg-white border-2 overflow-x-auto mb-2"
-               style={{ borderColor: 'rgba(14, 42, 74, 0.15)' }}>
+               style={{
+                 borderColor: 'rgba(14, 42, 74, 0.15)',
+                 boxShadow: '0 2px 8px rgba(14, 42, 74, 0.05)',
+               }}>
             <div className="bg-[color:var(--cream-tint)]/70 grid gap-px min-w-[900px]"
                  style={{ gridTemplateColumns: `220px repeat(${owners.length}, minmax(60px, 1fr))` }}>
               <div className="bg-[color:var(--cream-tint)]">
@@ -792,8 +795,14 @@ const handleResetDraft = () => {
                 const isNominator = currentNominatorId === o.id;
                 const theme = getOwnerTheme(o.name);
                 return (
-                 <div key={o.id}
-                    className={`p-2 border-b border-[color:var(--green-forest)]/15 ${isNominator ? 'bg-[color:var(--cream-deep)]' : 'bg-[color:var(--cream-tint)]/60'}`}>
+                <div key={o.id}
+                    className="p-2"
+                    style={{
+                      background: isNominator
+                        ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.18) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(253, 181, 21, 0.18) 100%)'
+                        : 'var(--cream-deep)',
+                      borderRight: '1px solid rgba(255,255,255,0.6)',
+                    }}>
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <RankBadge rank={rankByOwner.get(o.id)} ownerName={o.name} />
                       <span className="serif text-[10px] sm:text-[11px] text-[color:var(--green-deep)] font-semibold">{colHeader(o.name)}</span>
@@ -842,7 +851,7 @@ const handleResetDraft = () => {
                           cursor: isClickable ? 'pointer' : 'default',
                           boxShadow: isNominated ? '0 1px 4px rgba(253, 181, 21, 0.15)' : 'none',
                         }}>
-                        <span className="text-[9px] tabular text-[color:var(--green-moss)]/60 shrink-0 w-7 text-right">
+                        <span className="text-[10px] tabular text-[color:var(--green-deep)]/80 shrink-0 w-7 text-right font-semibold">
                           #{rank}
                         </span>
                         <span className={`serif text-xs truncate flex-1 ${isSold ? 'text-[color:var(--green-moss)] line-through' : 'text-[color:var(--green-deep)]'}`}>
