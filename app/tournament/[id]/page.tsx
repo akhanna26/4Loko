@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 import { getTournamentDetail } from '../../../lib/queries';
 import TournamentView from './TournamentView';
 
