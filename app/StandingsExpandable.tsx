@@ -113,7 +113,7 @@ export default function StandingsExpandable({
   return (
     <section className="mb-14">
       <div className="flex items-baseline justify-between mb-4 sm:mb-6 gap-2 flex-wrap">
-        <h2 className="serif text-2xl sm:text-3xl text-[color:var(--green-deep)] font-semibold">Standings</h2>
+       <h2 className="serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none" style={{ letterSpacing: '-0.02em' }}>Standings</h2>
         <div className="flex items-baseline gap-3">
           {hasLive && (
             <span className="flex items-center gap-1.5 text-[9px] sm:text-[10px] uppercase tabular text-[color:var(--chicago-red)] font-semibold" style={{ letterSpacing: '0.2em' }}>
