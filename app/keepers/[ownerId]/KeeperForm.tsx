@@ -55,7 +55,7 @@ export default function KeeperForm({
   const keeperInfo = selectedGolfer ? computeKeeperPrice(selectedGolfer.was_keeper ? selectedGolfer.keeper_stage : 0) : null;
 
   return (
-    <div className="bg-[color:var(--cream-tint)]/70 border border-[color:var(--green-forest)]/15 shadow-sm overflow-hidden">
+    <div className="bg-[color:var(--cream-deep)]/30 border border-[color:var(--green-forest)]/15 shadow-sm overflow-hidden">
       <div className="bg-[color:var(--cream-deep)]/40 px-4 sm:px-5 py-3 border-b border-[color:var(--green-forest)]/15 flex items-baseline justify-between">
         <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.18em' }}>
           Masters Roster
