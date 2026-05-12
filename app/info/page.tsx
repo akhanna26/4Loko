@@ -191,8 +191,19 @@ export default function RulesPage() {
                   No rules match that search.
                 </p>
               )}
-              {filtered.map((faq, i) => (
-                <details key={i} className="bg-white border border-[color:var(--green-forest)]/10 group">
+              {filtered.map((faq, i) => {
+                // Rotate through subtle cream shades by category
+                const categoryTint: Record<string, string> = {
+                  'Format':   'rgba(255, 255, 255, 0.9)',
+                  'Scoring':  'rgba(253, 181, 21, 0.05)',  // gold tint
+                  'Draft':    'rgba(14, 42, 74, 0.04)',     // navy tint
+                  'Keepers':  'rgba(0, 95, 47, 0.04)',      // green tint
+                  'Payouts':  'rgba(200, 16, 46, 0.04)',    // red tint
+                  'Bonuses':  'rgba(253, 181, 21, 0.05)',   // gold tint
+                };
+                const bg = categoryTint[faq.category] ?? 'rgba(255, 255, 255, 0.9)';
+                return (
+                <details key={i} className="border border-[color:var(--green-forest)]/10 group" style={{ background: bg }}>
                   <summary className="cursor-pointer p-3 sm:p-4 flex items-baseline justify-between gap-4 hover:bg-[color:var(--cream-tint)]/40 transition-colors list-none">
                     <div className="flex items-baseline gap-3 min-w-0 flex-1">
                       <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
@@ -206,7 +217,8 @@ export default function RulesPage() {
                     <p className="serif text-sm text-[color:var(--green-deep)] leading-relaxed">{faq.answer}</p>
                   </div>
                 </details>
-              ))}
+              );
+              })}
             </div>
           </div>
         </div>
