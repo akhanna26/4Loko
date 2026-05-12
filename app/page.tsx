@@ -145,7 +145,8 @@ export default async function SeasonPage() {
               {owners.map((o) => {
                 const theme = getOwnerTheme(o.name);
                 return (
-                  <div key={o.id} className="flex items-center gap-3 py-1">
+                  <div key={o.id} className="flex items-center gap-2.5 p-2.5 bg-white/70 border border-[color:var(--green-forest)]/10"
+                    style={{ borderLeft: `2px solid ${theme.primary}` }}>
                     <div
                       className="w-9 h-9 sm:w-10 sm:h-10 rounded-full text-white flex items-center justify-center text-[10px] sm:text-xs tabular font-semibold shadow-sm shrink-0"
                       style={{
@@ -156,7 +157,14 @@ export default async function SeasonPage() {
                     >
                       {initials(o.name)}
                     </div>
-                    <span className="serif text-sm text-[color:var(--green-deep)] truncate">{o.name}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="serif text-xs sm:text-sm text-[color:var(--green-deep)] truncate font-semibold">
+                        {shortName(o.name)}
+                      </div>
+                      <div className="text-[9px] uppercase text-[color:var(--green-moss)] tabular" style={{ letterSpacing: '0.12em' }}>
+                        Owner
+                      </div>
+                    </div>
                   </div>
                 );
               })}
