@@ -69,18 +69,17 @@ export default function StandingsExpandable({
     });
   };
 
-  const colTemplate = '40px minmax(170px, 1fr) ' + eventOrder.map((e) => (e.type === 'MAJOR' ? '52px' : '46px')).join(' ') + ' 64px 28px';
+  const colTemplate = '28px minmax(120px, 1fr) ' + eventOrder.map((e) => (e.type === 'MAJOR' ? '40px' : '36px')).join(' ') + ' 48px 18px';
 
   const renderCell = (eventName: string, score: number | undefined, isElev: boolean) => {
     const status = tournamentStatusByName[eventName];
-    if (status === 'upcoming') return <span className="board-num-pending">tbd</span>;
+    if (status === 'upcoming') return <span style={{ color: 'rgba(42, 70, 54, 0.25)', fontStyle: 'italic', fontSize: '10px' }}>—</span>;
     if (score === undefined || score === null) return <span className="board-num-pending">—</span>;
     if (score === 0) return <span style={{ color: 'var(--green-moss)' }}>E</span>;
     const style = tieredScoreStyle(score, quartilesByEvent[eventName]);
     return (
       <span
-        className={isElev ? 'board-num-elev' : 'board-num-major'}
-        style={{ color: style.color, fontWeight: style.weight }}>
+        style={{ color: style.color, fontWeight: style.weight, fontSize: isElev ? '10px' : '12px', fontFamily: "'Inter Tight', 'Inter', system-ui, sans-serif", fontVariantNumeric: 'tabular-nums' }}>
         {score > 0 ? `+${score}` : score}
       </span>
     );
@@ -117,18 +116,18 @@ export default function StandingsExpandable({
         boxShadow: '0 2px 8px rgba(14, 42, 74, 0.06)',
         padding: '16px',
       }} className="overflow-x-auto">
-        <div style={{ background: 'rgba(245, 241, 230, 0.5)', padding: '16px' }} className="min-w-[800px]">
+        <div style={{ background: 'rgba(245, 241, 230, 0.5)' }} className="p-3 sm:p-4 min-w-[560px]">
           
-          <div className="board-row board-header" style={{ gridTemplateColumns: colTemplate, background: 'var(--cream-deep)', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-            <div className="board-cell">Pos</div>
-            <div className="board-cell">Owner</div>
+         <div className="grid" style={{ gridTemplateColumns: colTemplate, background: 'var(--cream-deep)', borderBottom: '1px solid rgba(42,70,54,0.1)' }}>
+            <div className="px-2 py-1.5 text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>#</div>
+            <div className="px-2 py-1.5 text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>Owner</div>
             {eventOrder.map((e) => (
-              <div key={e.short} className={`board-cell text-right ${e.type === 'PGA' ? 'board-col-elev' : ''}`}>
+              <div key={e.short} className="px-2 py-1.5 text-[9px] uppercase text-right text-[color:var(--green-moss)]" style={{ letterSpacing: '0.14em' }}>
                 {e.short}
               </div>
             ))}
-            <div className="board-cell text-right">Total</div>
-            <div className="board-cell" />
+            <div className="px-2 py-1.5 text-[9px] uppercase text-right text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.14em' }}>Total</div>
+            <div />
           </div>
 
           {standings.map((s, i) => {
