@@ -7,6 +7,7 @@ import {
 import { getMajorAccent } from '../components/Emblems';
 import Link from 'next/link';
 import StandingsExpandable from './StandingsExpandable';
+import { getOwnerTheme } from '../lib/owner-themes';
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -96,11 +97,12 @@ export default async function SeasonPage() {
         </div>
 
         <div style={{
-          background: 'rgba(255, 255, 255, 0.85)',
-          border: '1px solid rgba(42, 70, 54, 0.15)',
-          boxShadow: '0 2px 8px rgba(14, 42, 74, 0.05)',
+          background: 'white',
+          border: '1px solid rgba(14, 42, 74, 0.2)',
+          boxShadow: '0 2px 8px rgba(14, 42, 74, 0.06)',
+          padding: '16px',
         }}>
-          <div style={{ background: 'rgba(240, 234, 219, 0.6)' }} className="p-3 sm:p-5 space-y-3">
+          <div className="space-y-3">
             {flightPairs.map((pair, idx) => {
               const accent = getMajorAccent(pair.major.tournament_name);
               const flightNum = idx + 1;
@@ -109,8 +111,13 @@ export default async function SeasonPage() {
               const tournamentElevated = pair.elevated ? tournaments.find((t) => t.id === pair.elevated!.tournament_id) : null;
 
               return (
-                <div key={pair.major.tournament_id} className="relative pl-6 sm:pl-10"
-                  style={{ borderLeft: `3px solid ${bracketColor}` }}>
+                <div key={pair.major.tournament_id}
+                  style={{
+                    background: 'var(--cream-tint)',
+                    borderLeft: `3px solid ${bracketColor}`,
+                    padding: '12px 16px 12px 24px',
+                    position: 'relative',
+                  }}>
                   <div className="absolute -left-[3px] top-3 w-2 sm:w-3 h-px" style={{ background: bracketColor }} />
                   <div className="absolute -left-[3px] bottom-3 w-2 sm:w-3 h-px" style={{ background: bracketColor }} />
                   <p className="text-[9px] uppercase mb-2 mt-1"
@@ -141,30 +148,36 @@ export default async function SeasonPage() {
         </div>
 
         <div style={{
-          background: 'rgba(255, 255, 255, 0.85)',
-          border: '1px solid rgba(42, 70, 54, 0.15)',
-          boxShadow: '0 2px 8px rgba(14, 42, 74, 0.05)',
+          background: 'white',
+          border: '1px solid rgba(14, 42, 74, 0.2)',
+          boxShadow: '0 2px 8px rgba(14, 42, 74, 0.06)',
+          padding: '16px',
         }}>
-          <div style={{ background: 'rgba(240, 234, 219, 0.6)' }} className="p-3 sm:p-5">
+          <div style={{ background: 'var(--cream-tint)', padding: '16px' }}>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
-              {owners.map((o) => (
-                <div key={o.id} className="flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5"
-                  style={{
-                    background: 'white',
-                    border: '1px solid rgba(42, 70, 54, 0.1)',
-                  }}>
-                  <div
-                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[color:var(--green-deep)] text-[color:var(--cream)] flex items-center justify-center text-[10px] sm:text-xs tabular font-semibold shadow-sm shrink-0"
+              {owners.map((o) => {
+                const theme = getOwnerTheme(o.name);
+                return (
+                  <div key={o.id} className="flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5"
                     style={{
-                      letterSpacing: '0.05em',
-                      border: '2px solid white',
-                    }}
-                  >
-                    {initials(o.name)}
+                      background: 'white',
+                      border: `1px solid ${theme.primary}30`,
+                      borderLeft: `3px solid ${theme.primary}`,
+                    }}>
+                    <div
+                      className="w-8 h-8 sm:w-10 sm:h-10 rounded-full text-white flex items-center justify-center text-[10px] sm:text-xs tabular font-semibold shadow-sm shrink-0"
+                      style={{
+                        letterSpacing: '0.05em',
+                        background: theme.primary,
+                        border: `2px solid ${theme.secondary}`,
+                      }}
+                    >
+                      {initials(o.name)}
+                    </div>
+                    <span className="serif text-xs sm:text-sm text-[color:var(--green-deep)] truncate">{o.name}</span>
                   </div>
-                  <span className="serif text-xs sm:text-sm text-[color:var(--green-deep)] truncate">{o.name}</span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
