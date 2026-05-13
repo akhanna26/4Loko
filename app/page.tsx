@@ -95,45 +95,44 @@ export default async function SeasonPage() {
           </span>
         </div>
 
-        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-3 sm:p-5 shadow-sm">
-         <div style={{
+        <div style={{
           background: 'rgba(255, 255, 255, 0.85)',
           border: '1px solid rgba(42, 70, 54, 0.15)',
           boxShadow: '0 2px 8px rgba(14, 42, 74, 0.05)',
         }}>
           <div style={{ background: 'rgba(240, 234, 219, 0.6)' }} className="p-3 sm:p-5 space-y-3">
-          {flightPairs.map((pair, idx) => {
-            const accent = getMajorAccent(pair.major.tournament_name);
-            const flightNum = idx + 1;
-            const bracketColor = accent?.bracket ?? 'var(--green-deep)';
-            const tournamentMajor = tournaments.find((t) => t.id === pair.major.tournament_id);
-            const tournamentElevated = pair.elevated ? tournaments.find((t) => t.id === pair.elevated!.tournament_id) : null;
+            {flightPairs.map((pair, idx) => {
+              const accent = getMajorAccent(pair.major.tournament_name);
+              const flightNum = idx + 1;
+              const bracketColor = accent?.bracket ?? 'var(--green-deep)';
+              const tournamentMajor = tournaments.find((t) => t.id === pair.major.tournament_id);
+              const tournamentElevated = pair.elevated ? tournaments.find((t) => t.id === pair.elevated!.tournament_id) : null;
 
-            return (
-              <div key={pair.major.tournament_id} className="relative pl-6 sm:pl-10"
-                style={{ borderLeft: `3px solid ${bracketColor}` }}>
-                <div className="absolute -left-[3px] top-3 w-2 sm:w-3 h-px" style={{ background: bracketColor }} />
-                <div className="absolute -left-[3px] bottom-3 w-2 sm:w-3 h-px" style={{ background: bracketColor }} />
-                <p className="text-[9px] uppercase mb-2 mt-1"
-                  style={{ letterSpacing: '0.32em', color: bracketColor }}>
-                  Flight {flightNum}
-                </p>
+              return (
+                <div key={pair.major.tournament_id} className="relative pl-6 sm:pl-10"
+                  style={{ borderLeft: `3px solid ${bracketColor}` }}>
+                  <div className="absolute -left-[3px] top-3 w-2 sm:w-3 h-px" style={{ background: bracketColor }} />
+                  <div className="absolute -left-[3px] bottom-3 w-2 sm:w-3 h-px" style={{ background: bracketColor }} />
+                  <p className="text-[9px] uppercase mb-2 mt-1"
+                    style={{ letterSpacing: '0.32em', color: bracketColor }}>
+                    Flight {flightNum}
+                  </p>
 
-                <EventCard event={pair.major} tournament={tournamentMajor} accent={accent} isMajor />
+                  <EventCard event={pair.major} tournament={tournamentMajor} accent={accent} isMajor />
 
-                {pair.elevated && (
-                  <div className="ml-2 sm:ml-4 mt-1 mb-3">
-                    <EventCard event={pair.elevated} tournament={tournamentElevated} accent={accent} isMajor={false} />
-                  </div>
-                )}
-              </div>
-            );
-         })}
+                  {pair.elevated && (
+                    <div className="ml-2 sm:ml-4 mt-1 mb-3">
+                      <EventCard event={pair.elevated} tournament={tournamentElevated} accent={accent} isMajor={false} />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-     <section>
+      <section>
         <div className="flex items-baseline justify-between mb-4 sm:mb-5 gap-2">
           <h2 className="serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none" style={{ letterSpacing: '-0.02em' }}>Field</h2>
           <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
