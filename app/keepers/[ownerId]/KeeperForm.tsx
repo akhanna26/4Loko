@@ -3,17 +3,22 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { saveKeeperDeclaration, clearKeeperDeclaration, computeKeeperPrice, RosterEntry } from '../../../lib/draft';
 
+import { getOwnerTheme } from '../../../lib/owner-themes';
+
 export default function KeeperForm({
   ownerId,
+  ownerName,
   flightId,
   roster,
   currentDeclaration,
 }: {
   ownerId: number;
+  ownerName: string;
   flightId: number;
   roster: RosterEntry[];
   currentDeclaration: { golfer_id: number; keeper_price: number; keeper_stage: number } | null;
 }) {
+  const theme = getOwnerTheme(ownerName);
   const router = useRouter();
   const [selected, setSelected] = useState<number | null>(currentDeclaration?.golfer_id ?? null);
   const [isPending, startTransition] = useTransition();
@@ -79,12 +84,12 @@ export default function KeeperForm({
               className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 cursor-pointer transition-all last:border-b-0 hover:shadow-md"
               style={{
                 background: isSelected
-                  ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.18) 0%, rgba(255, 255, 255, 0.98) 50%, rgba(253, 181, 21, 0.18) 100%)'
+                  ? `linear-gradient(135deg, ${theme.primary}15 0%, rgba(255, 255, 255, 0.98) 50%, ${theme.primary}15 100%)`
                   : 'white',
                 margin: '6px',
-                border: isSelected ? '1px solid rgba(253, 181, 21, 0.5)' : '1px solid rgba(14, 42, 74, 0.18)',
-                borderLeft: isSelected ? '3px solid var(--gold-masters)' : '3px solid rgba(14, 42, 74, 0.18)',
-                boxShadow: isSelected ? '0 2px 8px rgba(253, 181, 21, 0.15)' : '0 1px 3px rgba(14, 42, 74, 0.06)',
+                border: isSelected ? `1px solid ${theme.primary}60` : '1px solid rgba(14, 42, 74, 0.18)',
+                borderLeft: isSelected ? `3px solid ${theme.primary}` : '3px solid rgba(14, 42, 74, 0.18)',
+                boxShadow: isSelected ? `0 2px 8px ${theme.primary}25` : '0 1px 3px rgba(14, 42, 74, 0.06)',
               }}
             >
               <input
@@ -138,9 +143,9 @@ export default function KeeperForm({
             letterSpacing: '0.18em',
             background: selected === null
               ? 'var(--green-moss)'
-              : 'linear-gradient(135deg, var(--green-deep) 0%, var(--green-forest) 100%)',
-            border: '1px solid var(--green-deep)',
-            boxShadow: selected === null ? 'none' : '0 2px 12px rgba(26, 48, 34, 0.3)',
+              : `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`,
+            border: `1px solid ${theme.primary}`,
+            boxShadow: selected === null ? 'none' : `0 2px 12px ${theme.primary}40`,
           }}
         >
           {isPending ? 'Saving…' : currentDeclaration ? 'Update keeper' : `Confirm ${keeperInfo ? `· $${keeperInfo.price}` : ''}`}
