@@ -240,6 +240,7 @@ export async function getOwnerRanks(): Promise<Map<number, StandingRank>> {
           owner_id: nameToId.get(h.owner_name),
           owner_name: h.owner_name,
           season_score: Number(h.yearlong_total) || 0,
+          season_year: h.season_year    // <-- ADD THIS LINE
         }))
         .filter((r: any) => r.owner_id !== undefined);
       isFallback = true;
