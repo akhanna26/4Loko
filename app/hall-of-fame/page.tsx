@@ -1,10 +1,20 @@
-import { getMajorWinners, getChampions, getYearlongStandings, getEventResults } from '../../lib/queries';
+import { getMajorWinners, getChampions, getYearlongStandings } from '../../lib/queries';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
 const HEADING_CLASS = "serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none";
 const HEADING_STYLE = { letterSpacing: '-0.02em' };
+
+const WHITE_CASE_STYLE: React.CSSProperties = {
+  background: 'rgba(255, 255, 255, 0.85)',
+  border: '1px solid rgba(42, 70, 54, 0.15)',
+  boxShadow: '0 2px 8px rgba(14, 42, 74, 0.05)',
+};
+
+const INNER_CREAM_STYLE: React.CSSProperties = {
+  background: 'rgba(240, 234, 219, 0.6)',
+};
 
 function formatScore(s: number) {
   return s > 0 ? `+${s}` : s === 0 ? 'E' : `${s}`;
@@ -19,7 +29,6 @@ export default async function HallOfFamePage() {
     getYearlongStandings(2023),
   ]);
 
-  // Major counts tally
   const majorTally = new Map<string, number>();
   for (const m of majorWinners) {
     majorTally.set(m.owner_name, (majorTally.get(m.owner_name) ?? 0) + 1);
@@ -57,7 +66,7 @@ export default async function HallOfFamePage() {
         </p>
       </header>
 
-      {/* CHAMPIONS — year-long winners */}
+      {/* CHAMPIONS */}
       {champions.length > 0 && (
         <section className="mb-12 sm:mb-14">
           <div className="flex items-baseline justify-between mb-4 sm:mb-5 gap-2">
@@ -67,13 +76,18 @@ export default async function HallOfFamePage() {
             </span>
           </div>
 
-          <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm">
-            <div className="bg-[color:var(--cream-tint)]/60 p-4 sm:p-6">
+          <div style={WHITE_CASE_STYLE}>
+            <div style={INNER_CREAM_STYLE} className="p-4 sm:p-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {champions.map((c) => (
                   <div key={c.season_year}
-                    className="bg-white p-4 border border-[color:var(--green-forest)]/15"
-                    style={{ borderTop: '3px solid var(--gold-masters)' }}>
+                    style={{
+                      background: 'white',
+                      border: '1px solid rgba(42, 70, 54, 0.15)',
+                      borderTop: '3px solid var(--gold-masters)',
+                      boxShadow: '0 1px 3px rgba(14, 42, 74, 0.06)',
+                    }}
+                    className="p-4">
                     <p className="text-[10px] uppercase tabular text-[color:var(--gold-masters)] font-semibold" style={{ letterSpacing: '0.24em' }}>
                       {c.season_year}
                     </p>
@@ -99,12 +113,15 @@ export default async function HallOfFamePage() {
             </span>
           </div>
 
-          <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm">
-            <div className="bg-[color:var(--cream-tint)]/60 p-4 sm:p-6">
+          <div style={WHITE_CASE_STYLE}>
+            <div style={INNER_CREAM_STYLE} className="p-4 sm:p-6">
               <div className="space-y-1">
                 {tallyRanked.map(([name, count], i) => (
-                  <div key={name} className="flex items-baseline justify-between gap-3 py-2"
-                    style={{ borderBottom: i < tallyRanked.length - 1 ? '1px solid rgba(255,255,255,0.7)' : 'none' }}>
+                  <div key={name} className="flex items-baseline justify-between gap-3 py-2 px-2"
+                    style={{
+                      background: 'white',
+                      borderBottom: i < tallyRanked.length - 1 ? '1px solid rgba(42, 70, 54, 0.08)' : 'none',
+                    }}>
                     <div className="flex items-baseline gap-3">
                       <span className="text-xs tabular text-[color:var(--green-moss)] w-6">#{i + 1}</span>
                       <span className="serif text-sm sm:text-base text-[color:var(--green-deep)]">{name}</span>
@@ -130,12 +147,15 @@ export default async function HallOfFamePage() {
             </span>
           </div>
 
-          <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm">
-            <div className="bg-[color:var(--cream-tint)]/60 p-4 sm:p-6">
+          <div style={WHITE_CASE_STYLE}>
+            <div style={INNER_CREAM_STYLE} className="p-4 sm:p-6">
               <div className="space-y-1">
                 {majorWinners.map((m, i) => (
-                  <div key={`${m.season_year}-${m.tournament_name}`} className="flex items-baseline justify-between gap-3 py-2"
-                    style={{ borderBottom: i < majorWinners.length - 1 ? '1px solid rgba(255,255,255,0.7)' : 'none' }}>
+                  <div key={`${m.season_year}-${m.tournament_name}`} className="flex items-baseline justify-between gap-3 py-2 px-2"
+                    style={{
+                      background: 'white',
+                      borderBottom: i < majorWinners.length - 1 ? '1px solid rgba(42, 70, 54, 0.08)' : 'none',
+                    }}>
                     <div className="flex items-baseline gap-3 flex-wrap min-w-0">
                       <span className="text-xs tabular text-[color:var(--green-moss)] shrink-0">{m.season_year}</span>
                       <span className="text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
@@ -164,19 +184,19 @@ export default async function HallOfFamePage() {
               </span>
             </div>
 
-            <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm">
-              <div className="bg-[color:var(--cream-tint)]/60 p-4 sm:p-6">
+            <div style={WHITE_CASE_STYLE}>
+              <div style={INNER_CREAM_STYLE} className="p-4 sm:p-6">
                 <div className="space-y-1">
                   {standings.map((s, i) => {
                     const isLeader = s.finish_rank === 1;
                     return (
-                      <div key={s.owner_name} className="grid items-baseline gap-3 py-2"
+                      <div key={s.owner_name} className="grid items-baseline gap-3 py-2 px-2"
                         style={{
                           gridTemplateColumns: '30px 1fr 80px 60px',
-                          borderBottom: i < standings.length - 1 ? '1px solid rgba(255,255,255,0.7)' : 'none',
-                          background: isLeader ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.06) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(253, 181, 21, 0.06) 100%)' : 'transparent',
+                          background: isLeader ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.08) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(253, 181, 21, 0.08) 100%)' : 'white',
                           borderLeft: isLeader ? '3px solid var(--gold-masters)' : '3px solid transparent',
-                          paddingLeft: isLeader ? '12px' : '8px',
+                          borderBottom: i < standings.length - 1 ? '1px solid rgba(42, 70, 54, 0.08)' : 'none',
+                          paddingLeft: isLeader ? '8px' : '8px',
                         }}>
                         <span className="text-xs tabular text-[color:var(--green-moss)]">
                           {s.finish_rank}
