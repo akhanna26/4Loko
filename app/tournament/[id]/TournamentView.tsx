@@ -198,11 +198,22 @@ export default function TournamentView({ detail }: { detail: TournamentDetail })
                             <span className="sm:hidden">{shortName(r.owner_name)}</span>
                             {isLeader && <span className="ml-1 text-[color:var(--gold-masters)]">★</span>}
                           </span>
-                          {r.daily_scores.map((d) => (
-                            <span key={d.day} className="text-[10px] sm:text-xs tabular text-right" style={{ color: d.score && d.score > 0 ? 'var(--green-deep)' : 'rgba(42,70,54,0.4)' }}>
-                              {dailyDisplay(d.score)}
-                            </span>
-                          ))}
+                          {r.daily_scores.map((d) => {
+                            const s = d.score;
+                            const color =
+                              s === null ? 'rgba(42,70,54,0.4)' :
+                              s >= 5 ? 'var(--masters-green)' :
+                              s >= 2 ? 'var(--green-forest)' :
+                              s === 0 || s === null ? 'var(--green-moss)' :
+                              s < 0 ? 'var(--chicago-red)' :
+                              'var(--green-deep)';
+                            const weight = s !== null && s >= 5 ? 700 : s !== null && s >= 2 ? 600 : 500;
+                            return (
+                              <span key={d.day} className="text-[10px] sm:text-xs tabular text-right" style={{ color, fontWeight: weight }}>
+                                {dailyDisplay(d.score)}
+                              </span>
+                            );
+                          })}
                           <span className="text-[10px] sm:text-xs tabular text-right" style={{ color: r.bonus_total > 0 ? secondary : 'rgba(42,70,54,0.4)', fontWeight: r.bonus_total > 0 ? 700 : 400 }}>
                             {r.bonus_total > 0 ? `+${r.bonus_total}` : '—'}
                           </span>
@@ -228,47 +239,70 @@ export default function TournamentView({ detail }: { detail: TournamentDetail })
                               <div className="min-w-[420px]">
                                 {/* Roster column header */}
                                 <div className="grid gap-1 py-1 mb-1 border-b border-[color:var(--green-forest)]/15"
-                                  style={{ gridTemplateColumns: 'minmax(140px, 1fr) 38px repeat(4, 36px) 44px' }}>
+                                  style={{ gridTemplateColumns: 'minmax(120px, 1fr) 32px repeat(4, 32px) 36px 36px' }}>
                                   <span className="text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>Golfer</span>
                                   <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>$</span>
                                   <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Thu</span>
                                   <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Fri</span>
                                   <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Sat</span>
                                   <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Sun</span>
-                                  <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Total</span>
+                                  <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Bon</span>
+                                  <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Tot</span>
                                 </div>
 
-                                {r.golfers.map((g) => (
-                                  <div key={g.golfer_id} className="grid gap-1 py-1.5 items-baseline"
-                                    style={{
-                                      gridTemplateColumns: 'minmax(140px, 1fr) 38px repeat(4, 36px) 44px',
-                                      borderTop: '1px solid rgba(255,255,255,0.7)',
-                                    }}>
-                                    <span className="serif text-xs text-[color:var(--green-deep)] truncate">
-                                      {g.is_keeper && <span className="mr-1 text-[8px] uppercase font-bold" style={{ color: secondary, letterSpacing: '0.15em' }}>K</span>}
-                                      {g.full_name}
-                                    </span>
-                                    <span className="text-[10px] tabular text-[color:var(--green-moss)] text-right">${g.purchase_price}</span>
-                                    {g.day_scores.map((ds) => (
-                                      <span key={ds.day} className="text-[10px] tabular text-right"
-                                        style={{
-                                          color: ds.raw_score === null ? 'rgba(42,70,54,0.3)' :
-                                                 ds.counted ? primary :
-                                                 'rgba(42,70,54,0.4)',
-                                          fontWeight: ds.counted ? 700 : 400,
-                                          background: ds.counted && ds.raw_score !== null ? `${primary}12` : 'transparent',
-                                          paddingLeft: '3px',
-                                          paddingRight: '3px',
-                                        }}>
-                                        {ds.raw_score === null ? '—' : formatScore(ds.raw_score)}
+                                {r.golfers.map((g) => {
+                                  // Sum bonuses tied to this specific golfer
+                                  const golferBonusPts = r.bonuses
+                                    .filter((b: any) => {
+                                      // Bonus is for THIS golfer if detail mentions their name
+                                      return b.detail.includes(g.full_name);
+                                    })
+                                    .reduce((sum: number, b: any) => sum + b.points, 0);
+                                  const golferTotal = g.best_round_total + golferBonusPts;
+                                  return (
+                                    <div key={g.golfer_id} className="grid gap-1 py-1.5 items-baseline"
+                                      style={{
+                                        gridTemplateColumns: 'minmax(120px, 1fr) 32px repeat(4, 32px) 36px 36px',
+                                        borderTop: '1px solid rgba(255,255,255,0.7)',
+                                      }}>
+                                      <span className="serif text-xs text-[color:var(--green-deep)] truncate">
+                                        {g.is_keeper && <span className="mr-1 text-[8px] uppercase font-bold" style={{ color: secondary, letterSpacing: '0.15em' }}>K</span>}
+                                        {g.full_name}
                                       </span>
-                                    ))}
-                                    <span className="text-[10px] tabular text-right font-semibold"
-                                      style={{ color: g.best_round_total > 0 ? primary : 'rgba(42,70,54,0.4)' }}>
-                                      {g.best_round_total > 0 ? `+${g.best_round_total}` : '—'}
-                                    </span>
-                                  </div>
-                                ))}
+                                      <span className="text-[10px] tabular text-[color:var(--green-moss)] text-right">${g.purchase_price}</span>
+                                      {g.day_scores.map((ds) => {
+                                        const s = ds.raw_score;
+                                        const baseColor =
+                                          s === null ? 'rgba(42,70,54,0.3)' :
+                                          s >= 5 ? 'var(--masters-green)' :
+                                          s >= 2 ? 'var(--green-forest)' :
+                                          s === 0 ? 'var(--green-moss)' :
+                                          s < 0 ? 'var(--chicago-red)' :
+                                          'var(--green-deep)';
+                                        const color = ds.counted ? primary : (s !== null ? baseColor : 'rgba(42,70,54,0.3)');
+                                        return (
+                                          <span key={ds.day} className="text-[10px] tabular text-right"
+                                            style={{
+                                              color,
+                                              fontWeight: ds.counted ? 700 : 400,
+                                              background: ds.counted && s !== null ? `${primary}12` : 'transparent',
+                                              paddingLeft: '3px',
+                                              paddingRight: '3px',
+                                            }}>
+                                            {s === null ? '—' : formatScore(s)}
+                                          </span>
+                                        );
+                                      })}
+                                      <span className="text-[10px] tabular text-right" style={{ color: golferBonusPts > 0 ? secondary : 'rgba(42,70,54,0.4)', fontWeight: golferBonusPts > 0 ? 700 : 400 }}>
+                                        {golferBonusPts > 0 ? `+${golferBonusPts}` : '—'}
+                                      </span>
+                                      <span className="text-[10px] tabular text-right font-bold"
+                                        style={{ color: golferTotal > 0 ? primary : 'rgba(42,70,54,0.4)' }}>
+                                        {golferTotal > 0 ? `+${golferTotal}` : '—'}
+                                      </span>
+                                    </div>
+                                  );
+                                })}
 
                                 {r.golfers.length === 0 && (
                                   <p className="text-[10px] text-[color:var(--green-moss)] italic serif py-2">No roster recorded.</p>
