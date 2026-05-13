@@ -1,6 +1,12 @@
 'use client';
 import { useState, useMemo } from 'react';
 
+const shortName = (name: string) => {
+  const p = name.trim().split(/\s+/);
+  if (p.length < 2) return name;
+  return `${p[0][0]}. ${p[p.length - 1]}`;
+};
+
 type Standing = { owner_name: string; total: number; per_event: Record<string, number> };
 type EventOrder = { name: string; short: string; type: 'MAJOR' | 'PGA' };
 
@@ -103,20 +109,19 @@ export default function StandingsExpandable({
 
   return (
     <section className="mb-14">
-      <div className="flex items-baseline justify-between mb-5">
-        <h2 className="serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none" style={{ letterSpacing: '-0.02em' }}>Standings</h2>
-        <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
-          Live · click owners to expand
+      <div className="flex items-baseline justify-between mb-3 sm:mb-4 gap-2">
+        <h2 className="serif text-xl sm:text-2xl text-[color:var(--green-deep)] font-semibold leading-none" style={{ letterSpacing: '-0.01em' }}>Standings</h2>
+        <span className="text-[9px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.16em' }}>
+          Tap rows to expand
         </span>
       </div>
 
 <div style={{
         background: 'white',
-        border: '1px solid rgba(14, 42, 74, 0.2)',
-        boxShadow: '0 2px 8px rgba(14, 42, 74, 0.06)',
-        padding: '16px',
+        border: '1px solid rgba(14, 42, 74, 0.18)',
+        boxShadow: '0 1px 4px rgba(14, 42, 74, 0.05)',
       }} className="overflow-x-auto">
-        <div style={{ background: 'rgba(245, 241, 230, 0.5)' }} className="p-3 sm:p-4 min-w-[560px]">
+        <div style={{ background: 'rgba(245, 241, 230, 0.5)' }} className="p-2.5 sm:p-4 min-w-[500px]">
           
          <div className="grid" style={{ gridTemplateColumns: colTemplate, background: 'var(--cream-deep)', borderBottom: '1px solid rgba(42,70,54,0.1)' }}>
             <div className="px-2 py-1.5 text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>#</div>
@@ -147,8 +152,9 @@ export default function StandingsExpandable({
                   }}
                 >
                   <div className={`board-cell board-num ${isLeader ? 'board-num-leader' : 'board-num-major'}`}>{rank}</div>
-                  <div className={`board-cell board-name flex items-center ${isLeader ? 'board-num-leader' : ''}`} style={{ fontSize: '15px', color: isLeader ? undefined : 'var(--green-deep)' }}>
-                    <span>{s.owner_name}</span>
+                  <div className={`board-cell board-name flex items-center ${isLeader ? 'board-num-leader' : ''}`} style={{ fontSize: '13px', color: isLeader ? undefined : 'var(--green-deep)' }}>
+                    <span className="hidden sm:inline truncate">{s.owner_name}</span>
+                    <span className="sm:hidden truncate">{shortName(s.owner_name)}</span>
                     <MedalDot rank={rank} />
                   </div>
                   {eventOrder.map((e) => (
@@ -203,10 +209,6 @@ export default function StandingsExpandable({
           })}
         </div>
       </div>
-
-      <p className="text-[10px] uppercase text-[color:var(--green-moss)] mt-3 text-right" style={{ letterSpacing: '0.18em' }}>
-        Top 25% saturated · upper half forest · zero in moss · negatives in red
-      </p>
     </section>
   );
 }
