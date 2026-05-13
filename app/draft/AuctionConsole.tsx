@@ -845,8 +845,8 @@ const handleResetDraft = () => {
                             ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.18) 0%, rgba(255, 255, 255, 0.95) 50%, rgba(253, 181, 21, 0.18) 100%)'
                             : isSold
                               ? 'rgba(42, 70, 54, 0.08)'
-                              : 'transparent',
-                          borderBottom: '1px solid rgba(255, 255, 255, 0.6)',
+                              : 'white',
+                          borderBottom: '1px solid rgba(14, 42, 74, 0.1)',
                           borderLeft: isNominated ? '3px solid var(--gold-masters)' : '3px solid transparent',
                           cursor: isClickable ? 'pointer' : 'default',
                           boxShadow: isNominated ? '0 1px 4px rgba(253, 181, 21, 0.15)' : 'none',
@@ -878,8 +878,9 @@ const handleResetDraft = () => {
                             background: isFlashing ? 'var(--gold-masters)' :
                                        isBuyer ? theme.primaryAlpha :
                                        isSold ? 'rgba(42, 70, 54, 0.08)' :
-                                       'transparent',
-                            borderBottom: '1px solid rgba(255, 255, 255, 0.6)',
+                                       'white',
+                            borderBottom: '1px solid rgba(14, 42, 74, 0.1)',
+                            borderLeft: '1px solid rgba(14, 42, 74, 0.04)',
                             boxShadow: isBuyer ? `inset 0 0 0 1.5px ${theme.primary}` : undefined,
                           }}>
                           {isBuyer && (
@@ -966,9 +967,10 @@ function SnakeColumn({ fullSnake, session, ownerById }: any) {
                   const label = `${round.round}.${String(i + 1).padStart(2, '0')}`;
                   return (
                     <div key={`${round.round}-${i}`}
-                      className="px-1 py-0.5 flex items-baseline gap-1 text-[10px]"
+                      className="px-1 py-1 flex items-baseline gap-1 text-[10px]"
                       style={{
-                        background: isCurrent ? 'rgba(253, 181, 21, 0.3)' : undefined,
+                        background: isCurrent ? 'rgba(253, 181, 21, 0.3)' : 'white',
+                        borderBottom: '1px solid rgba(14, 42, 74, 0.08)',
                         boxShadow: isCurrent ? 'inset 0 0 0 1px var(--gold-masters)' : undefined,
                         opacity: isPast ? 0.4 : 1,
                       }}>
