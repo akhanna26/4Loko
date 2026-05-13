@@ -1,3 +1,4 @@
+import { getOwnerTheme } from '../../lib/owner-themes';
 import { getActiveOwners } from '../../lib/queries';
 import { getFlight, getAllKeeperDeclarations } from '../../lib/draft';
 import Link from 'next/link';
@@ -37,7 +38,7 @@ export default async function KeepersIndex() {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-[color:var(--green-forest)]/15">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {owners.map((o) => {
             const decl = declaredByOwner.get(o.id);
             const isDeclared = !!decl;
