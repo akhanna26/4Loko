@@ -89,14 +89,19 @@ export default async function SeasonPage() {
 
       <section className="mb-12 sm:mb-16 mt-12 sm:mt-16">
         <div className="flex items-baseline justify-between mb-4 sm:mb-6 gap-2">
-          <h2 className="serif text-2xl sm:text-3xl text-[color:var(--green-deep)] font-semibold">Calendar</h2>
+          <h2 className="serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none" style={{ letterSpacing: '-0.02em' }}>Calendar</h2>
           <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
             {tournaments.length} events · 4 flights
           </span>
         </div>
 
         <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-3 sm:p-5 shadow-sm">
-          <div className="bg-[color:var(--cream-tint)]/60 p-3 sm:p-5 space-y-3">
+         <div style={{
+          background: 'rgba(255, 255, 255, 0.85)',
+          border: '1px solid rgba(42, 70, 54, 0.15)',
+          boxShadow: '0 2px 8px rgba(14, 42, 74, 0.05)',
+        }}>
+          <div style={{ background: 'rgba(240, 234, 219, 0.6)' }} className="p-3 sm:p-5 space-y-3">
           {flightPairs.map((pair, idx) => {
             const accent = getMajorAccent(pair.major.tournament_name);
             const flightNum = idx + 1;
@@ -128,29 +133,40 @@ export default async function SeasonPage() {
         </div>
       </section>
 
-      <section>
+     <section>
         <div className="flex items-baseline justify-between mb-4 sm:mb-5 gap-2">
-          <h2 className="serif text-2xl sm:text-3xl text-[color:var(--green-deep)] font-semibold">Field</h2>
+          <h2 className="serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none" style={{ letterSpacing: '-0.02em' }}>Field</h2>
           <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
             {owners.length} owners
           </span>
         </div>
 
-        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-3 sm:p-5 shadow-sm">
-          <div className="bg-[color:var(--cream-tint)]/60 p-3 sm:p-5">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-3 sm:gap-x-4 gap-y-2 sm:gap-y-3">
-            {owners.map((o) => (
-              <div key={o.id} className="flex items-center gap-2 sm:gap-3 py-1">
-                <div
-                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[color:var(--green-deep)] text-[color:var(--cream)] flex items-center justify-center text-[10px] sm:text-xs tabular font-semibold border-2 border-white shadow-sm shrink-0"
-                  style={{ letterSpacing: '0.05em' }}
-                >
-                  {initials(o.name)}
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.85)',
+          border: '1px solid rgba(42, 70, 54, 0.15)',
+          boxShadow: '0 2px 8px rgba(14, 42, 74, 0.05)',
+        }}>
+          <div style={{ background: 'rgba(240, 234, 219, 0.6)' }} className="p-3 sm:p-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+              {owners.map((o) => (
+                <div key={o.id} className="flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5"
+                  style={{
+                    background: 'white',
+                    border: '1px solid rgba(42, 70, 54, 0.1)',
+                  }}>
+                  <div
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[color:var(--green-deep)] text-[color:var(--cream)] flex items-center justify-center text-[10px] sm:text-xs tabular font-semibold shadow-sm shrink-0"
+                    style={{
+                      letterSpacing: '0.05em',
+                      border: '2px solid white',
+                    }}
+                  >
+                    {initials(o.name)}
+                  </div>
+                  <span className="serif text-xs sm:text-sm text-[color:var(--green-deep)] truncate">{o.name}</span>
                 </div>
-                <span className="serif text-xs sm:text-sm text-[color:var(--green-deep)] truncate">{o.name}</span>
-              </div>
-           ))}
-          </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
