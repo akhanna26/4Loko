@@ -105,14 +105,19 @@ export default function StandingsExpandable({
   return (
     <section className="mb-14">
       <div className="flex items-baseline justify-between mb-5">
-        <h2 className="serif text-3xl text-[color:var(--green-deep)] font-semibold">Standings</h2>
+        <h2 className="serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none" style={{ letterSpacing: '-0.02em' }}>Standings</h2>
         <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
           Live · click owners to expand
         </span>
       </div>
 
-<div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-5 overflow-x-auto shadow-sm">
-        <div className="bg-[color:var(--cream-tint)]/60 p-3 min-w-[800px]">
+<div style={{
+        background: 'rgba(255, 255, 255, 0.85)',
+        border: '1px solid rgba(42, 70, 54, 0.15)',
+        boxShadow: '0 2px 8px rgba(14, 42, 74, 0.05)',
+      }} className="overflow-x-auto">
+        <div style={{ background: 'rgba(240, 234, 219, 0.6)' }} className="p-3 sm:p-5 min-w-[800px]">
+          
           <div className="board-row board-header" style={{ gridTemplateColumns: colTemplate, background: 'var(--cream-deep)', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
             <div className="board-cell">Pos</div>
             <div className="board-cell">Owner</div>
