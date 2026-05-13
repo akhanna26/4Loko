@@ -63,7 +63,7 @@ export default function RootLayout({
   <span className="text-[color:var(--green-forest)]/30">|</span>
   <a href="/draft" className="hover:text-[color:var(--green-deep)] transition-colors">Draft</a>
   <span className="text-[color:var(--green-forest)]/30">|</span>
-<a href="/rules" className="hover:text-[color:var(--green-deep)] transition-colors">Rules</a>
+<a href="/info" className="hover:text-[color:var(--green-deep)] transition-colors">Rules</a>
 </nav>
           </div>
         </header>
