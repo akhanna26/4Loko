@@ -95,7 +95,8 @@ export default async function SeasonPage() {
           </span>
         </div>
 
-        <div className="bg-white/50 border border-[color:var(--green-forest)]/15 p-3 sm:p-5 space-y-3">
+        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-3 sm:p-5 shadow-sm">
+          <div className="bg-[color:var(--cream-tint)]/60 p-3 sm:p-5 space-y-3">
           {flightPairs.map((pair, idx) => {
             const accent = getMajorAccent(pair.major.tournament_name);
             const flightNum = idx + 1;
@@ -122,7 +123,8 @@ export default async function SeasonPage() {
                 )}
               </div>
             );
-          })}
+         })}
+          </div>
         </div>
       </section>
 
@@ -134,8 +136,9 @@ export default async function SeasonPage() {
           </span>
         </div>
 
-        <div className="bg-white/50 border border-[color:var(--green-forest)]/15 p-3 sm:p-5">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-3 sm:gap-x-4 gap-y-2 sm:gap-y-3">
+        <div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-3 sm:p-5 shadow-sm">
+          <div className="bg-[color:var(--cream-tint)]/60 p-3 sm:p-5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-3 sm:gap-x-4 gap-y-2 sm:gap-y-3">
             {owners.map((o) => (
               <div key={o.id} className="flex items-center gap-2 sm:gap-3 py-1">
                 <div
@@ -146,7 +149,8 @@ export default async function SeasonPage() {
                 </div>
                 <span className="serif text-xs sm:text-sm text-[color:var(--green-deep)] truncate">{o.name}</span>
               </div>
-            ))}
+           ))}
+          </div>
           </div>
         </div>
       </section>
@@ -195,10 +199,9 @@ function DraftWeekHero({ tournament, accent }: { tournament: any; accent: any })
   const days = Math.max(0, daysUntil(tournament.start_date));
   const primary = accent?.primary ?? 'var(--green-deep)';
   return (
-    <div className="bg-[color:var(--cream-deep)]/40 p-6 sm:p-10 relative"
+    <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm p-6 sm:p-10 relative"
       style={{
         borderTop: `3px solid ${primary}`,
-        boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)',
       }}>
       <p className="text-[9px] sm:text-[10px] uppercase mb-3" style={{ letterSpacing: '0.32em', color: primary }}>
         Draft Week · Bidding Wednesday
@@ -226,10 +229,9 @@ function DraftWeekHero({ tournament, accent }: { tournament: any; accent: any })
 function LiveHero({ tournament, accent }: { tournament: any; accent: any }) {
   const primary = accent?.primary ?? 'var(--gold-masters)';
   return (
-    <div className="bg-[color:var(--cream-deep)]/40 p-6 sm:p-10 relative"
+    <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm p-6 sm:p-10 relative"
       style={{
         borderTop: `3px solid ${primary}`,
-        boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)',
       }}>
       <div className="flex items-center gap-2 mb-3">
         <span className="w-2 h-2 rounded-full bg-[color:var(--chicago-red)] live-pulse" />
