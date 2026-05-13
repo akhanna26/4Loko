@@ -57,8 +57,8 @@ export default function KeeperForm({
   return (
     <div className="border-2 shadow-sm overflow-hidden"
       style={{
-        background: 'var(--cream-tint)',
-        borderColor: 'rgba(14, 42, 74, 0.15)',
+        background: 'var(--cream-deep)',
+        borderColor: 'rgba(14, 42, 74, 0.2)',
       }}>
       <div className="bg-[color:var(--cream-deep)]/40 px-4 sm:px-5 py-3 border-b border-[color:var(--green-forest)]/15 flex items-baseline justify-between">
         <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.18em' }}>
@@ -82,9 +82,9 @@ export default function KeeperForm({
                   ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.18) 0%, rgba(255, 255, 255, 0.98) 50%, rgba(253, 181, 21, 0.18) 100%)'
                   : 'white',
                 margin: '6px',
-                border: isSelected ? '1px solid rgba(253, 181, 21, 0.4)' : '1px solid rgba(42, 70, 54, 0.1)',
-                borderLeft: isSelected ? '3px solid var(--gold-masters)' : '3px solid rgba(42, 70, 54, 0.1)',
-                boxShadow: isSelected ? '0 2px 8px rgba(253, 181, 21, 0.15)' : '0 1px 2px rgba(42, 70, 54, 0.04)',
+                border: isSelected ? '1px solid rgba(253, 181, 21, 0.5)' : '1px solid rgba(14, 42, 74, 0.18)',
+                borderLeft: isSelected ? '3px solid var(--gold-masters)' : '3px solid rgba(14, 42, 74, 0.18)',
+                boxShadow: isSelected ? '0 2px 8px rgba(253, 181, 21, 0.15)' : '0 1px 3px rgba(14, 42, 74, 0.06)',
               }}
             >
               <input
