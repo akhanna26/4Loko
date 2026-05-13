@@ -117,7 +117,7 @@ export default function StandingsExpandable({
         boxShadow: '0 2px 8px rgba(14, 42, 74, 0.06)',
         padding: '16px',
       }} className="overflow-x-auto">
-        <div style={{ background: 'var(--cream-tint)', padding: '16px' }} className="min-w-[800px]">
+        <div style={{ background: 'rgba(245, 241, 230, 0.5)', padding: '16px' }} className="min-w-[800px]">
           
           <div className="board-row board-header" style={{ gridTemplateColumns: colTemplate, background: 'var(--cream-deep)', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
             <div className="board-cell">Pos</div>
