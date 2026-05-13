@@ -15,14 +15,12 @@ export const metadata: Metadata = {
 };
 
 const SPONSORS = [
-  'Manscaped',
-  'Liquid Death',
-  'Athletic Greens',
-  'BetterHelp',
-  'NordVPN',
-  'Squarespace',
-  'Magic Spoon',
-  'Helix Sleep',
+  'Stove Gardner Coding Solutions',
+  'The Antonellis',
+  'Deez',
+  'A Nerd',
+  'The Power of Love',
+  'LIV (RIP)',
 ];
 
 export default function RootLayout({
