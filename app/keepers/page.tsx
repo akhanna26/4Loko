@@ -47,11 +47,18 @@ export default async function KeepersIndex() {
               const theme = getOwnerTheme(o.name);
               return (
                 <Link
-                  key={o.id}
-                  href={`/keepers/${o.id}`}
-                  className="group flex items-center gap-3 p-3 sm:p-4 bg-[color:var(--cream-tint)]/60 border border-[color:var(--green-forest)]/10 hover:bg-[color:var(--cream-deep)]/50 transition-all"
-                  style={{ borderLeft: `3px solid ${theme.primary}` }}
-                >
+                key={o.id}
+                href={`/keepers/${o.id}`}
+                className="group flex items-center gap-3 p-3 sm:p-4 transition-all hover:shadow-md"
+                style={{
+                  background: isDeclared
+                    ? `linear-gradient(135deg, ${theme.primary}10 0%, white 50%, ${theme.primary}10 100%)`
+                    : 'white',
+                  border: `1px solid ${theme.primary}30`,
+                  borderLeft: `3px solid ${theme.primary}`,
+                  boxShadow: '0 1px 4px rgba(14, 42, 74, 0.06)',
+                }}
+              >
                   <div
                     className="w-10 h-10 sm:w-11 sm:h-11 rounded-full text-white flex items-center justify-center text-xs tabular font-semibold border-2 border-white shadow-sm shrink-0"
                     style={{
