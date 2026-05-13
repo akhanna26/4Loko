@@ -319,6 +319,13 @@ export type TournamentDetail = {
   major_winner: { owner_name: string; golfer_name: string } | null;
 };
 
+const ROUND_TO_DAY: Record<number, 'Th' | 'Fr' | 'Sa' | 'Su'> = {
+  1: 'Th', 2: 'Fr', 3: 'Sa', 4: 'Su',
+};
+const DAY_TO_ROUND: Record<'Th' | 'Fr' | 'Sa' | 'Su', number> = {
+  Th: 1, Fr: 2, Sa: 3, Su: 4,
+};
+
 export async function getTournamentDetail(tournamentId: number): Promise<TournamentDetail | null> {
   const { data: tdata, error: terr } = await supabase
     .from('tournaments')
@@ -327,6 +334,211 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
     .single();
   if (terr || !tdata) return null;
   const tournament = tdata as Tournament & { flight_id: number };
+
+  const { data: rosterData } = await supabase
+    .from('rosters')
+    .select('owner_id, golfer_id, purchase_price, is_keeper')
+    .eq('flight_id', tournament.flight_id);
+
+  const { data: ownersData } = await supabase
+    .from('owners')
+    .select('id, name, nickname')
+    .eq('is_active', true);
+
+  const { data: golfersData } = await supabase
+    .from('golfers')
+    .select('id, full_name');
+
+  const golferIds = [...new Set((rosterData ?? []).map((r: any) => r.golfer_id))];
+
+  // Real schema: round_number + strokes_vs_par (negative = good)
+  // We invert to POINTS (positive = good) for display
+  const { data: scoresData } = golferIds.length > 0 ? await supabase
+    .from('scores')
+    .select('golfer_id, round_number, strokes_vs_par')
+    .eq('tournament_id', tournamentId)
+    .in('golfer_id', golferIds) : { data: [] };
+
+  const { data: tScores } = await supabase
+    .from('v_owner_tournament_score')
+    .select('owner_id, owner_name, total_score')
+    .eq('tournament_id', tournamentId);
+
+  const { data: bonusData } = await supabase
+    .from('bonuses')
+    .select('owner_id, golfer_id, bonus_kind, points, round_number')
+    .eq('tournament_id', tournamentId);
+
+  // adjusted scores view — try with real schema columns
+  let adjData: any[] = [];
+  try {
+    const { data: adj } = await supabase
+      .from('v_adjusted_scores')
+      .select('owner_id, golfer_id, round_number, is_counted')
+      .eq('tournament_id', tournamentId);
+    adjData = adj ?? [];
+  } catch (e) {
+    adjData = [];
+  }
+
+  const ownerMap = new Map((ownersData ?? []).map((o: any) => [o.id, o]));
+  const golferMap = new Map((golfersData ?? []).map((g: any) => [g.id, g]));
+
+  const rostersByOwner = new Map<number, any[]>();
+  for (const r of rosterData ?? []) {
+    if (!rostersByOwner.has(r.owner_id)) rostersByOwner.set(r.owner_id, []);
+    rostersByOwner.get(r.owner_id)!.push(r);
+  }
+
+  // Per-golfer-per-round raw strokes vs par
+  const strokesByGolferRound = new Map<string, number>();
+  for (const s of scoresData ?? []) {
+    const sa = s as any;
+    strokesByGolferRound.set(`${sa.golfer_id}-${sa.round_number}`, sa.strokes_vs_par);
+  }
+
+  // Counted-flag per (owner, golfer, round) from view
+  const countedFlag = new Map<string, boolean>();
+  for (const a of adjData) {
+    countedFlag.set(`${a.owner_id}-${a.golfer_id}-${a.round_number}`, a.is_counted);
+  }
+
+  // Bonuses per owner
+  const bonusesByOwner = new Map<number, { kind: string; points: number; detail: string }[]>();
+  for (const b of (bonusData ?? []) as any[]) {
+    if (!bonusesByOwner.has(b.owner_id)) bonusesByOwner.set(b.owner_id, []);
+    const golfer = b.golfer_id ? golferMap.get(b.golfer_id) : null;
+    const dayLabel = b.round_number ? ROUND_TO_DAY[b.round_number] : null;
+    const detail =
+      b.bonus_kind === 'CHAMPION' ? `Champion: ${(golfer as any)?.full_name ?? '—'}` :
+      b.bonus_kind === 'DAILY_LOW' ? `${dayLabel ?? 'Daily'} low${golfer ? `: ${(golfer as any).full_name}` : ''}` :
+      b.bonus_kind === 'HIO' ? `Hole-in-one${golfer ? `: ${(golfer as any).full_name}` : ''}` :
+      b.bonus_kind;
+    bonusesByOwner.get(b.owner_id)!.push({
+      kind: b.bonus_kind,
+      points: Number(b.points) || 0,
+      detail,
+    });
+  }
+
+  const days: ('Th' | 'Fr' | 'Sa' | 'Su')[] = ['Th', 'Fr', 'Sa', 'Su'];
+
+  // Fallback: compute counted-set when no v_adjusted_scores view exists.
+  const computeCountedFallback = (ownerId: number, roster: any[]): Map<string, boolean> => {
+    const result = new Map<string, boolean>();
+    for (const day of days) {
+      const roundNum = DAY_TO_ROUND[day];
+      const candidates = roster
+        .map((r: any) => {
+          const strokes = strokesByGolferRound.get(`${r.golfer_id}-${roundNum}`);
+          if (strokes === null || strokes === undefined) return null;
+          return { golfer_id: r.golfer_id, points: -strokes };
+        })
+        .filter((x: any) => x !== null)
+        .sort((a: any, b: any) => b!.points - a!.points);
+      const topN = day === 'Sa' || day === 'Su' ? 2 : 4;
+      candidates.slice(0, topN).forEach((c: any) => {
+        result.set(`${ownerId}-${c!.golfer_id}-${roundNum}`, true);
+      });
+    }
+    return result;
+  };
+
+  const useFallback = adjData.length === 0;
+
+  const allOwnerIds = [...rostersByOwner.keys()];
+  const rostersOut = allOwnerIds.map((oid) => {
+    const owner = ownerMap.get(oid) as any;
+    const ownerRoster = rostersByOwner.get(oid) ?? [];
+
+    const fallbackCounted = useFallback ? computeCountedFallback(oid, ownerRoster) : null;
+
+    const golfers = ownerRoster.map((r: any) => {
+      const golfer = golferMap.get(r.golfer_id) as any;
+      const day_scores = days.map((d) => {
+        const roundNum = DAY_TO_ROUND[d];
+        const strokes = strokesByGolferRound.get(`${r.golfer_id}-${roundNum}`);
+        // Convert strokes to POINTS for display (negate strokes_vs_par)
+        const points = strokes === undefined ? null : -strokes;
+        const counted = useFallback
+          ? (fallbackCounted!.get(`${oid}-${r.golfer_id}-${roundNum}`) ?? false)
+          : (countedFlag.get(`${oid}-${r.golfer_id}-${roundNum}`) ?? false);
+        return { day: d, raw_score: points, counted };
+      });
+      const best_round_total = day_scores
+        .filter((d) => d.counted)
+        .reduce((s, d) => s + (d.raw_score ?? 0), 0);
+      return {
+        golfer_id: r.golfer_id,
+        full_name: golfer?.full_name ?? 'Unknown',
+        purchase_price: r.purchase_price,
+        is_keeper: r.is_keeper,
+        day_scores,
+        best_round_total,
+      };
+    });
+
+    const daily_scores = days.map((d) => {
+      const dayPoints = golfers
+        .map((g) => {
+          const ds = g.day_scores.find((ds: any) => ds.day === d);
+          return ds && ds.counted && ds.raw_score !== null ? ds.raw_score : null;
+        })
+        .filter((s): s is number => s !== null);
+      return {
+        day: d,
+        score: dayPoints.length > 0 ? dayPoints.reduce((a, b) => a + b, 0) : null,
+      };
+    });
+
+    const bonuses = bonusesByOwner.get(oid) ?? [];
+    const bonus_total = bonuses.reduce((s, b) => s + b.points, 0);
+    const ownerScore = (tScores ?? []).find((s: any) => s.owner_id === oid);
+
+    return {
+      owner_id: oid,
+      owner_name: owner?.name ?? 'Unknown',
+      nickname: owner?.nickname ?? null,
+      rank: 0,
+      is_tied: false,
+      daily_scores,
+      bonuses,
+      bonus_total,
+      total_score: ownerScore ? Number((ownerScore as any).total_score) : 0,
+      golfers,
+    };
+  });
+
+  rostersOut.sort((a, b) => b.total_score - a.total_score);
+
+  let currentRank = 0;
+  let prevScore: number | null = null;
+  for (let i = 0; i < rostersOut.length; i++) {
+    if (prevScore === null || rostersOut[i].total_score !== prevScore) {
+      currentRank = i + 1;
+    }
+    prevScore = rostersOut[i].total_score;
+    rostersOut[i].rank = currentRank;
+  }
+  const rankCounts = new Map<number, number>();
+  for (const r of rostersOut) rankCounts.set(r.rank, (rankCounts.get(r.rank) ?? 0) + 1);
+  for (const r of rostersOut) r.is_tied = (rankCounts.get(r.rank) ?? 0) > 1;
+
+  const champBonus = (bonusData ?? []).find((b: any) => b.bonus_kind === 'CHAMPION') as any;
+  const major_winner = champBonus
+    ? {
+        owner_name: (ownerMap.get(champBonus.owner_id) as any)?.name ?? '',
+        golfer_name: (golferMap.get(champBonus.golfer_id) as any)?.full_name ?? '',
+      }
+    : null;
+
+  return {
+    tournament: tournament as any,
+    flight_id: tournament.flight_id,
+    rosters: rostersOut,
+    major_winner,
+  };
+}
 
   // Get rosters for this flight (rosters carry across the flight)
   const { data: rosterData } = await supabase
