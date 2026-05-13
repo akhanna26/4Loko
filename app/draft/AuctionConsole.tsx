@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useTransition, useMemo } from 'react';
-import { Owner, StandingRank } from '../../lib/queries';
+import { StandingRank } from '../../lib/queries';
 import {
   AuctionSession, AuctionBid, OwnerState, GolferPoolEntry,
   getAuctionBids, getOwnerStates, getGolferPool, getAuctionSession,
