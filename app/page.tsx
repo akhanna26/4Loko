@@ -113,7 +113,7 @@ export default async function SeasonPage() {
               return (
                 <div key={pair.major.tournament_id}
                   style={{
-                    background: 'var(--cream-tint)',
+                    background: 'rgba(245, 241, 230, 0.5)',
                     borderLeft: `3px solid ${bracketColor}`,
                     padding: '12px 16px 12px 24px',
                     position: 'relative',
@@ -153,7 +153,7 @@ export default async function SeasonPage() {
           boxShadow: '0 2px 8px rgba(14, 42, 74, 0.06)',
           padding: '16px',
         }}>
-          <div style={{ background: 'var(--cream-tint)', padding: '16px' }}>
+          <div style={{ background: 'rgba(245, 241, 230, 0.5)', padding: '16px' }}>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
               {owners.map((o) => {
                 const theme = getOwnerTheme(o.name);
