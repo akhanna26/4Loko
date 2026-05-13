@@ -111,8 +111,8 @@ export default function StandingsExpandable({
         </span>
       </div>
 
-      <div className="bg-white/50 border border-[color:var(--green-forest)]/15 p-5 overflow-x-auto">
-        <div className="min-w-[800px]">
+<div className="bg-white/80 border border-[color:var(--green-forest)]/15 p-5 overflow-x-auto shadow-sm">
+        <div className="bg-[color:var(--cream-tint)]/60 p-3 min-w-[800px]">
           <div className="board-row board-header" style={{ gridTemplateColumns: colTemplate, background: 'var(--cream-deep)', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
             <div className="board-cell">Pos</div>
             <div className="board-cell">Owner</div>
