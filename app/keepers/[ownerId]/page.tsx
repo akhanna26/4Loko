@@ -61,6 +61,7 @@ export default async function OwnerKeeperPage({ params }: { params: Promise<{ ow
       ) : (
         <KeeperForm
           ownerId={ownerId}
+          ownerName={owner.name}
           flightId={pgaFlight.id}
           roster={roster}
           currentDeclaration={currentDecl ? {
