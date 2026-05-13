@@ -56,13 +56,13 @@ export default async function HallOfFamePage() {
           boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6), 0 2px 12px rgba(253, 181, 21, 0.1)',
         }}>
         <p className="text-[10px] uppercase mb-2" style={{ letterSpacing: '0.32em', color: 'var(--gold-masters)' }}>
-          The Butler&apos;s Cabin
+          Presenting the FORE Lokos Hall of Fame
         </p>
         <h1 className="serif text-4xl sm:text-6xl md:text-7xl font-light text-[color:var(--green-deep)] leading-none" style={{ letterSpacing: '-0.02em' }}>
           Hall of Fame
         </h1>
         <p className="serif italic text-sm sm:text-base text-[color:var(--green-moss)] mt-3 sm:mt-4">
-          The keepers of FORE Lokos history
+          Kings Amongst Men
         </p>
       </header>
 
