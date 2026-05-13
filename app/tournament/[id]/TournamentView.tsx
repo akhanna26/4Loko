@@ -15,16 +15,14 @@ function formatDateRange(start: string, end: string) {
   return `${formatDate(start)} – ${formatDate(end)}, ${s.getFullYear()}`;
 }
 
-const initials = (name: string) =>
-  name.split(/\s+/).map((n) => n[0]).filter((c) => /[A-Za-z]/.test(c)).slice(0, 2).join('').toUpperCase();
-
 const shortName = (name: string) => {
   const p = name.trim().split(/\s+/);
   if (p.length < 2) return name;
   return `${p[0][0]}. ${p[p.length - 1]}`;
 };
 
-type SortKey = 'rank' | 'name' | 'th' | 'fr' | 'sa' | 'su' | 'bonus' | 'total';
+const HEADING_CLASS = "serif text-3xl sm:text-5xl text-[color:var(--green-deep)] font-light leading-none";
+const HEADING_STYLE = { letterSpacing: '-0.02em' };
 
 export default function TournamentView({ detail }: { detail: TournamentDetail }) {
   const { tournament, rosters, major_winner } = detail;
@@ -37,274 +35,279 @@ export default function TournamentView({ detail }: { detail: TournamentDetail })
   const primary = accent?.primary ?? 'var(--green-deep)';
   const secondary = accent?.accent ?? 'var(--gold-masters)';
 
-  const [sortKey, setSortKey] = useState<SortKey>('rank');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   const sortedRosters = useMemo(() => {
-    const sorted = [...rosters];
-    sorted.sort((a, b) => {
-      let av: any, bv: any;
-      switch (sortKey) {
-        case 'rank': av = a.rank; bv = b.rank; break;
-        case 'name': av = a.owner_name; bv = b.owner_name; break;
-        case 'th': av = a.daily_scores.find(d => d.day === 'Th')?.score ?? 0; bv = b.daily_scores.find(d => d.day === 'Th')?.score ?? 0; break;
-        case 'fr': av = a.daily_scores.find(d => d.day === 'Fr')?.score ?? 0; bv = b.daily_scores.find(d => d.day === 'Fr')?.score ?? 0; break;
-        case 'sa': av = a.daily_scores.find(d => d.day === 'Sa')?.score ?? 0; bv = b.daily_scores.find(d => d.day === 'Sa')?.score ?? 0; break;
-        case 'su': av = a.daily_scores.find(d => d.day === 'Su')?.score ?? 0; bv = b.daily_scores.find(d => d.day === 'Su')?.score ?? 0; break;
-        case 'bonus': av = a.bonus_total; bv = b.bonus_total; break;
-        case 'total': av = a.total_score; bv = b.total_score; break;
-      }
-      if (av < bv) return sortDir === 'asc' ? -1 : 1;
-      if (av > bv) return sortDir === 'asc' ? 1 : -1;
-      return 0;
-    });
-    return sorted;
-  }, [rosters, sortKey, sortDir]);
+    return [...rosters].sort((a, b) => b.total_score - a.total_score || a.owner_name.localeCompare(b.owner_name));
+  }, [rosters]);
 
-  const handleSort = (key: SortKey) => {
-    if (sortKey === key) {
-      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortKey(key);
-      setSortDir(['total', 'th', 'fr', 'sa', 'su', 'bonus'].includes(key) ? 'desc' : 'asc');
-    }
+  const toggle = (ownerId: number) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(ownerId)) next.delete(ownerId);
+      else next.add(ownerId);
+      return next;
+    });
   };
 
-  const SortHeader = ({ k, label, align = 'left' }: { k: SortKey; label: string; align?: 'left' | 'right' }) => (
-    <button onClick={() => handleSort(k)}
-      className={`text-[10px] uppercase font-semibold tracking-wider hover:opacity-70 ${align === 'right' ? 'text-right ml-auto' : 'text-left'}`}
-      style={{ letterSpacing: '0.18em', color: sortKey === k ? primary : 'var(--green-moss)' }}>
-      {label}{sortKey === k && (sortDir === 'asc' ? ' ↑' : ' ↓')}
-    </button>
-  );
-
-  const podium = sortedRosters
-    .slice()
-    .sort((a, b) => a.rank - b.rank)
-    .filter(r => r.rank <= 3 && r.total_score > 0);
-
-  const dailyDisplay = (s: number | null) => s === null ? '—' : s.toString();
   const formatScore = (s: number) => s > 0 ? `+${s}` : s === 0 ? 'E' : `${s}`;
+  const dailyDisplay = (s: number | null) => s === null ? '—' : (s > 0 ? `+${s}` : s === 0 ? 'E' : `${s}`);
+
+  const podium = sortedRosters.slice(0, 3).filter(r => r.total_score > 0);
+
+  // Column template — 28 / name / 4 days / bonus / total / chevron
+  const colTemplate = '24px minmax(110px, 1fr) repeat(4, 40px) 40px 50px 18px';
 
   return (
-    <main className="max-w-6xl mx-auto px-6 pt-10 pb-16">
+    <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10 pb-12 sm:pb-16">
       <Link href="/" className="text-[10px] uppercase text-[color:var(--green-moss)] hover:text-[color:var(--green-deep)] mb-6 inline-block" style={{ letterSpacing: '0.18em' }}>
         ← 2026 Season
       </Link>
 
-      {/* HEADER — cream-first, venue color in stripe + text only */}
-      <header className="bg-[color:var(--cream-deep)]/40 px-8 py-8 mb-10 relative"
+      {/* HEADER */}
+      <header className="p-6 sm:p-8 md:p-10 mb-8 sm:mb-10 relative"
         style={{
+          background: `linear-gradient(135deg, ${primary}10 0%, rgba(255,255,255,0.92) 50%, ${primary}10 100%)`,
+          border: `1px solid ${primary}30`,
           borderTop: `3px solid ${primary}`,
-          boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.6)',
+          boxShadow: `inset 0 0 0 1px rgba(255,255,255,0.6), 0 2px 12px ${primary}10`,
         }}>
-        <div className="flex items-baseline justify-between flex-wrap gap-3 mb-3">
-          <div className="flex items-baseline gap-2.5">
-            {accent && <span style={{ color: primary }}><accent.Emblem className="w-4 h-4" /></span>}
-            <p className="text-[10px] uppercase" style={{ letterSpacing: '0.32em', color: primary }}>
-              {isMajor ? 'Major' : 'Elevated Event'} · {formatDateRange(tournament.start_date, tournament.end_date)}
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-3 sm:mb-4">
+          <div className="flex items-center gap-2">
+            {isLive && (
+              <span className="w-2 h-2 rounded-full bg-[color:var(--chicago-red)] live-pulse" />
+            )}
+            <p className="text-[10px] sm:text-[11px] uppercase font-semibold" style={{ letterSpacing: '0.32em', color: isLive ? 'var(--chicago-red)' : primary }}>
+              {isLive ? 'Live Now' : isFinal ? 'Final' : 'Upcoming'} · {isMajor ? 'Major' : 'Elevated Event'}
             </p>
           </div>
-          <span className={`text-[10px] uppercase tabular ${isLive ? 'live-pulse' : ''}`}
-            style={{
-              letterSpacing: '0.24em',
-              color: isLive ? 'var(--chicago-red)' : isFinal ? 'var(--green-moss)' : 'var(--green-forest)',
-              opacity: isFinal ? 0.7 : 1,
-            }}>
-            {tournament.status}
+          <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.2em' }}>
+            {formatDateRange(tournament.start_date, tournament.end_date)}
           </span>
         </div>
 
-        <h1 className="font-light leading-none text-5xl md:text-6xl"
-          style={{ letterSpacing: '-0.02em', color: primary }}>
+        <h1 className="font-light leading-[0.95] text-4xl sm:text-6xl md:text-7xl text-[color:var(--green-deep)] break-words" style={{ letterSpacing: '-0.02em' }}>
           {tournament.name.toUpperCase()}
         </h1>
         {tournament.venue && (
-          <p className="serif italic text-sm text-[color:var(--green-moss)] mt-3">{tournament.venue}</p>
+          <p className="serif italic text-sm sm:text-base text-[color:var(--green-moss)] mt-3">{tournament.venue}</p>
         )}
       </header>
 
       {/* UPCOMING — empty state */}
       {isUpcoming && (
-        <section className="bg-[color:var(--cream-deep)]/30 border border-[color:var(--green-forest)]/20 p-8 text-center">
+        <section className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm p-6 sm:p-8 text-center">
           <p className="text-[10px] uppercase text-[color:var(--green-moss)] mb-2" style={{ letterSpacing: '0.24em' }}>
             Coming up
           </p>
-          <p className="serif text-lg text-[color:var(--green-deep)]">
-          {isMajor ? 'Draft happens before tee time. Check back when scoring begins.' : 'Rosters carry over from this flight\u2019s major. Bonuses score during the event.'}
+          <p className="serif text-base sm:text-lg text-[color:var(--green-deep)]">
+            {isMajor ? 'Draft happens before tee time. Check back when scoring begins.' : 'Rosters carry over from this flight\u2019s major. Bonuses score during the event.'}
           </p>
         </section>
       )}
 
       {!isUpcoming && (
         <>
-          {/* PODIUM + MAJOR WINNER */}
-          {(podium.length > 0) && (
-            <section className="mb-10 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-stretch">
-              <div className="grid grid-cols-3 gap-3">
+          {/* PODIUM */}
+          {podium.length > 0 && (
+            <section className="mb-8 sm:mb-10">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {podium.map((r, i) => {
                   const labelColor = i === 0 ? 'var(--gold-masters)' : i === 1 ? 'var(--silver)' : 'var(--bronze)';
                   const labelText = i === 0 ? 'Winner' : i === 1 ? '2nd' : '3rd';
                   return (
                     <div key={r.owner_id}
-                      className="p-4 bg-[color:var(--cream)] border border-[color:var(--green-forest)]/15"
+                      className="p-3 sm:p-4 bg-white border border-[color:var(--green-forest)]/15 shadow-sm"
                       style={i === 0
                         ? { borderTop: `3px solid ${labelColor}` }
                         : { borderTop: `2px solid ${labelColor}` }}>
-                      <p className="text-[10px] uppercase" style={{ letterSpacing: '0.24em', color: labelColor }}>{labelText}</p>
-                      <p className="serif text-xl text-[color:var(--green-deep)] font-semibold mt-1">{r.owner_name}</p>
-                      <p className="text-sm tabular text-[color:var(--green-moss)] mt-0.5">{formatScore(r.total_score)}</p>
+                      <p className="text-[9px] sm:text-[10px] uppercase" style={{ letterSpacing: '0.18em', color: labelColor }}>{labelText}</p>
+                      <p className="serif text-sm sm:text-lg text-[color:var(--green-deep)] font-semibold mt-1 truncate">{r.owner_name}</p>
+                      <p className="text-xs sm:text-sm tabular text-[color:var(--green-moss)] mt-0.5">{formatScore(r.total_score)}</p>
                     </div>
                   );
                 })}
               </div>
               {major_winner && isMajor && (
-                <div className="p-4 max-w-xs flex flex-col justify-center bg-[color:var(--cream)] border border-[color:var(--green-forest)]/15"
+                <div className="mt-3 p-3 sm:p-4 bg-white border border-[color:var(--green-forest)]/15 shadow-sm"
                   style={{ borderLeft: `3px solid ${primary}` }}>
                   <p className="text-[10px] uppercase" style={{ letterSpacing: '0.24em', color: primary }}>Major Winner Pot</p>
-                  <p className="serif text-base mt-1 text-[color:var(--green-deep)]">{major_winner.golfer_name}</p>
-                  <p className="text-xs italic text-[color:var(--green-moss)]">on {major_winner.owner_name}'s roster</p>
+                  <p className="serif text-sm sm:text-base mt-1 text-[color:var(--green-deep)] font-semibold">{major_winner.golfer_name}</p>
+                  <p className="text-xs italic text-[color:var(--green-moss)]">on {major_winner.owner_name}&apos;s roster</p>
                 </div>
               )}
             </section>
           )}
 
-          {/* STANDINGS TABLE */}
-          <section className="mb-12">
-            <div className="flex items-baseline justify-between mb-4">
-              <h2 className="serif text-2xl font-semibold" style={{ color: primary }}>Standings</h2>
-              <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
-                Click to sort
+          {/* STANDINGS — expandable Standings-style table */}
+          <section className="mb-10 sm:mb-14">
+            <div className="flex items-baseline justify-between mb-4 sm:mb-5 gap-2">
+              <h2 className={HEADING_CLASS} style={HEADING_STYLE}>Standings</h2>
+              <span className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.18em' }}>
+                Tap rows to expand
               </span>
             </div>
-            <div className="bg-white/80 border border-[color:var(--green-forest)]/15 shadow-sm overflow-x-auto" style={{ borderTop: `2px solid ${primary}` }}>
-              <div className="bg-[color:var(--cream-tint)]/60 min-w-[800px]">
-                <div className="grid gap-2 px-4 py-2 border-b border-[color:var(--green-forest)]/15"
-                  style={{ gridTemplateColumns: '40px minmax(180px, 1fr) repeat(4, 60px) 60px 80px' }}>
-                  <SortHeader k="rank" label="#" />
-                  <SortHeader k="name" label="Owner" />
-                  <SortHeader k="th" label="Thu" align="right" />
-                  <SortHeader k="fr" label="Fri" align="right" />
-                  <SortHeader k="sa" label="Sat" align="right" />
-                  <SortHeader k="su" label="Sun" align="right" />
-                  <SortHeader k="bonus" label="Bonus" align="right" />
-                  <SortHeader k="total" label="Total" align="right" />
-                </div>
 
-                {sortedRosters.map((r) => {
-                  const rank = r.is_tied ? `T${r.rank}` : r.rank;
-                  const isLeader = r.rank === 1 && r.total_score > 0;
-                  return (
-                    <div key={r.owner_id}
-                      className="grid gap-2 px-4 py-2 border-b border-[color:var(--green-forest)]/10 items-baseline hover:bg-[color:var(--cream-deep)]/60"
-                      style={{ gridTemplateColumns: '40px minmax(180px, 1fr) repeat(4, 60px) 60px 80px', background: isLeader ? 'var(--cream-deep)' : 'transparent' }}>
-                      <span className="serif text-sm tabular" style={{ color: isLeader ? primary : 'var(--green-moss)' }}>{rank}</span>
-                      <span className={`serif text-sm ${isLeader ? 'font-semibold' : ''}`} style={{ color: isLeader ? primary : 'var(--green-deep)' }}>{r.owner_name}</span>
-                      {r.daily_scores.map((d) => (
-                        <span key={d.day} className={`text-xs tabular text-right ${d.score && d.score > 0 ? 'text-[color:var(--green-deep)]' : 'text-[color:var(--green-moss)]/50'}`}>
-                          {dailyDisplay(d.score)}
-                        </span>
-                      ))}
-                      <span className="text-xs tabular text-right" style={{ color: r.bonus_total > 0 ? secondary : 'var(--green-moss)', fontWeight: r.bonus_total > 0 ? 600 : 400 }}>
-                        {r.bonus_total > 0 ? `+${r.bonus_total}` : '—'}
-                      </span>
-                      <span className="text-base tabular text-right font-semibold" style={{ color: isLeader ? primary : r.total_score > 0 ? 'var(--green-deep)' : 'var(--green-moss)' }}>
-                        {formatScore(r.total_score)}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
+            <div className="bg-white border-2 shadow-sm overflow-x-auto"
+              style={{
+                borderColor: 'rgba(14, 42, 74, 0.15)',
+                boxShadow: '0 2px 8px rgba(14, 42, 74, 0.05)',
+              }}>
+              <div className="bg-[color:var(--cream-tint)]/60 p-2 sm:p-3">
+                <div className="min-w-[420px] sm:min-w-[520px]">
+                  {/* Column header */}
+                  <div className="grid items-baseline gap-1 px-2 py-2"
+                    style={{
+                      gridTemplateColumns: colTemplate,
+                      background: 'var(--cream-deep)',
+                      borderBottom: '1px solid rgba(0,0,0,0.05)',
+                    }}>
+                    <span className="text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>#</span>
+                    <span className="text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>Owner</span>
+                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Thu</span>
+                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Fri</span>
+                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Sat</span>
+                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Sun</span>
+                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Bon</span>
+                    <span className="text-[9px] uppercase text-[color:var(--green-deep)] text-right font-semibold" style={{ letterSpacing: '0.14em' }}>Total</span>
+                    <span />
+                  </div>
 
-          {/* PER-OWNER ROSTER DETAIL */}
-          <section>
-            <div className="flex items-baseline justify-between mb-4">
-              <h2 className="serif text-2xl font-semibold" style={{ color: primary }}>Rosters</h2>
-              <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
-                {sortedRosters.length} owners · counted scores in venue color
-              </span>
-            </div>
-            <div className="space-y-6">
-              {sortedRosters.map((r) => {
-                const rankLabel = r.is_tied ? `T${r.rank}` : r.rank;
-                const isLeader = r.rank === 1 && r.total_score > 0;
-                return (
-                  <div key={r.owner_id} className="bg-white/80 border border-[color:var(--green-forest)]/15 p-5 shadow-sm"
-                    style={isLeader ? { borderLeft: `3px solid ${secondary}` } : {}}>
-                    <div className="flex items-baseline justify-between mb-4 pb-3 border-b border-[color:var(--green-forest)]/15 flex-wrap gap-2">
-                      <div className="flex items-baseline gap-3">
-                        <span className="serif text-sm tabular" style={{ color: isLeader ? primary : 'var(--green-moss)' }}>#{rankLabel}</span>
-                        <h3 className={`serif text-xl font-semibold ${isLeader ? '' : 'text-[color:var(--green-deep)]'}`} style={isLeader ? { color: primary } : {}}>{r.owner_name}</h3>
-                        {r.nickname && r.nickname !== r.owner_name && (
-                          <span className="text-xs text-[color:var(--green-moss)] italic">({r.nickname})</span>
+                  {/* Owner rows */}
+                  {sortedRosters.map((r, i) => {
+                    const rank = i + 1;
+                    const isLeader = rank === 1 && r.total_score > 0;
+                    const isExpanded = expanded.has(r.owner_id);
+                    return (
+                      <div key={r.owner_id}>
+                        <button
+                          onClick={() => toggle(r.owner_id)}
+                          className="grid w-full items-baseline gap-1 px-2 py-2.5 text-left transition-all hover:bg-white/40"
+                          style={{
+                            gridTemplateColumns: colTemplate,
+                            borderTop: i === 0 ? 'none' : '1px solid rgba(255, 255, 255, 0.7)',
+                            background: isLeader
+                              ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.08) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(253, 181, 21, 0.08) 100%)'
+                              : undefined,
+                            borderLeft: isLeader ? '3px solid var(--gold-masters)' : '3px solid transparent',
+                          }}
+                        >
+                          <span className="text-[11px] sm:text-xs tabular text-[color:var(--green-moss)]">{rank}</span>
+                          <span className="serif text-xs sm:text-sm text-[color:var(--green-deep)] truncate" style={{ fontWeight: isLeader ? 700 : 500 }}>
+                            <span className="hidden sm:inline">{r.owner_name}</span>
+                            <span className="sm:hidden">{shortName(r.owner_name)}</span>
+                            {isLeader && <span className="ml-1 text-[color:var(--gold-masters)]">★</span>}
+                          </span>
+                          {r.daily_scores.map((d) => (
+                            <span key={d.day} className="text-[10px] sm:text-xs tabular text-right" style={{ color: d.score && d.score > 0 ? 'var(--green-deep)' : 'rgba(42,70,54,0.4)' }}>
+                              {dailyDisplay(d.score)}
+                            </span>
+                          ))}
+                          <span className="text-[10px] sm:text-xs tabular text-right" style={{ color: r.bonus_total > 0 ? secondary : 'rgba(42,70,54,0.4)', fontWeight: r.bonus_total > 0 ? 700 : 400 }}>
+                            {r.bonus_total > 0 ? `+${r.bonus_total}` : '—'}
+                          </span>
+                          <span className="text-xs sm:text-sm tabular text-right font-bold" style={{ color: isLeader ? 'var(--green-deep)' : r.total_score > 0 ? 'var(--green-deep)' : 'var(--green-moss)' }}>
+                            {formatScore(r.total_score)}
+                          </span>
+                          <span className="text-[10px] text-right text-[color:var(--green-moss)]">{isExpanded ? '▾' : '▸'}</span>
+                        </button>
+
+                        {/* EXPANDED PER-GOLFER DETAIL */}
+                        {isExpanded && (
+                          <div className="px-3 sm:px-5 py-3 sm:py-4"
+                            style={{
+                              background: 'rgba(245, 241, 230, 0.85)',
+                              borderLeft: `2px solid ${primary}`,
+                            }}>
+                            <p className="text-[10px] uppercase mb-2 sm:mb-3" style={{ letterSpacing: '0.18em', color: primary }}>
+                              {r.owner_name} · roster
+                            </p>
+
+                            {/* Roster table */}
+                            <div className="overflow-x-auto">
+                              <div className="min-w-[420px]">
+                                {/* Roster column header */}
+                                <div className="grid gap-1 py-1 mb-1 border-b border-[color:var(--green-forest)]/15"
+                                  style={{ gridTemplateColumns: 'minmax(140px, 1fr) 38px repeat(4, 36px) 44px' }}>
+                                  <span className="text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>Golfer</span>
+                                  <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>$</span>
+                                  <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Thu</span>
+                                  <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Fri</span>
+                                  <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Sat</span>
+                                  <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Sun</span>
+                                  <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Total</span>
+                                </div>
+
+                                {r.golfers.map((g) => (
+                                  <div key={g.golfer_id} className="grid gap-1 py-1.5 items-baseline"
+                                    style={{
+                                      gridTemplateColumns: 'minmax(140px, 1fr) 38px repeat(4, 36px) 44px',
+                                      borderTop: '1px solid rgba(255,255,255,0.7)',
+                                    }}>
+                                    <span className="serif text-xs text-[color:var(--green-deep)] truncate">
+                                      {g.is_keeper && <span className="mr-1 text-[8px] uppercase font-bold" style={{ color: secondary, letterSpacing: '0.15em' }}>K</span>}
+                                      {g.full_name}
+                                    </span>
+                                    <span className="text-[10px] tabular text-[color:var(--green-moss)] text-right">${g.purchase_price}</span>
+                                    {g.day_scores.map((ds) => (
+                                      <span key={ds.day} className="text-[10px] tabular text-right"
+                                        style={{
+                                          color: ds.raw_score === null ? 'rgba(42,70,54,0.3)' :
+                                                 ds.counted ? primary :
+                                                 'rgba(42,70,54,0.4)',
+                                          fontWeight: ds.counted ? 700 : 400,
+                                          background: ds.counted && ds.raw_score !== null ? `${primary}12` : 'transparent',
+                                          paddingLeft: '3px',
+                                          paddingRight: '3px',
+                                        }}>
+                                        {ds.raw_score === null ? '—' : formatScore(ds.raw_score)}
+                                      </span>
+                                    ))}
+                                    <span className="text-[10px] tabular text-right font-semibold"
+                                      style={{ color: g.best_round_total > 0 ? primary : 'rgba(42,70,54,0.4)' }}>
+                                      {g.best_round_total > 0 ? `+${g.best_round_total}` : '—'}
+                                    </span>
+                                  </div>
+                                ))}
+
+                                {r.golfers.length === 0 && (
+                                  <p className="text-[10px] text-[color:var(--green-moss)] italic serif py-2">No roster recorded.</p>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Bonuses */}
+                            {r.bonuses.length > 0 && (
+                              <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(42,70,54,0.1)' }}>
+                                <p className="text-[10px] uppercase mb-1.5" style={{ letterSpacing: '0.18em', color: secondary }}>
+                                  Bonuses · +{r.bonus_total}
+                                </p>
+                                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                                  {r.bonuses.map((b, idx) => (
+                                    <div key={idx} className="text-[11px]">
+                                      <span className="serif text-[color:var(--green-deep)]">{b.detail}</span>
+                                      <span className="tabular ml-1 font-bold" style={{ color: secondary }}>+{b.points}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            <p className="mt-3 text-[10px] text-[color:var(--green-moss)] italic serif">
+                              Bold scores count toward team total (top 4 Thu/Fri, top 2 Sat/Sun).
+                            </p>
+                          </div>
                         )}
                       </div>
-                      <span className="text-xl tabular font-semibold" style={{ color: isLeader ? primary : r.total_score > 0 ? 'var(--green-deep)' : 'var(--green-moss)' }}>
-                        {formatScore(r.total_score)}
-                      </span>
-                    </div>
-
-                    <div className="overflow-x-auto">
-                      <div className="min-w-[700px]">
-                        <div className="grid gap-2 py-1 border-b border-[color:var(--green-forest)]/10 text-[10px] uppercase text-[color:var(--green-moss)]"
-                          style={{ gridTemplateColumns: 'minmax(180px, 1fr) 60px repeat(4, 50px) 60px', letterSpacing: '0.18em' }}>
-                          <span>Golfer</span>
-                          <span className="text-right">Cost</span>
-                          <span className="text-right">Thu</span>
-                          <span className="text-right">Fri</span>
-                          <span className="text-right">Sat</span>
-                          <span className="text-right">Sun</span>
-                          <span className="text-right">Counted</span>
-                        </div>
-                        {r.golfers.map((g) => (
-                          <div key={g.golfer_id} className="grid gap-2 py-1.5 border-b border-[color:var(--green-forest)]/5 items-baseline"
-                            style={{ gridTemplateColumns: 'minmax(180px, 1fr) 60px repeat(4, 50px) 60px' }}>
-                            <span className="serif text-sm text-[color:var(--green-deep)]">
-                              {g.is_keeper && <span className="mr-1 text-[9px] uppercase font-semibold" style={{ color: secondary, letterSpacing: '0.15em' }}>K</span>}
-                              {g.full_name}
-                            </span>
-                            <span className="text-xs tabular text-[color:var(--green-moss)] text-right">${g.purchase_price}</span>
-                            {g.day_scores.map((ds) => (
-                              <span key={ds.day} className={`text-xs tabular text-right ${
-                                ds.raw_score === null ? 'text-[color:var(--green-moss)]/30' :
-                                ds.counted ? 'font-semibold px-1' :
-                                'text-[color:var(--green-moss)]/40'
-                              }`}
-                              style={ds.counted && ds.raw_score !== null ? { color: primary, background: `${primary}10` } : {}}>
-                                {ds.raw_score === null ? '—' : formatScore(ds.raw_score)}
-                              </span>
-                            ))}
-                            <span className={`text-xs tabular text-right ${g.best_round_total > 0 ? 'font-semibold' : 'text-[color:var(--green-moss)]/50'}`} style={g.best_round_total > 0 ? { color: primary } : {}}>
-                              {g.best_round_total > 0 ? `+${g.best_round_total}` : '—'}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {r.bonuses.length > 0 && (
-                      <div className="mt-4 pt-3 border-t border-[color:var(--green-forest)]/10">
-                        <p className="text-[10px] uppercase mb-2" style={{ letterSpacing: '0.18em', color: secondary }}>Bonuses · +{r.bonus_total}</p>
-                        <div className="flex flex-wrap gap-x-4 gap-y-1">
-                          {r.bonuses.map((b, i) => (
-                            <div key={i} className="text-xs">
-                              <span className="serif text-[color:var(--green-deep)]">{b.detail}</span>
-                              <span className="tabular ml-1.5 font-semibold" style={{ color: secondary }}>+{b.points}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {r.golfers.length === 0 && (
-                      <p className="text-xs text-[color:var(--green-moss)] italic serif py-3">No roster recorded.</p>
-                    )}
-                  </div>
-                );
-              })}
+                    );
+                  })}
+                </div>
+              </div>
             </div>
+
+            <p className="text-[10px] uppercase text-[color:var(--green-moss)] mt-3 text-right" style={{ letterSpacing: '0.18em' }}>
+              Tap any row to see per-golfer scoring
+            </p>
           </section>
         </>
       )}
