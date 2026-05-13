@@ -365,6 +365,30 @@ export default function AuctionConsole({
       } catch (e: any) { setError(e.message); }
     });
   };
+  const handleFlipTournamentStatus = (newStatus: 'live' | 'upcoming' | 'final') => {
+    if (!isDriver) return;
+    const labels = { live: 'LIVE (start scoring)', upcoming: 'UPCOMING (back to pre-draft)', final: 'FINAL (lock results)' };
+    if (!confirm(`Flip tournament to ${labels[newStatus]}?`)) return;
+    startTransition(async () => {
+      try {
+        const { supabase } = await import('../../lib/supabase');
+        // Find the tournament for THIS flight (the major)
+        const { data: tournaments } = await supabase
+          .from('tournaments')
+          .select('id')
+          .eq('flight_id', flightId)
+          .eq('event_type', 'MAJOR')
+          .single();
+        if (!tournaments) { setError('Tournament not found'); return; }
+        await supabase
+          .from('tournaments')
+          .update({ status: newStatus })
+          .eq('id', tournaments.id);
+        setInfo(`Tournament status → ${newStatus}.`);
+        setTimeout(() => setInfo(null), 4000);
+      } catch (e: any) { setError(e.message); }
+    });
+  };
 const handleResetDraft = () => {
     if (!isDriver) return;
     if (!confirm('RESET ENTIRE DRAFT? This clears all picks, frees all golfers, and sets pick counter back to 0. Cannot be undone.')) return;
@@ -737,6 +761,23 @@ const handleResetDraft = () => {
                     className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] hover:text-[color:var(--chicago-red)] disabled:opacity-30"
                     style={{ letterSpacing: '0.18em' }}>
                     undo
+                  </button>
+                  <span className="text-[color:var(--green-forest)]/30">·</span>
+                  <button onClick={() => handleFlipTournamentStatus('live')}
+                    className="text-[9px] sm:text-[10px] uppercase font-semibold transition-all"
+                    style={{
+                      letterSpacing: '0.18em',
+                      color: 'white',
+                      background: 'var(--chicago-red)',
+                      padding: '4px 10px',
+                      boxShadow: '0 2px 6px rgba(200, 16, 46, 0.3)',
+                    }}>
+                    Start Live →
+                  </button>
+                  <button onClick={() => handleFlipTournamentStatus('upcoming')}
+                    className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)] hover:text-[color:var(--green-deep)] ml-1"
+                    style={{ letterSpacing: '0.18em' }}>
+                    (undo to upcoming)
                   </button>
                   <span className="text-[color:var(--green-forest)]/30">·</span>
                   <button onClick={handleResetDraft}
