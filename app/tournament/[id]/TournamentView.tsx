@@ -181,14 +181,15 @@ export default function TournamentView({ detail }: { detail: TournamentDetail })
                       <div key={r.owner_id}>
                         <button
                           onClick={() => toggle(r.owner_id)}
-                          className="grid w-full items-baseline gap-1 px-2 py-2.5 text-left transition-all hover:bg-white/40"
+                          className="grid w-full items-baseline gap-1 px-2 py-3 text-left transition-all hover:bg-[color:var(--cream-deep)]/40"
                           style={{
                             gridTemplateColumns: colTemplate,
-                            borderTop: i === 0 ? 'none' : '1px solid rgba(255, 255, 255, 0.7)',
+                            borderTop: i === 0 ? 'none' : '1px solid rgba(42, 70, 54, 0.12)',
                             background: isLeader
                               ? 'linear-gradient(135deg, rgba(253, 181, 21, 0.08) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(253, 181, 21, 0.08) 100%)'
-                              : undefined,
+                              : 'white',
                             borderLeft: isLeader ? '3px solid var(--gold-masters)' : '3px solid transparent',
+                            cursor: 'pointer',
                           }}
                         >
                           <span className="text-[11px] sm:text-xs tabular text-[color:var(--green-moss)]">{rank}</span>
@@ -219,7 +220,7 @@ export default function TournamentView({ detail }: { detail: TournamentDetail })
                           <span className="text-xs sm:text-sm tabular text-right font-bold" style={{ color: isLeader ? 'var(--green-deep)' : r.total_score > 0 ? 'var(--green-deep)' : 'var(--green-moss)' }}>
                             {formatScore(r.total_score)}
                           </span>
-                          <span className="text-[10px] text-right text-[color:var(--green-moss)]">{isExpanded ? '▾' : '▸'}</span>
+                          <span className="text-xs text-right text-[color:var(--green-deep)] font-semibold">{isExpanded ? '▾' : '▸'}</span>
                         </button>
 
                         {/* EXPANDED PER-GOLFER DETAIL */}
