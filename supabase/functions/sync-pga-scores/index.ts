@@ -1,17 +1,15 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-// Match ESPN event names to your tournament IDs
-// Add new mappings each season as the calendar fills in.
 const ESPN_TOURNAMENT_MAP: Record<string, { dbId: number; par: number }> = {
-  'PGA Championship': { dbId: 4, par: 70 },        // 2026 Aronimink
-  'U.S. Open': { dbId: 6, par: 70 },                // varies by venue
-  'The Open Championship': { dbId: 8, par: 71 },    // varies by venue
-  'The Masters': { dbId: 2, par: 72 },              // Augusta is always 72
-  'RBC Heritage': { dbId: 1, par: 71 },             // Harbour Town
-  'Memorial Tournament': { dbId: 3, par: 72 },      // Muirfield Village
-  'Travelers Championship': { dbId: 5, par: 70 },   // TPC River Highlands
-  'FedEx St. Jude Championship': { dbId: 7, par: 70 }, // TPC Southwind
+  'PGA Championship': { dbId: 4, par: 70 },
+  'U.S. Open': { dbId: 6, par: 70 },
+  'The Open Championship': { dbId: 8, par: 71 },
+  'The Masters': { dbId: 2, par: 72 },
+  'RBC Heritage': { dbId: 1, par: 71 },
+  'Memorial Tournament': { dbId: 3, par: 72 },
+  'Travelers Championship': { dbId: 5, par: 70 },
+  'FedEx St. Jude Championship': { dbId: 7, par: 70 },
 }
 
 serve(async (req) => {
@@ -21,7 +19,20 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
 
-    // 1. Fetch ESPN scoreboard
+    // Short-circuit: if NO tournament is live, skip all work
+    const { data: liveCheck } = await supabase
+      .from('tournaments')
+      .select('id, name')
+      .eq('status', 'live')
+      .maybeSingle()
+
+    if (!liveCheck) {
+      return new Response(JSON.stringify({
+        skipped: true,
+        reason: 'No tournament currently live'
+      }), { headers: { 'Content-Type': 'application/json' } })
+    }
+
     const espnUrl = 'https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard'
     const espnRes = await fetch(espnUrl)
     if (!espnRes.ok) throw new Error(`ESPN fetch failed: ${espnRes.status}`)
@@ -34,8 +45,6 @@ serve(async (req) => {
     }
 
     const espnEventName = event.name || event.shortName || ''
-
-    // 2. Match ESPN event to our DB tournament
     const mapping = ESPN_TOURNAMENT_MAP[espnEventName]
     if (!mapping) {
       return new Response(JSON.stringify({
@@ -48,7 +57,6 @@ serve(async (req) => {
     const tournamentId = mapping.dbId
     const tournamentPar = mapping.par
 
-    // 3. Verify the matched tournament is LIVE in our DB
     const { data: tournament } = await supabase
       .from('tournaments')
       .select('status, name, id')
@@ -59,19 +67,16 @@ serve(async (req) => {
       return new Response(JSON.stringify({
         skipped: true,
         reason: `Tournament ${tournamentId} not found in DB`,
-        espn_event_name: espnEventName,
       }), { headers: { 'Content-Type': 'application/json' } })
     }
 
     if (tournament.status !== 'live') {
       return new Response(JSON.stringify({
         skipped: true,
-        reason: `Tournament "${tournament.name}" status is "${tournament.status}", not "live". Function does nothing.`,
-        espn_event_name: espnEventName,
+        reason: `Tournament "${tournament.name}" status is "${tournament.status}", not "live".`,
       }), { headers: { 'Content-Type': 'application/json' } })
     }
 
-    // 4. Parse competitors from ESPN
     const competition = event.competitions?.[0]
     if (!competition) throw new Error('No competition in event')
     const competitors = competition.competitors ?? []
@@ -91,25 +96,30 @@ serve(async (req) => {
 
       const lineScores = c.linescores ?? []
 
-     for (let roundIdx = 0; roundIdx < lineScores.length; roundIdx++) {
-        const ls = lineScores[roundIdx]
+      const roundTotals = lineScores.filter((ls: any) => ls?.period >= 1 && ls?.period <= 4)
 
-        // ESPN returns round total in linescores[i].value (e.g. 67.0)
-        // AND the relative-to-par in displayValue (e.g. "-3" or "E")
-        // Only process if period matches round (1-4) and value is a real stroke count (60-90)
-        if (ls?.period !== roundIdx + 1) continue
+      for (const ls of roundTotals) {
         const strokes = ls?.value
-        if (typeof strokes !== 'number' || strokes < 50 || strokes > 100) continue
+        const display = ls?.displayValue
 
-        const strokesVsPar = Math.round(strokes - tournamentPar)
-        const roundNumber = roundIdx + 1
+        if (typeof strokes !== 'number' || strokes < 60 || strokes > 95) continue
 
-        // Resolve golfer ID via your existing SQL function (handles aliases)
+        let strokesVsPar: number
+        if (display === 'E') {
+          strokesVsPar = 0
+        } else if (typeof display === 'string' && /^[+-]?\d+$/.test(display)) {
+          strokesVsPar = parseInt(display.replace('+', ''), 10)
+        } else {
+          strokesVsPar = Math.round(strokes - tournamentPar)
+        }
+
+        const roundNumber = ls.period
+
         const { data: resolved } = await supabase
           .rpc('resolve_golfer', { golfer_name: golferName })
 
         if (!resolved) {
-          failedResolves.push(golferName)
+          if (!failedResolves.includes(golferName)) failedResolves.push(golferName)
           continue
         }
 
@@ -124,7 +134,6 @@ serve(async (req) => {
       }
     }
 
-    // 5. Bulk upsert into scores
     if (rows.length > 0) {
       const { error } = await supabase
         .from('scores')
