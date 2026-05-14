@@ -31,7 +31,7 @@ serve(async (req) => {
     }
 
     // Fetch ESPN leaderboard
-    const espnUrl = 'https://site.api.espn.com/apis/site/v2/sports/golf/pga/leaderboard'
+    const espnUrl = 'https://site.api.espn.com/apis/site/v2/sports/golf/pga/leaderboard?event=401811947'
     const espnRes = await fetch(espnUrl)
     if (!espnRes.ok) throw new Error(`ESPN fetch failed: ${espnRes.status}`)
     const espn = await espnRes.json()
