@@ -91,13 +91,17 @@ serve(async (req) => {
 
       const lineScores = c.linescores ?? []
 
-      for (let roundIdx = 0; roundIdx < lineScores.length; roundIdx++) {
+     for (let roundIdx = 0; roundIdx < lineScores.length; roundIdx++) {
         const ls = lineScores[roundIdx]
-        const strokes = ls?.value
-        // Skip if no value yet OR if value is 0 (not started)
-        if (typeof strokes !== 'number' || strokes === 0) continue
 
-        const strokesVsPar = strokes - tournamentPar
+        // ESPN returns round total in linescores[i].value (e.g. 67.0)
+        // AND the relative-to-par in displayValue (e.g. "-3" or "E")
+        // Only process if period matches round (1-4) and value is a real stroke count (60-90)
+        if (ls?.period !== roundIdx + 1) continue
+        const strokes = ls?.value
+        if (typeof strokes !== 'number' || strokes < 50 || strokes > 100) continue
+
+        const strokesVsPar = Math.round(strokes - tournamentPar)
         const roundNumber = roundIdx + 1
 
         // Resolve golfer ID via your existing SQL function (handles aliases)
