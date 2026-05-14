@@ -1,129 +1,112 @@
-// Supabase Edge Function: sync-pga-scores
-// Runs every 15 minutes. Fetches ESPN PGA leaderboard, parses, upserts into scores table.
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+// Supabase Edge Function: pulls PGA Championship leaderboard from ESPN every 15 min
+// and upserts scores into the database.
+// Deploy: supabase functions deploy sync-pga-scores
+// Test: curl https://YOUR_PROJECT.functions.supabase.co/sync-pga-scores
 
-const ESPN_URL = 'https://site.api.espn.com/apis/site/v2/sports/golf/pga/leaderboard';
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-// PGA Championship 2026 — Aronimink Golf Club, par 70
-const TOURNAMENT_PAR = 70;
-const TOURNAMENT_ID = 4; // FORE Lokos tournament_id for PGA Championship
+const TOURNAMENT_ID = 4 // PGA Championship
+const TOURNAMENT_PAR = 70 // Aronimink — verify and adjust
 
-Deno.serve(async (req) => {
-  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
-  // 1. Verify tournament is in 'live' state
-  const { data: tournament } = await supabase
-    .from('tournaments')
-    .select('id, status, name')
-    .eq('id', TOURNAMENT_ID)
-    .single();
-
-  if (!tournament || tournament.status !== 'live') {
-    return new Response(JSON.stringify({
-      skipped: true,
-      reason: `Tournament ${TOURNAMENT_ID} status is "${tournament?.status}", not live.`
-    }), { headers: { 'Content-Type': 'application/json' } });
-  }
-
-  // 2. Fetch ESPN leaderboard
-  let espnData;
+serve(async (req) => {
   try {
-    const espnResponse = await fetch(ESPN_URL);
-    if (!espnResponse.ok) throw new Error(`ESPN returned ${espnResponse.status}`);
-    espnData = await espnResponse.json();
-  } catch (e) {
-    return new Response(JSON.stringify({
-      error: 'ESPN fetch failed',
-      message: e.message
-    }), { status: 500, headers: { 'Content-Type': 'application/json' } });
-  }
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    )
 
-  // 3. Find the event in ESPN data
-  const event = espnData?.events?.find((e: any) => 
-    e.name?.toLowerCase().includes('pga championship') ||
-    e.shortName?.toLowerCase().includes('pga champ')
-  );
+    // Confirm tournament is live before processing
+    const { data: tournament } = await supabase
+      .from('tournaments')
+      .select('status, name')
+      .eq('id', TOURNAMENT_ID)
+      .single()
 
-  if (!event) {
-    return new Response(JSON.stringify({
-      error: 'PGA Championship not found in ESPN events',
-      available: espnData?.events?.map((e: any) => e.name) ?? []
-    }), { status: 404, headers: { 'Content-Type': 'application/json' } });
-  }
-
-  const competitors = event?.competitions?.[0]?.competitors ?? [];
-
-  // 4. Parse each player and prepare score rows
-  const scoreRows: any[] = [];
-  const failedResolves: string[] = [];
-  let totalProcessed = 0;
-  let totalUpserted = 0;
-
-  for (const c of competitors) {
-    const name = c?.athlete?.displayName;
-    if (!name) continue;
-    totalProcessed++;
-
-    // Resolve name to our golfer_id via our alias function
-    const { data: resolved, error: resolveErr } = await supabase.rpc('resolve_golfer', { input_name: name });
-    if (resolveErr || !resolved) {
-      failedResolves.push(name);
-      continue;
-    }
-    const golferId = resolved;
-
-    // Determine status
-    const positionId = c?.status?.position?.id;
-    const positionLabel = c?.status?.position?.displayName ?? '';
-    const espnStatus = c?.status?.type?.name ?? '';
-    let recordStatus: 'active' | 'mc' | 'wd' = 'active';
-    if (espnStatus.includes('STATUS_WD') || positionLabel.includes('WD')) recordStatus = 'wd';
-    else if (positionLabel.includes('CUT') || positionId === 'CUT') recordStatus = 'mc';
-
-    // Linescores: each round's gross score
-    const linescores = c?.linescores ?? [];
-    for (const ls of linescores) {
-      const round = ls?.period;
-      const value = ls?.value;
-      if (!round || value == null) continue;
-      const strokesVsPar = Number(value) - TOURNAMENT_PAR;
-      scoreRows.push({
-        tournament_id: TOURNAMENT_ID,
-        golfer_id: golferId,
-        round_number: round,
-        strokes_vs_par: strokesVsPar,
-        status: recordStatus,
-      });
-    }
-  }
-
-  // 5. Upsert all rows
-  if (scoreRows.length > 0) {
-    const { error: upsertErr, count } = await supabase
-      .from('scores')
-      .upsert(scoreRows, {
-        onConflict: 'tournament_id,golfer_id,round_number',
-        count: 'exact',
-      });
-    if (upsertErr) {
+    if (!tournament || tournament.status !== 'live') {
       return new Response(JSON.stringify({
-        error: 'Upsert failed',
-        message: upsertErr.message,
-        attempted: scoreRows.length
-      }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+        skipped: true,
+        reason: `Tournament not live (status=${tournament?.status})`
+      }), { headers: { 'Content-Type': 'application/json' } })
     }
-    totalUpserted = count ?? scoreRows.length;
-  }
 
-  return new Response(JSON.stringify({
-    success: true,
-    espn_event_name: event.name,
-    competitors_seen: competitors.length,
-    rows_processed: totalProcessed,
-    rows_upserted: totalUpserted,
-    failed_resolves: failedResolves,
-    timestamp: new Date().toISOString(),
-  }), { headers: { 'Content-Type': 'application/json' } });
-});
+    // Fetch ESPN leaderboard
+    const espnUrl = 'https://site.api.espn.com/apis/site/v2/sports/golf/pga/leaderboard'
+    const espnRes = await fetch(espnUrl)
+    if (!espnRes.ok) throw new Error(`ESPN fetch failed: ${espnRes.status}`)
+    const espn = await espnRes.json()
+
+    const event = espn.events?.[0]
+    if (!event) throw new Error('No event in ESPN response')
+
+    const competition = event.competitions?.[0]
+    if (!competition) throw new Error('No competition in event')
+
+    const competitors = competition.competitors ?? []
+
+    let processed = 0
+    let failedResolves: string[] = []
+    const rows: any[] = []
+
+    for (const c of competitors) {
+      const golferName = c.athlete?.displayName
+      if (!golferName) continue
+
+      const status = c.status?.position?.id // ESPN status codes
+      const isCut = c.status?.type?.name === 'STATUS_CUT'
+      const isWD = c.status?.type?.name === 'STATUS_WITHDRAWN'
+      const dbStatus = isWD ? 'wd' : isCut ? 'mc' : 'active'
+
+      // Get the score for each round from linescores
+      const lineScores = c.linescores ?? []
+
+      for (let roundIdx = 0; roundIdx < lineScores.length; roundIdx++) {
+        const ls = lineScores[roundIdx]
+        const strokes = ls?.value
+        if (typeof strokes !== 'number' || strokes === 0) continue
+
+        const strokesVsPar = strokes - TOURNAMENT_PAR
+        const roundNumber = roundIdx + 1
+
+        // Resolve golfer ID using your SQL function (handles aliases)
+        const { data: resolved } = await supabase
+          .rpc('resolve_golfer', { golfer_name: golferName })
+
+        if (!resolved) {
+          failedResolves.push(golferName)
+          continue
+        }
+
+        rows.push({
+          tournament_id: TOURNAMENT_ID,
+          golfer_id: resolved,
+          round_number: roundNumber,
+          strokes_vs_par: strokesVsPar,
+          status: dbStatus,
+        })
+        processed++
+      }
+    }
+
+    // Bulk upsert
+    if (rows.length > 0) {
+      const { error } = await supabase
+        .from('scores')
+        .upsert(rows, { onConflict: 'tournament_id,golfer_id,round_number' })
+      if (error) throw error
+    }
+
+    return new Response(JSON.stringify({
+      processed,
+      rows_upserted: rows.length,
+      failed_resolves: failedResolves,
+      tournament_name: tournament.name,
+    }), { headers: { 'Content-Type': 'application/json' } })
+
+  } catch (e: any) {
+    return new Response(JSON.stringify({ error: e.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    })
+  }
+})
