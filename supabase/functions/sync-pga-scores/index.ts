@@ -18,8 +18,12 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
+<<<<<<< Updated upstream
 
     // Short-circuit: if NO tournament is live, skip all work
+=======
+// Short-circuit: if NO tournament is live, skip all work
+>>>>>>> Stashed changes
     const { data: liveCheck } = await supabase
       .from('tournaments')
       .select('id, name')
@@ -96,14 +100,28 @@ serve(async (req) => {
 
       const lineScores = c.linescores ?? []
 
+<<<<<<< Updated upstream
+=======
+      // Only process round-total entries (period 1-4). Skip hole-by-hole nested entries.
+>>>>>>> Stashed changes
       const roundTotals = lineScores.filter((ls: any) => ls?.period >= 1 && ls?.period <= 4)
 
       for (const ls of roundTotals) {
         const strokes = ls?.value
         const display = ls?.displayValue
+<<<<<<< Updated upstream
 
         if (typeof strokes !== 'number' || strokes < 60 || strokes > 95) continue
 
+=======
+        // Real round totals are 50-100 strokes
+
+        // Only process FINISHED rounds. Skip in-progress.
+        // A round is finished when strokes is a real round total (60-90) AND golfer status is OK
+        if (typeof strokes !== 'number' || strokes < 60 || strokes > 95) continue
+
+        // Parse displayValue directly (it's already relative-to-par as "-3", "E", "+2")
+>>>>>>> Stashed changes
         let strokesVsPar: number
         if (display === 'E') {
           strokesVsPar = 0
