@@ -36,7 +36,8 @@ const shortName = (name: string) => {
   if (parts.length < 2) return name;
   return `${parts[0][0]}. ${parts[parts.length - 1]}`;
 };
-
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 export default async function SeasonPage() {
   const [tournaments, owners, standings, eventScores] = await Promise.all([
     getTournaments(),
