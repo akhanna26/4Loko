@@ -55,7 +55,7 @@ export default function TournamentView({ detail }: { detail: TournamentDetail })
 
   const podium = sortedRosters.slice(0, 3).filter(r => r.total_score > 0);
 
-  const colTemplate = '24px minmax(110px, 1fr) repeat(4, 40px) 40px 50px 18px';
+  const colTemplate = '20px minmax(80px, 1fr) 46px repeat(4, 32px) 32px 14px';
 
   return (
     <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-10 pb-12 sm:pb-16">
@@ -153,7 +153,7 @@ export default function TournamentView({ detail }: { detail: TournamentDetail })
                 boxShadow: '0 2px 8px rgba(14, 42, 74, 0.05)',
               }}>
               <div className="bg-[color:var(--cream-tint)]/60 p-2 sm:p-3">
-                <div className="min-w-[420px] sm:min-w-[520px]">
+                <div className="min-w-[340px]">
                   {/* Column header */}
                   <div className="grid items-baseline gap-1 px-2 py-2"
                     style={{
@@ -163,12 +163,12 @@ export default function TournamentView({ detail }: { detail: TournamentDetail })
                     }}>
                     <span className="text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>#</span>
                     <span className="text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>Owner</span>
-                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Thu</span>
-                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Fri</span>
-                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Sat</span>
-                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Sun</span>
-                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Bon</span>
                     <span className="text-[9px] uppercase text-[color:var(--green-deep)] text-right font-semibold" style={{ letterSpacing: '0.14em' }}>Total</span>
+                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Th</span>
+                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Fr</span>
+                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Sa</span>
+                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Su</span>
+                    <span className="text-[9px] uppercase text-[color:var(--green-moss)] text-right" style={{ letterSpacing: '0.14em' }}>Bon</span>
                     <span />
                   </div>
 
@@ -198,6 +198,9 @@ export default function TournamentView({ detail }: { detail: TournamentDetail })
                             <span className="sm:hidden">{shortName(r.owner_name)}</span>
                             {isLeader && <span className="ml-1 text-[color:var(--gold-masters)]">★</span>}
                           </span>
+                          <span className="text-[11px] sm:text-sm tabular text-right font-bold" style={{ color: isLeader ? 'var(--green-deep)' : r.total_score > 0 ? 'var(--green-deep)' : 'var(--green-moss)' }}>
+                            {formatScore(r.total_score)}
+                          </span>
                           {r.daily_scores.map((d) => {
                             const s = d.score;
                             const color =
@@ -209,18 +212,15 @@ export default function TournamentView({ detail }: { detail: TournamentDetail })
                               'var(--green-deep)';
                             const weight = s !== null && s >= 5 ? 700 : s !== null && s >= 2 ? 600 : 500;
                             return (
-                              <span key={d.day} className="text-[10px] sm:text-xs tabular text-right" style={{ color, fontWeight: weight }}>
+                              <span key={d.day} className="text-[10px] tabular text-right" style={{ color, fontWeight: weight }}>
                                 {dailyDisplay(s)}
                               </span>
                             );
                           })}
-                          <span className="text-[10px] sm:text-xs tabular text-right" style={{ color: r.bonus_total > 0 ? secondary : 'rgba(42,70,54,0.4)', fontWeight: r.bonus_total > 0 ? 700 : 400 }}>
+                          <span className="text-[10px] tabular text-right" style={{ color: r.bonus_total > 0 ? secondary : 'rgba(42,70,54,0.4)', fontWeight: r.bonus_total > 0 ? 700 : 400 }}>
                             {r.bonus_total > 0 ? `+${r.bonus_total}` : '—'}
                           </span>
-                          <span className="text-xs sm:text-sm tabular text-right font-bold" style={{ color: isLeader ? 'var(--green-deep)' : r.total_score > 0 ? 'var(--green-deep)' : 'var(--green-moss)' }}>
-                            {formatScore(r.total_score)}
-                          </span>
-                          <span className="text-xs text-right text-[color:var(--green-deep)] font-semibold">{isExpanded ? '▾' : '▸'}</span>
+                          <span className="text-[10px] text-right text-[color:var(--green-moss)]">{isExpanded ? '▾' : '▸'}</span>
                         </button>
 
                         {/* EXPANDED PER-GOLFER DETAIL */}
