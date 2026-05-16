@@ -1,4 +1,3 @@
-cat > lib/queries.ts << 'QUERIESEOF'
 import { supabase } from './supabase';
 
 export type YearlongStanding = {
@@ -563,4 +562,3 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
     major_winner,
   };
 }
-
