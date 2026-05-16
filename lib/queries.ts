@@ -40,7 +40,7 @@ export type EventScore = {
   event_type: 'MAJOR' | 'PGA';
   status: 'upcoming' | 'live' | 'final';
   start_date: string;
-  ranks: { rank: number; owner_name: string; score: number }[]; // top 3 for majors, all scorers for non-majors
+  ranks: { rank: number; owner_name: string; score: number }[];
   major_winner_owner: string | null;
   major_winner_golfer: string | null;
 };
@@ -127,7 +127,6 @@ export async function getLiveYearlong(): Promise<{ owner_name: string; total: nu
     .sort((a, b) => b.total - a.total);
 }
 
-// All events with status + scoring; for majors: top-3, for non-majors: all owners with positive bonuses
 export async function getEventScores(): Promise<EventScore[]> {
   const { data: tdata, error: terr } = await supabase
     .from('tournaments')
@@ -147,7 +146,6 @@ export async function getEventScores(): Promise<EventScore[]> {
     scores = (sdata ?? []) as any[];
   }
 
-  // Champions for major events
   const { data: champData } = await supabase
     .from('bonuses')
     .select('tournament_id, owner_id, golfer_id, bonus_kind')
@@ -175,7 +173,6 @@ export async function getEventScores(): Promise<EventScore[]> {
       if (t.event_type === 'MAJOR') {
         ranks = tScores.slice(0, 3).map((s, i) => ({ rank: i + 1, owner_name: s.owner_name, score: s.score }));
       } else {
-        // Non-majors: only show point-getters (positive scores)
         ranks = tScores.filter((s) => s.score > 0).map((s, i) => ({ rank: i + 1, owner_name: s.owner_name, score: s.score }));
       }
     }
@@ -198,12 +195,10 @@ export type StandingRank = {
   owner_id: number;
   rank: number | null;
   is_tied: boolean;
-  is_fallback: boolean; // true if using last year's data
+  is_fallback: boolean;
 };
 
-// Compute current rank by yearlong points; fall back to prev year if no events scored yet
 export async function getOwnerRanks(): Promise<Map<number, StandingRank>> {
-  // Get current year from view; if everyone is at 0, fall back to last year
   const { data: current, error: cErr } = await supabase
     .from('v_yearlong_standings')
     .select('owner_id, owner_name, season_score, season_year')
@@ -212,10 +207,8 @@ export async function getOwnerRanks(): Promise<Map<number, StandingRank>> {
   if (cErr) throw cErr;
 
   const result = new Map<number, StandingRank>();
-
   if (!current || current.length === 0) return result;
 
-  // Most recent season
   const latestYear = current[0].season_year;
   const currentRows = current.filter((r: any) => r.season_year === latestYear);
   const hasScored = currentRows.some((r: any) => Number(r.season_score) !== 0);
@@ -224,7 +217,6 @@ export async function getOwnerRanks(): Promise<Map<number, StandingRank>> {
   let isFallback = false;
 
   if (!hasScored) {
-    // Fall back to historical_results from previous year
     const prevYear = latestYear - 1;
     const { data: hist } = await supabase
       .from('historical_results')
@@ -240,14 +232,13 @@ export async function getOwnerRanks(): Promise<Map<number, StandingRank>> {
           owner_id: nameToId.get(h.owner_name),
           owner_name: h.owner_name,
           season_score: Number(h.yearlong_total) || 0,
-          season_year: h.season_year    // <-- ADD THIS LINE
+          season_year: h.season_year
         }))
         .filter((r: any) => r.owner_id !== undefined);
       isFallback = true;
     }
   }
 
-  // Sort highest to lowest, compute ranks with ties
   const sorted = [...useRows].sort((a: any, b: any) => Number(b.season_score) - Number(a.season_score));
 
   let currentRank = 0;
@@ -267,7 +258,6 @@ export async function getOwnerRanks(): Promise<Map<number, StandingRank>> {
     });
   }
 
-  // Mark ties
   const rankCounts = new Map<number, number>();
   for (const r of result.values()) {
     if (r.rank !== null) rankCounts.set(r.rank, (rankCounts.get(r.rank) ?? 0) + 1);
@@ -276,7 +266,6 @@ export async function getOwnerRanks(): Promise<Map<number, StandingRank>> {
     if (r.rank !== null && (rankCounts.get(r.rank) ?? 0) > 1) r.is_tied = true;
   }
 
-  // Add owners that aren't in the standings (e.g., new owners) with null rank
   const { data: allActive } = await supabase
     .from('owners')
     .select('id')
@@ -294,6 +283,7 @@ export async function getOwnerRanks(): Promise<Map<number, StandingRank>> {
 
   return result;
 }
+
 export type TournamentDetail = {
   tournament: Tournament;
   flight_id: number;
@@ -313,7 +303,7 @@ export type TournamentDetail = {
       purchase_price: number;
       is_keeper: boolean;
       day_scores: { day: 'Th' | 'Fr' | 'Sa' | 'Su'; raw_score: number | null; counted: boolean }[];
-      best_round_total: number;  // sum of counted rounds
+      best_round_total: number;
     }[];
   }[];
   major_winner: { owner_name: string; golfer_name: string } | null;
@@ -351,8 +341,6 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
 
   const golferIds = [...new Set((rosterData ?? []).map((r: any) => r.golfer_id))];
 
-  // Real schema: round_number + strokes_vs_par (negative = good)
-  // We invert to POINTS (positive = good) for display
   const { data: scoresData } = golferIds.length > 0 ? await supabase
     .from('scores')
     .select('golfer_id, round_number, strokes_vs_par, status')
@@ -369,7 +357,6 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
     .select('owner_id, golfer_id, bonus_kind, points, round_number')
     .eq('tournament_id', tournamentId);
 
-  // adjusted scores view — try with real schema columns
   let adjData: any[] = [];
   try {
     const { data: adj } = await supabase
@@ -390,11 +377,8 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
     rostersByOwner.get(r.owner_id)!.push(r);
   }
 
-  // Per-golfer-per-round raw strokes vs par
   const strokesByGolferRound = new Map<string, number>();
-  // Per-golfer-per-round status (active / mc / wd)
   const statusByGolferRound = new Map<string, string>();
-  // Per-golfer overall worst status seen (mc or wd "sticks")
   const golferCutStatus = new Map<number, 'mc' | 'wd'>();
   for (const s of scoresData ?? []) {
     const sa = s as any;
@@ -407,7 +391,6 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
     }
   }
 
-  // Field-worst strokes_vs_par among ACTIVE golfers, per round
   const fieldWorstByRound = new Map<number, number>();
   for (const s of scoresData ?? []) {
     const sa = s as any;
@@ -418,48 +401,25 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
     }
   }
 
-  // MC golfers get field-worst from R3 onward. WD golfers are excluded
-  // entirely (no penalty, no benefit — their rounds simply never count).
   const penaltyStartRound = new Map<number, number>();
   for (const [gid, cutStatus] of golferCutStatus.entries()) {
     if (cutStatus === 'mc') {
       penaltyStartRound.set(gid, 3);
     }
-    // wd: intentionally NOT added to penaltyStartRound — no substitution applied
-  }
-    statusByGolferRound.set(`${sa.golfer_id}-${sa.round_number}`, sa.status);
-    if (sa.status === 'wd') {
-      golferCutStatus.set(sa.golfer_id, 'wd');
-    } else if (sa.status === 'mc' && golferCutStatus.get(sa.golfer_id) !== 'wd') {
-      golferCutStatus.set(sa.golfer_id, 'mc');
-    }
   }
 
-  // Field-worst strokes_vs_par among ACTIVE golfers, per round
-  const fieldWorstByRound = new Map<number, number>();
-  for (const s of scoresData ?? []) {
-    const sa = s as any;
-    if (sa.status !== 'active') continue;
-    const cur = fieldWorstByRound.get(sa.round_number);
-    if (cur === undefined || sa.strokes_vs_par > cur) {
-      fieldWorstByRound.set(sa.round_number, sa.strokes_vs_par);
-    }
-  }
-
-  // Counted-flag per (owner, golfer, round) from view
   const countedFlag = new Map<string, boolean>();
   for (const a of adjData) {
     countedFlag.set(`${a.owner_id}-${a.golfer_id}-${a.round_number}`, a.is_counted);
   }
 
-  // Bonuses per owner
   const bonusesByOwner = new Map<number, { kind: string; points: number; detail: string }[]>();
   for (const b of (bonusData ?? []) as any[]) {
     if (!bonusesByOwner.has(b.owner_id)) bonusesByOwner.set(b.owner_id, []);
     const golfer = b.golfer_id ? golferMap.get(b.golfer_id) : null;
     const dayLabel = b.round_number ? ROUND_TO_DAY[b.round_number] : null;
     const detail =
-      b.bonus_kind === 'CHAMPION' ? `Champion: ${(golfer as any)?.full_name ?? '—'}` :
+      b.bonus_kind === 'CHAMPION' ? `Champion: ${(golfer as any)?.full_name ?? '-'}` :
       b.bonus_kind === 'DAILY_LOW' ? `${dayLabel ?? 'Daily'} low${golfer ? `: ${(golfer as any).full_name}` : ''}` :
       b.bonus_kind === 'HIO' ? `Hole-in-one${golfer ? `: ${(golfer as any).full_name}` : ''}` :
       b.bonus_kind;
@@ -472,14 +432,19 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
 
   const days: ('Th' | 'Fr' | 'Sa' | 'Su')[] = ['Th', 'Fr', 'Sa', 'Su'];
 
-  // Fallback: compute counted-set when no v_adjusted_scores view exists.
   const computeCountedFallback = (ownerId: number, roster: any[]): Map<string, boolean> => {
     const result = new Map<string, boolean>();
     for (const day of days) {
       const roundNum = DAY_TO_ROUND[day];
       const candidates = roster
         .map((r: any) => {
-          const strokes = strokesByGolferRound.get(`${r.golfer_id}-${roundNum}`);
+          let strokes = strokesByGolferRound.get(`${r.golfer_id}-${roundNum}`);
+          const cutStatus = golferCutStatus.get(r.golfer_id);
+          const penaltyStart = penaltyStartRound.get(r.golfer_id);
+          if (cutStatus && penaltyStart !== undefined && roundNum >= penaltyStart) {
+            const worst = fieldWorstByRound.get(roundNum);
+            if (worst !== undefined) strokes = worst;
+          }
           if (strokes === null || strokes === undefined) return null;
           return { golfer_id: r.golfer_id, points: -strokes };
         })
@@ -508,8 +473,6 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
         const roundNum = DAY_TO_ROUND[d];
         let strokes = strokesByGolferRound.get(`${r.golfer_id}-${roundNum}`);
 
-        // MC/WD field-worst substitution: from penalty-start round onward,
-        // a cut or withdrawn golfer is assigned the field-worst score that round.
         const cutStatus = golferCutStatus.get(r.golfer_id);
         const penaltyStart = penaltyStartRound.get(r.golfer_id);
         if (cutStatus && penaltyStart !== undefined && roundNum >= penaltyStart) {
@@ -519,20 +482,6 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
           }
         }
 
-        // Convert strokes to POINTS for display (negate strokes_vs_par)
-        const points = strokes === undefined ? null : -strokes;
-        // MC/WD field-worst substitution: from penalty-start round onward,
-        // a cut or withdrawn golfer is assigned the field-worst score that round.
-        const cutStatus = golferCutStatus.get(r.golfer_id);
-        const penaltyStart = penaltyStartRound.get(r.golfer_id);
-        if (cutStatus && penaltyStart !== undefined && roundNum >= penaltyStart) {
-          const worst = fieldWorstByRound.get(roundNum);
-          if (worst !== undefined) {
-            strokes = worst;
-          }
-        }
-
-        // Convert strokes to POINTS for display (negate strokes_vs_par)
         const points = strokes === undefined ? null : -strokes;
         const counted = useFallback
           ? (fallbackCounted!.get(`${oid}-${r.golfer_id}-${roundNum}`) ?? false)
