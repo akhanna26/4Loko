@@ -1,15 +1,15 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const ESPN_TOURNAMENT_MAP: Record<string, { dbId: number; par: number }> = {
-  'PGA Championship': { dbId: 4, par: 70 },
-  'U.S. Open': { dbId: 6, par: 70 },
-  'The Open Championship': { dbId: 8, par: 71 },
-  'The Masters': { dbId: 2, par: 72 },
-  'RBC Heritage': { dbId: 1, par: 71 },
-  'Memorial Tournament': { dbId: 3, par: 72 },
-  'Travelers Championship': { dbId: 5, par: 70 },
-  'FedEx St. Jude Championship': { dbId: 7, par: 70 },
+const ESPN_TOURNAMENT_MAP: Record<string, { dbId: number; par: number; flightId: number }> = {
+  'PGA Championship': { dbId: 4, par: 70, flightId: 2 },
+  'U.S. Open': { dbId: 6, par: 70, flightId: 3 },
+  'The Open Championship': { dbId: 8, par: 71, flightId: 4 },
+  'The Masters': { dbId: 2, par: 72, flightId: 1 },
+  'RBC Heritage': { dbId: 1, par: 71, flightId: 1 },
+  'Memorial Tournament': { dbId: 3, par: 72, flightId: 2 },
+  'Travelers Championship': { dbId: 5, par: 70, flightId: 3 },
+  'FedEx St. Jude Championship': { dbId: 7, par: 70, flightId: 4 },
 }
 
 serve(async (req) => {
@@ -18,12 +18,8 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
-<<<<<<< Updated upstream
 
     // Short-circuit: if NO tournament is live, skip all work
-=======
-// Short-circuit: if NO tournament is live, skip all work
->>>>>>> Stashed changes
     const { data: liveCheck } = await supabase
       .from('tournaments')
       .select('id, name')
@@ -60,6 +56,7 @@ serve(async (req) => {
 
     const tournamentId = mapping.dbId
     const tournamentPar = mapping.par
+    const flightId = mapping.flightId
 
     const { data: tournament } = await supabase
       .from('tournaments')
@@ -81,6 +78,7 @@ serve(async (req) => {
       }), { headers: { 'Content-Type': 'application/json' } })
     }
 
+    // ---- SYNC SCORES ----
     const competition = event.competitions?.[0]
     if (!competition) throw new Error('No competition in event')
     const competitors = competition.competitors ?? []
@@ -88,6 +86,8 @@ serve(async (req) => {
     let processed = 0
     const failedResolves: string[] = []
     const rows: any[] = []
+    const espnFieldCount = competitors.length
+    
 
     for (const c of competitors) {
       const golferName = c.athlete?.displayName
@@ -99,29 +99,15 @@ serve(async (req) => {
       const dbStatus = isWD ? 'wd' : isCut ? 'mc' : 'active'
 
       const lineScores = c.linescores ?? []
-
-<<<<<<< Updated upstream
-=======
-      // Only process round-total entries (period 1-4). Skip hole-by-hole nested entries.
->>>>>>> Stashed changes
       const roundTotals = lineScores.filter((ls: any) => ls?.period >= 1 && ls?.period <= 4)
 
+      // Track who's "in" for each round (to determine round complete)
       for (const ls of roundTotals) {
         const strokes = ls?.value
+        if (typeof strokes !== 'number' || strokes < 60 || strokes > 95) continue
+        const roundNumber = ls.period
+
         const display = ls?.displayValue
-<<<<<<< Updated upstream
-
-        if (typeof strokes !== 'number' || strokes < 60 || strokes > 95) continue
-
-=======
-        // Real round totals are 50-100 strokes
-
-        // Only process FINISHED rounds. Skip in-progress.
-        // A round is finished when strokes is a real round total (60-90) AND golfer status is OK
-        if (typeof strokes !== 'number' || strokes < 60 || strokes > 95) continue
-
-        // Parse displayValue directly (it's already relative-to-par as "-3", "E", "+2")
->>>>>>> Stashed changes
         let strokesVsPar: number
         if (display === 'E') {
           strokesVsPar = 0
@@ -130,8 +116,6 @@ serve(async (req) => {
         } else {
           strokesVsPar = Math.round(strokes - tournamentPar)
         }
-
-        const roundNumber = ls.period
 
         const { data: resolved } = await supabase
           .rpc('resolve_golfer', { golfer_name: golferName })
@@ -159,6 +143,76 @@ serve(async (req) => {
       if (error) throw error
     }
 
+    /// ---- AUTO DAILY-LOW BONUS (self-correcting) ----
+    // Every sync: wipe all DAILY_LOW for this tournament and rebuild from
+    // current scores. Whoever holds a round's field-low right now gets it.
+    // As the round progresses the bonus moves automatically; once the round
+    // ends it's permanent because scores stop changing.
+    const bonusReport: Record<number, { lowScore: number | null; golfers: string[] }> = {}
+
+    await supabase
+      .from('bonuses')
+      .delete()
+      .eq('tournament_id', tournamentId)
+      .eq('bonus_kind', 'DAILY_LOW')
+
+    const rebuiltBonusRows: any[] = []
+
+    for (const roundNumber of [1, 2, 3, 4]) {
+      const { data: roundScores } = await supabase
+        .from('scores')
+        .select('golfer_id, strokes_vs_par, status')
+        .eq('tournament_id', tournamentId)
+        .eq('round_number', roundNumber)
+        .eq('status', 'active')
+
+      if (!roundScores || roundScores.length === 0) {
+        bonusReport[roundNumber] = { lowScore: null, golfers: [] }
+        continue
+      }
+
+      const fieldLow = Math.min(...roundScores.map((s: any) => s.strokes_vs_par))
+      const lowGolferIds = roundScores
+        .filter((s: any) => s.strokes_vs_par === fieldLow)
+        .map((s: any) => s.golfer_id)
+
+      const { data: ownerRosters } = await supabase
+        .from('rosters')
+        .select('owner_id, golfer_id')
+        .eq('flight_id', flightId)
+        .in('golfer_id', lowGolferIds)
+
+      for (const r of ownerRosters ?? []) {
+        rebuiltBonusRows.push({
+          tournament_id: tournamentId,
+          owner_id: r.owner_id,
+          golfer_id: r.golfer_id,
+          bonus_kind: 'DAILY_LOW',
+          points: 1,
+          round_number: roundNumber,
+        })
+      }
+
+      const { data: golferNames } = await supabase
+        .from('golfers')
+        .select('id, full_name')
+        .in('id', lowGolferIds)
+
+      bonusReport[roundNumber] = {
+        lowScore: fieldLow,
+        golfers: (golferNames ?? []).map((g: any) => g.full_name),
+      }
+    }
+
+    if (rebuiltBonusRows.length > 0) {
+      await supabase
+        .from('bonuses')
+        .upsert(rebuiltBonusRows, {
+          onConflict: 'tournament_id,owner_id,golfer_id,bonus_kind,round_number',
+          ignoreDuplicates: true,
+        })
+    }
+
     return new Response(JSON.stringify({
       processed,
       rows_upserted: rows.length,
@@ -166,6 +220,7 @@ serve(async (req) => {
       tournament_name: tournament.name,
       espn_event_name: espnEventName,
       tournament_id: tournamentId,
+      bonus_report: bonusReport,
     }), { headers: { 'Content-Type': 'application/json' } })
 
   } catch (e: any) {
