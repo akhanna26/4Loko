@@ -1,4 +1,4 @@
-cat > lib/queries.ts << 'QUERIESEOF'
+
 import { supabase } from './supabase';
 
 export type YearlongStanding = {
