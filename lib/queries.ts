@@ -9,7 +9,7 @@ export type YearlongStanding = {
 };
 
 export type EventResult = {
-  season_year: number;ƒ√
+  season_year: number;
   tournament_name: string;
   event_type: string;
   owner_name: string;
@@ -418,24 +418,31 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
     }
   }
 
-  // Determine the first round each cut/wd golfer stopped being active.
-  // For 'mc': they played R1+R2 for real, penalty starts R3.
-  // For 'wd': penalty starts the first round with no active score.
+  // MC golfers get field-worst from R3 onward. WD golfers are excluded
+  // entirely (no penalty, no benefit — their rounds simply never count).
   const penaltyStartRound = new Map<number, number>();
   for (const [gid, cutStatus] of golferCutStatus.entries()) {
     if (cutStatus === 'mc') {
       penaltyStartRound.set(gid, 3);
-    } else {
-      // wd — find first round 1..4 where they have no 'active' score
-      let start = 1;
-      for (let rn = 1; rn <= 4; rn++) {
-        if (statusByGolferRound.get(`${gid}-${rn}`) === 'active') {
-          start = rn + 1;
-        } else {
-          break;
-        }
-      }
-      penaltyStartRound.set(gid, start);
+    }
+    // wd: intentionally NOT added to penaltyStartRound — no substitution applied
+  }
+    statusByGolferRound.set(`${sa.golfer_id}-${sa.round_number}`, sa.status);
+    if (sa.status === 'wd') {
+      golferCutStatus.set(sa.golfer_id, 'wd');
+    } else if (sa.status === 'mc' && golferCutStatus.get(sa.golfer_id) !== 'wd') {
+      golferCutStatus.set(sa.golfer_id, 'mc');
+    }
+  }
+
+  // Field-worst strokes_vs_par among ACTIVE golfers, per round
+  const fieldWorstByRound = new Map<number, number>();
+  for (const s of scoresData ?? []) {
+    const sa = s as any;
+    if (sa.status !== 'active') continue;
+    const cur = fieldWorstByRound.get(sa.round_number);
+    if (cur === undefined || sa.strokes_vs_par > cur) {
+      fieldWorstByRound.set(sa.round_number, sa.strokes_vs_par);
     }
   }
 
@@ -501,6 +508,19 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
         const roundNum = DAY_TO_ROUND[d];
         let strokes = strokesByGolferRound.get(`${r.golfer_id}-${roundNum}`);
 
+        // MC/WD field-worst substitution: from penalty-start round onward,
+        // a cut or withdrawn golfer is assigned the field-worst score that round.
+        const cutStatus = golferCutStatus.get(r.golfer_id);
+        const penaltyStart = penaltyStartRound.get(r.golfer_id);
+        if (cutStatus && penaltyStart !== undefined && roundNum >= penaltyStart) {
+          const worst = fieldWorstByRound.get(roundNum);
+          if (worst !== undefined) {
+            strokes = worst;
+          }
+        }
+
+        // Convert strokes to POINTS for display (negate strokes_vs_par)
+        const points = strokes === undefined ? null : -strokes;
         // MC/WD field-worst substitution: from penalty-start round onward,
         // a cut or withdrawn golfer is assigned the field-worst score that round.
         const cutStatus = golferCutStatus.get(r.golfer_id);
