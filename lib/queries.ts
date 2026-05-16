@@ -563,4 +563,4 @@ export async function getTournamentDetail(tournamentId: number): Promise<Tournam
     major_winner,
   };
 }
-QUERIESEOF
+
