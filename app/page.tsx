@@ -189,41 +189,65 @@ export default async function SeasonPage() {
 
 function BrandHero({ nextUpcoming, accent }: { nextUpcoming: any; accent: any }) {
   return (
-    <div className="text-center pt-4 pb-8 sm:pt-6 sm:pb-10 border-b border-[color:var(--green-forest)]/15">
-      <p className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.32em' }}>
-        Volume IV · The 2026 Season
-      </p>
-      <h1 className="mt-4 sm:mt-6 mb-2 leading-none flex items-center justify-center gap-2 sm:gap-4">
-        <span className="text-4xl sm:text-7xl font-light text-[color:var(--green-deep)]" style={{ letterSpacing: '-0.02em' }}>F</span>
-        <span className="inline-flex items-center" style={{ marginBottom: '0.05em' }}>
-          <svg className="w-8 h-8 sm:w-14 sm:h-14 text-[color:var(--gold-masters)]" viewBox="0 0 60 60" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="30" cy="30" r="22" />
-            <line x1="30" y1="14" x2="30" y2="46" />
-            <path d="M30 18 L42 22 L30 26 Z" fill="currentColor" stroke="none" />
-          </svg>
-        </span>
-        <span className="text-4xl sm:text-7xl font-light text-[color:var(--green-deep)]" style={{ letterSpacing: '-0.02em' }}>RE LOKOS</span>
-      </h1>
-      <div className="flex items-center justify-center gap-1 mt-1">
-        {[0, 1, 2, 3].map((i) => (
-          <svg key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[color:var(--chicago-red)]" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
-            <path d="M6 0 L7 4 L11 5 L8 7 L9 11 L6 9 L3 11 L4 7 L1 5 L5 4 Z" />
-          </svg>
-        ))}
+    <div className="px-2">
+      <div
+        className="relative text-center px-6 py-10 sm:px-10 sm:py-14 rounded-lg"
+        style={{
+          background: 'linear-gradient(180deg, #ffffff 0%, #fdfcf8 100%)',
+          border: '1px solid rgba(212, 175, 55, 0.35)',
+          boxShadow: '0 1px 0 rgba(255,255,255,0.9) inset, 0 8px 30px -12px rgba(42,70,54,0.18)',
+        }}
+      >
+        <div
+          aria-hidden="true"
+          className="absolute inset-3 rounded pointer-events-none"
+          style={{ border: '1px solid rgba(212, 175, 55, 0.22)' }}
+        />
+        <p className="relative text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.34em' }}>
+          Volume IV · The 2026 Season
+        </p>
+        <h1 className="relative mt-5 sm:mt-7 mb-2 leading-none flex items-center justify-center gap-2 sm:gap-4">
+          <span
+            className="text-4xl sm:text-7xl font-light text-[color:var(--green-deep)]"
+            style={{ letterSpacing: '-0.02em', textShadow: '0 1px 0 rgba(255,255,255,0.8)' }}
+          >F</span>
+          <span className="inline-flex items-center" style={{ marginBottom: '0.05em' }}>
+            <svg
+              className="w-8 h-8 sm:w-14 sm:h-14 text-[color:var(--gold-masters)]"
+              viewBox="0 0 60 60" fill="none" stroke="currentColor" strokeWidth="3"
+              strokeLinecap="round" strokeLinejoin="round"
+              style={{ filter: 'drop-shadow(0 1px 1px rgba(255,255,255,0.7))' }}
+            >
+              <circle cx="30" cy="30" r="22" />
+              <line x1="30" y1="14" x2="30" y2="46" />
+              <path d="M30 18 L42 22 L30 26 Z" fill="currentColor" stroke="none" />
+            </svg>
+          </span>
+          <span
+            className="text-4xl sm:text-7xl font-light text-[color:var(--green-deep)]"
+            style={{ letterSpacing: '-0.02em', textShadow: '0 1px 0 rgba(255,255,255,0.8)' }}
+          >RE LOKOS</span>
+        </h1>
+        <div className="relative flex items-center justify-center gap-1 mt-1">
+          {[0, 1, 2, 3].map((i) => (
+            <svg key={i} className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[color:var(--chicago-red)]" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+              <path d="M6 0 L7 4 L11 5 L8 7 L9 11 L6 9 L3 11 L4 7 L1 5 L5 4 Z" />
+            </svg>
+          ))}
+        </div>
+        <p className="relative mt-6 sm:mt-8 serif italic text-sm sm:text-base text-[color:var(--green-moss)]">
+          Up next: <span className="text-[color:var(--green-deep)] not-italic font-semibold">{nextUpcoming.name}</span>
+          <span className="hidden sm:inline">
+            <span className="mx-2 text-[color:var(--green-forest)]/40">·</span>
+            {nextUpcoming.venue}
+          </span>
+          <span className="mx-1.5 sm:mx-2 text-[color:var(--green-forest)]/40">·</span>
+          {Math.max(0, daysUntil(nextUpcoming.start_date))}d
+        </p>
       </div>
-      <p className="mt-6 sm:mt-8 serif italic text-sm sm:text-base text-[color:var(--green-moss)] px-2">
-        Up next: <span className="text-[color:var(--green-deep)] not-italic font-semibold">{nextUpcoming.name}</span>
-        <span className="hidden sm:inline">
-          <span className="mx-2 text-[color:var(--green-forest)]/40">·</span>
-          {nextUpcoming.venue}
-        </span>
-        <span className="mx-1.5 sm:mx-2 text-[color:var(--green-forest)]/40">·</span>
-        {Math.max(0, daysUntil(nextUpcoming.start_date))}d
-      </p>
     </div>
   );
 }
-
 function DraftWeekHero({ tournament, accent }: { tournament: any; accent: any }) {
   const days = Math.max(0, daysUntil(tournament.start_date));
   const primary = accent?.primary ?? 'var(--green-deep)';

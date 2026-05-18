@@ -75,7 +75,7 @@ export default function StandingsExpandable({
     });
   };
 
-  const colTemplate = '28px minmax(120px, 1fr) ' + eventOrder.map((e) => (e.type === 'MAJOR' ? '40px' : '36px')).join(' ') + ' 48px 18px';
+const colTemplate = '28px minmax(110px, 1fr) 50px ' + eventOrder.map((e) => (e.type === 'MAJOR' ? '40px' : '36px')).join(' ') + ' 18px';
 
   const renderCell = (eventName: string, score: number | undefined, isElev: boolean) => {
     const status = tournamentStatusByName[eventName];
@@ -125,13 +125,13 @@ export default function StandingsExpandable({
           
          <div className="grid" style={{ gridTemplateColumns: colTemplate, background: 'var(--cream-deep)', borderBottom: '1px solid rgba(42,70,54,0.1)' }}>
             <div className="px-2 py-1.5 text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>#</div>
-            <div className="px-2 py-1.5 text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>Owner</div>
+           <div className="px-2 py-1.5 text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>Owner</div>
+            <div className="px-2 py-1.5 text-[9px] uppercase text-right text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.14em' }}>Total</div>
             {eventOrder.map((e) => (
               <div key={e.short} className="px-2 py-1.5 text-[9px] uppercase text-right text-[color:var(--green-moss)]" style={{ letterSpacing: '0.14em' }}>
                 {e.short}
               </div>
             ))}
-            <div className="px-2 py-1.5 text-[9px] uppercase text-right text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.14em' }}>Total</div>
             <div />
           </div>
 
@@ -152,17 +152,17 @@ export default function StandingsExpandable({
                   }}
                 >
                   <div className={`board-cell board-num ${isLeader ? 'board-num-leader' : 'board-num-major'}`}>{rank}</div>
-                  <div className={`board-cell board-name flex items-center ${isLeader ? 'board-num-leader' : ''}`} style={{ fontSize: '13px', color: isLeader ? undefined : 'var(--green-deep)' }}>
+                 <div className={`board-cell board-name flex items-center ${isLeader ? 'board-num-leader' : ''}`} style={{ fontSize: '13px', color: isLeader ? undefined : 'var(--green-deep)' }}>
                     <span className="hidden sm:inline truncate">{s.owner_name}</span>
                     <span className="sm:hidden truncate">{shortName(s.owner_name)}</span>
                     <MedalDot rank={rank} />
                   </div>
+                  <div className="board-cell board-num text-right" style={{ fontWeight: 700 }}>{renderTotal(s.total, isLeader)}</div>
                   {eventOrder.map((e) => (
                     <div key={e.short} className={`board-cell board-num text-right ${e.type === 'PGA' ? 'board-col-elev' : ''}`}>
                       {renderCell(e.name, s.per_event[e.name], e.type === 'PGA')}
                     </div>
                   ))}
-                  <div className="board-cell board-num text-right">{renderTotal(s.total, isLeader)}</div>
                   <div className="board-cell board-num text-right text-[10px] text-[color:var(--green-moss)]">
                     {isExpanded ? '▾' : '▸'}
                   </div>
