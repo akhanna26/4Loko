@@ -52,17 +52,18 @@ export default function RootLayout({
                 <span className="chi-star" aria-hidden="true" />
               </span>
             </a>
-            <nav className="flex items-center gap-4 text-[11px] uppercase text-[color:var(--green-forest)]" style={{ letterSpacing: '0.18em' }}>
-  <a href="/" className="hover:text-[color:var(--green-deep)] transition-colors">2026 Season</a>
-  <span className="text-[color:var(--green-forest)]/30">|</span>
-  <a href="/hall-of-fame" className="hover:text-[color:var(--green-deep)] transition-colors">Hall of Fame</a>
-  <span className="text-[color:var(--green-forest)]/30">|</span>
-  <a href="/keepers" className="hover:text-[color:var(--green-deep)] transition-colors">Keepers</a>
-  <span className="text-[color:var(--green-forest)]/30">|</span>
-  <a href="/draft" className="hover:text-[color:var(--green-deep)] transition-colors">Draft</a>
-  <span className="text-[color:var(--green-forest)]/30">|</span>
-<a href="/info" className="hover:text-[color:var(--green-deep)] transition-colors">Rules</a>
-</nav>
+            <nav className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-[11px] uppercase text-[color:var(--green-forest)] whitespace-nowrap" style={{ letterSpacing: '0.14em' }}>
+              <a href="/" className="hover:text-[color:var(--green-deep)] transition-colors"><span className="sm:hidden">2026</span><span className="hidden sm:inline">2026 Season</span></a>
+              <span className="text-[color:var(--green-forest)]/30">|</span>
+              <a href="/hall-of-fame" className="hover:text-[color:var(--green-deep)] transition-colors"><span className="sm:hidden">HOF</span><span className="hidden sm:inline">Hall of Fame</span></a>
+              <span className="text-[color:var(--green-forest)]/30">|</span>
+              <a href="/keepers" className="hover:text-[color:var(--green-deep)] transition-colors">Keepers</a>
+              <span className="text-[color:var(--green-forest)]/30">|</span>
+              <a href="/draft" className="hover:text-[color:var(--green-deep)] transition-colors">Draft</a>
+              <span className="text-[color:var(--green-forest)]/30">|</span>
+              <a href="/info" className="hover:text-[color:var(--green-deep)] transition-colors">Rules</a>
+            </nav>
+
           </div>
         </header>
         {children}
