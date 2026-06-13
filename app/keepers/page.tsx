@@ -7,8 +7,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function KeepersIndex() {
   const owners = await getActiveOwners();
-  const flight = await getFlight(2026, 2);
-  if (!flight) return <main className="p-8">PGA Championship flight not found.</main>;
+  const flight = await getFlight(2026, 3);
+  if (!flight) return <main className="p-8">U.S. Open flight not found.</main>;
 
   const declarations = await getAllKeeperDeclarations(flight.id);
   const declaredByOwner = new Map(declarations.map((d) => [d.owner_id, d]));
@@ -17,7 +17,7 @@ export default async function KeepersIndex() {
     <main className="max-w-5xl mx-auto px-6 pt-10 pb-16">
       <div className="text-center mb-8">
         <p className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.24em' }}>
-          The PGA Championship · Aronimink · May 14–17
+          The U.S. Open · Shinnecock Hills · June 11–14
         </p>
       </div>
 
@@ -26,7 +26,7 @@ export default async function KeepersIndex() {
           Declare your keeper
         </h2>
         <p className="text-sm text-[color:var(--green-moss)] italic serif mt-3 max-w-md mx-auto">
-          Each owner may keep one Masters golfer for the PGA Championship. The keeper fee goes to the year-long pot.
+          Each owner may keep one PGA Championship golfer for the U.S. Open. The keeper fee goes to the year-long pot.
         </p>
       </section>
 

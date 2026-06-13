@@ -312,7 +312,7 @@ export default function AuctionConsole({
     if (!confirm('Apply declared keepers? This pre-populates rosters with kept golfers at original prices.')) return;
     startTransition(async () => {
       try {
-        const prevFlight = await getFlight(2026, 1);
+        const prevFlight = await getFlight(2026, 2);
         if (!prevFlight) { setError('Masters flight not found'); return; }
         const result = await applyKeepersToAuction(flightId, prevFlight.id);
         setInfo(`Applied ${result.applied} keeper${result.applied === 1 ? '' : 's'}.`);

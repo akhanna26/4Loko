@@ -29,18 +29,18 @@ export default async function OwnerKeeperPage({ params }: { params: Promise<{ ow
     );
   }
 
-  const pgaFlight = await getFlight(2026, 2);
-  const mastersFlight = await getFlight(2026, 1);
-  if (!pgaFlight || !mastersFlight) return <main className="p-8">Flights not configured.</main>;
+  const currentFlight = await getFlight(2026, 3);
+  const prevFlight = await getFlight(2026, 2);
+  if (!currentFlight || !prevFlight) return <main className="p-8">Flights not configured.</main>;
 
-  const roster = await getOwnerPrevRoster(ownerId, mastersFlight.id);
-  const currentDecl = await getKeeperDeclaration(pgaFlight.id, ownerId);
+  const roster = await getOwnerPrevRoster(ownerId, prevFlight.id);
+  const currentDecl = await getKeeperDeclaration(currentFlight.id, ownerId);
 
   return (
     <main className="max-w-3xl mx-auto px-6 pt-10 pb-16">
       <div className="text-center mb-8">
         <p className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.24em' }}>
-          PGA Championship Keeper · {owner.name}
+          U.S. Open Keeper · {owner.name}
         </p>
       </div>
 
@@ -50,19 +50,19 @@ export default async function OwnerKeeperPage({ params }: { params: Promise<{ ow
         </h1>
         <div className="divider-rule mt-5 mb-3 max-w-[160px] mx-auto" />
         <p className="text-sm text-[color:var(--green-moss)] italic serif">
-          Choose one Masters golfer to keep, or none.
+          Choose one PGA Championship golfer to keep, or none.
         </p>
       </section>
 
       {roster.length === 0 ? (
         <p className="text-center text-sm text-[color:var(--green-moss)] serif italic">
-          No Masters roster found for {owner.name}. Cannot select a keeper.
+          No PGA Championship roster found for {owner.name}. Cannot select a keeper.
         </p>
       ) : (
         <KeeperForm
           ownerId={ownerId}
           ownerName={owner.name}
-          flightId={pgaFlight.id}
+          flightId={currentFlight.id}
           roster={roster}
           currentDeclaration={currentDecl ? {
             golfer_id: currentDecl.golfer_id,

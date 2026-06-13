@@ -11,11 +11,11 @@ import { getActiveOwners, getOwnerRanks } from '../../lib/queries';
 export const dynamic = 'force-dynamic';
 
 export default async function DraftPage() {
-  const flight = await getFlight(2026, 2); // PGA Championship
+  const flight = await getFlight(2026, 3); // U.S. Open
   if (!flight) {
     return (
       <main className="max-w-4xl mx-auto px-6 pt-10">
-        <p className="serif text-2xl text-[color:var(--green-deep)]">PGA Championship flight not configured.</p>
+        <p className="serif text-2xl text-[color:var(--green-deep)]">U.S. Open flight not configured.</p>
       </main>
     );
   }
@@ -38,9 +38,9 @@ export default async function DraftPage() {
   }
 
   return (
-<AuctionConsole
+    <AuctionConsole
       flightId={flight.id}
-      flightName={flight.name ?? 'PGA Championship'}
+      flightName={flight.name ?? 'U.S. Open'}
       sessionId={session.id}
       initialSession={session}
       owners={owners}
