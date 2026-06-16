@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter_Tight, Source_Serif_4 } from 'next/font/google';
+import HeaderNav from './HeaderNav';
 
 const interTight = Inter_Tight({ subsets: ['latin'], variable: '--font-sans' });
 const sourceSerif = Source_Serif_4({
@@ -33,8 +34,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${interTight.variable} ${sourceSerif.variable}`}>
       <body className="sans-tight">
-        <header className="border-b border-[color:var(--green-forest)]/15 bg-[color:var(--cream)]">
-          <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
+        <header className="border-b border-[color:var(--green-forest)]/15 bg-[color:var(--cream-deep)]">
+          <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between gap-3">
             <a href="/" className="flex flex-col items-start group">
               <span className="serif text-2xl font-semibold tracking-tight text-[color:var(--green-deep)] leading-none flex items-baseline">
                 F
@@ -52,22 +53,11 @@ export default function RootLayout({
                 <span className="chi-star" aria-hidden="true" />
               </span>
             </a>
-            <nav className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-[11px] uppercase text-[color:var(--green-forest)] whitespace-nowrap" style={{ letterSpacing: '0.14em' }}>
-              <a href="/" className="hover:text-[color:var(--green-deep)] transition-colors"><span className="sm:hidden">2026</span><span className="hidden sm:inline">2026 Season</span></a>
-              <span className="text-[color:var(--green-forest)]/30">|</span>
-              <a href="/hall-of-fame" className="hover:text-[color:var(--green-deep)] transition-colors"><span className="sm:hidden">HOF</span><span className="hidden sm:inline">Hall of Fame</span></a>
-              <span className="text-[color:var(--green-forest)]/30">|</span>
-              <a href="/keepers" className="hover:text-[color:var(--green-deep)] transition-colors">Keepers</a>
-              <span className="text-[color:var(--green-forest)]/30">|</span>
-              <a href="/draft" className="hover:text-[color:var(--green-deep)] transition-colors">Draft</a>
-              <span className="text-[color:var(--green-forest)]/30">|</span>
-              <a href="/info" className="hover:text-[color:var(--green-deep)] transition-colors">Rules</a>
-            </nav>
-
+            <HeaderNav />
           </div>
         </header>
         {children}
-        <footer className="mt-24 border-t border-[color:var(--green-forest)]/15 bg-[color:var(--cream)]">
+        <footer className="mt-24 border-t border-[color:var(--green-forest)]/15 bg-[color:var(--cream-deep)]">
           <div className="max-w-5xl mx-auto px-6 py-6 flex justify-between items-baseline flex-wrap gap-2">
             <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
               FORE Lokos · Chicago · Vol. IV
