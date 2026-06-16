@@ -66,7 +66,7 @@ export default function KeeperForm({
       }}>
       <div className="px-4 sm:px-5 py-3 border-b border-[color:var(--green-forest)]/15 flex items-baseline justify-between" style={{ background: `${theme.primary}10` }}>
         <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.18em' }}>
-          Masters Roster
+          PGA Championship Roster
         </p>
         <p className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
           {sortedRoster.length} golfers
@@ -111,7 +111,7 @@ export default function KeeperForm({
                 <div className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.14em' }}>
                   Drafted
                 </div>
-                <div className="serif text-base sm:text-lg text-[color:var(--green-moss)] tabular">${g.purchase_price}</div>
+                <div className="serif text-lg sm:text-2xl text-[color:var(--green-deep)] tabular font-semibold">${g.purchase_price}</div>
               </div>
             </label>
           );
