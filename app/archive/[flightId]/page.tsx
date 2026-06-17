@@ -1,4 +1,4 @@
-import { getFlightPicks } from '../../../lib/archive';
+import { getFlightPicks, getFlightDraftHistory } from '../../../lib/archive';
 import { getOwnerTheme } from '../../../lib/owner-themes';
 import Link from 'next/link';
 
@@ -15,7 +15,11 @@ export default async function FlightArchivePage({ params }: { params: Promise<{ 
     );
   }
 
-  const { picks, flight } = await getFlightPicks(flightId);
+  const [{ picks, flight }, draftHistory] = await Promise.all([
+    getFlightPicks(flightId),
+    getFlightDraftHistory(flightId),
+  ]);
+
   if (!flight) {
     return (
       <main className="max-w-3xl mx-auto px-6 pt-10 pb-16">
@@ -27,7 +31,6 @@ export default async function FlightArchivePage({ params }: { params: Promise<{ 
     );
   }
 
-  // Bucket picks by owner, sort each bucket by purchase_price desc, sort owners by name
   const byOwner = new Map<number, { owner_id: number; owner_name: string; picks: typeof picks }>();
   for (const p of picks) {
     if (!byOwner.has(p.owner_id)) {
@@ -39,7 +42,6 @@ export default async function FlightArchivePage({ params }: { params: Promise<{ 
     .map((o) => ({ ...o, picks: [...o.picks].sort((a, b) => b.purchase_price - a.purchase_price) }))
     .sort((a, b) => a.owner_name.localeCompare(b.owner_name));
 
-  // Per-owner totals
   const totalsByOwner = new Map<number, { spent: number; points: number }>();
   for (const o of owners) {
     const spent = o.picks.reduce((sum, p) => sum + p.purchase_price, 0);
@@ -47,13 +49,15 @@ export default async function FlightArchivePage({ params }: { params: Promise<{ 
     totalsByOwner.set(o.owner_id, { spent, points });
   }
 
-  // Sort owners by points desc for the "results" view
   const ownersByPoints = [...owners].sort((a, b) =>
     (totalsByOwner.get(b.owner_id)!.points - totalsByOwner.get(a.owner_id)!.points)
   );
 
-  // Max picks per owner sets the row count for the grid
   const maxPicks = Math.max(...owners.map((o) => o.picks.length), 1);
+
+  // Split draft history into keepers (locked-in at the start) and auction picks (chronological)
+  const keepers = draftHistory.filter((b) => b.is_keeper).sort((a, b) => a.pick_order - b.pick_order);
+  const auctionPicks = draftHistory.filter((b) => !b.is_keeper);
 
   return (
     <main className="max-w-6xl mx-auto px-3 sm:px-6 pt-8 pb-16">
@@ -94,7 +98,6 @@ export default async function FlightArchivePage({ params }: { params: Promise<{ 
       {/* Grid view */}
       <section className="mb-10 overflow-x-auto">
         <div className="min-w-[700px] sm:min-w-[900px]" style={{ background: 'white', border: '1px solid rgba(14, 42, 74, 0.18)' }}>
-          {/* Owner header row */}
           <div className="grid" style={{ gridTemplateColumns: `60px repeat(${owners.length}, minmax(110px, 1fr))`, borderBottom: '2px solid rgba(42,70,54,0.2)', background: 'var(--cream-deep)' }}>
             <div className="px-2 py-3 text-[9px] uppercase text-[color:var(--green-moss)] tabular self-center text-center" style={{ letterSpacing: '0.14em' }}>
               Pick
@@ -115,7 +118,6 @@ export default async function FlightArchivePage({ params }: { params: Promise<{ 
             })}
           </div>
 
-          {/* Pick rows */}
           {Array.from({ length: maxPicks }).map((_, rowIdx) => (
             <div
               key={rowIdx}
@@ -154,7 +156,6 @@ export default async function FlightArchivePage({ params }: { params: Promise<{ 
             </div>
           ))}
 
-          {/* Totals row */}
           <div
             className="grid"
             style={{
@@ -180,7 +181,7 @@ export default async function FlightArchivePage({ params }: { params: Promise<{ 
       </section>
 
       {/* Standings */}
-      <section className="mb-12">
+      <section className="mb-10">
         <h2 className="serif text-xl text-[color:var(--green-deep)] mb-3 font-semibold">Standings</h2>
         <div style={{ background: 'white', border: '1px solid rgba(14, 42, 74, 0.18)' }}>
           {ownersByPoints.map((o, i) => {
@@ -208,6 +209,74 @@ export default async function FlightArchivePage({ params }: { params: Promise<{ 
               </div>
             );
           })}
+        </div>
+      </section>
+
+      {/* Draft History */}
+      <section className="mb-10">
+        <h2 className="serif text-xl text-[color:var(--green-deep)] mb-3 font-semibold">Draft History</h2>
+
+        {keepers.length > 0 && (
+          <div className="mb-5">
+            <h3 className="text-[10px] uppercase text-[color:var(--green-moss)] mb-2" style={{ letterSpacing: '0.18em' }}>
+              Keepers
+            </h3>
+            <div style={{ background: 'rgba(212,175,55,0.06)', border: '1px solid rgba(212,175,55,0.25)' }}>
+              {keepers.map((k, i) => {
+                const theme = getOwnerTheme(k.owner_name);
+                return (
+                  <div
+                    key={k.bid_id}
+                    className="flex items-center justify-between px-3 py-2 gap-3"
+                    style={{
+                      borderBottom: i === keepers.length - 1 ? 'none' : '1px solid rgba(212,175,55,0.18)',
+                      borderLeft: `3px solid ${theme.primary}`,
+                    }}
+                  >
+                    <div className="flex items-baseline gap-3 min-w-0">
+                      <span className="serif text-sm text-[color:var(--green-deep)] font-semibold truncate">{k.owner_name}</span>
+                      <span className="serif text-sm text-[color:var(--green-deep)] truncate">{k.golfer_name}</span>
+                    </div>
+                    <span className="tabular text-sm font-semibold text-[color:var(--green-deep)] shrink-0">${k.amount.toFixed(0)}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <h3 className="text-[10px] uppercase text-[color:var(--green-moss)] mb-2" style={{ letterSpacing: '0.18em' }}>
+          Auction picks (in order)
+        </h3>
+        <div style={{ background: 'white', border: '1px solid rgba(14, 42, 74, 0.18)' }}>
+          {auctionPicks.length === 0 ? (
+            <p className="px-4 py-6 text-center text-sm text-[color:var(--green-moss)] serif italic">
+              No auction picks recorded for this flight.
+            </p>
+          ) : (
+            auctionPicks.map((b, i) => {
+              const theme = getOwnerTheme(b.owner_name);
+              return (
+                <div
+                  key={b.bid_id}
+                  className="flex items-center justify-between px-3 py-2 gap-3"
+                  style={{
+                    borderBottom: i === auctionPicks.length - 1 ? 'none' : '1px solid rgba(42,70,54,0.06)',
+                    borderLeft: `3px solid ${theme.primary}`,
+                  }}
+                >
+                  <div className="flex items-baseline gap-3 min-w-0">
+                    <span className="text-[10px] uppercase text-[color:var(--green-moss)] tabular shrink-0" style={{ letterSpacing: '0.14em', width: '20px' }}>
+                      {i + 1}
+                    </span>
+                    <span className="serif text-sm text-[color:var(--green-deep)] font-semibold truncate">{b.owner_name}</span>
+                    <span className="serif text-sm text-[color:var(--green-deep)] truncate">{b.golfer_name}</span>
+                  </div>
+                  <span className="tabular text-sm font-semibold text-[color:var(--green-deep)] shrink-0">${b.amount.toFixed(0)}</span>
+                </div>
+              );
+            })
+          )}
         </div>
       </section>
     </main>

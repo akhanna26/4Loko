@@ -20,25 +20,46 @@ export type ArchiveFlightSummary = {
   champion_name: string | null;
 };
 
-// All flights whose primary tournament is final - eligible for the archive
+export type ArchiveBid = {
+  bid_id: number;
+  owner_id: number;
+  owner_name: string;
+  golfer_id: number;
+  golfer_name: string;
+  amount: number;
+  is_keeper: boolean;
+  pick_order: number;
+  created_at: string;
+};
+
+// Fixed: use season_year (not year) and use two-step query since tournaments has flight_id
 export async function getArchivedFlights(season_year: number): Promise<ArchiveFlightSummary[]> {
   const { data: flights } = await supabase
     .from('flights')
-    .select('id, flight_number, year, tournaments(id, name, status, event_type)')
-    .eq('year', season_year)
+    .select('id, flight_number, season_year')
+    .eq('season_year', season_year)
     .order('flight_number', { ascending: true });
 
-  if (!flights) return [];
+  if (!flights || flights.length === 0) return [];
+
+  const flightIds = flights.map((f: any) => f.id);
+  const { data: tournaments } = await supabase
+    .from('tournaments')
+    .select('id, name, status, event_type, flight_id')
+    .in('flight_id', flightIds);
+
+  // Map flight_id -> primary major tournament
+  const majorByFlight = new Map<number, any>();
+  for (const t of (tournaments ?? []) as any[]) {
+    if (t.event_type === 'MAJOR') majorByFlight.set(t.flight_id, t);
+  }
 
   const archived: ArchiveFlightSummary[] = [];
   for (const f of flights as any[]) {
-    // Each flight has multiple tournaments; the "primary" major (MAJOR event_type) is what we care about
-    const tourneys = Array.isArray(f.tournaments) ? f.tournaments : f.tournaments ? [f.tournaments] : [];
-    const major = tourneys.find((t: any) => t.event_type === 'MAJOR') ?? tourneys[0];
+    const major = majorByFlight.get(f.id);
     if (!major) continue;
     if (major.status !== 'final') continue;
 
-    // Find the champion - whoever rostered the actual tournament winner
     const { data: championBonus } = await supabase
       .from('bonuses')
       .select('golfer_id, golfers(full_name)')
@@ -60,17 +81,21 @@ export async function getArchivedFlights(season_year: number): Promise<ArchiveFl
 
 // All picks for a given flight, with bonus_points scoped to the flight's primary major
 export async function getFlightPicks(flight_id: number): Promise<{ picks: ArchivePick[]; flight: ArchiveFlightSummary | null }> {
-  // Resolve flight + primary tournament
   const { data: flight } = await supabase
     .from('flights')
-    .select('id, flight_number, year, tournaments(id, name, status, event_type)')
+    .select('id, flight_number, season_year')
     .eq('id', flight_id)
     .single();
 
   if (!flight) return { picks: [], flight: null };
 
-  const tourneys = Array.isArray((flight as any).tournaments) ? (flight as any).tournaments : [(flight as any).tournaments];
-  const major = tourneys.find((t: any) => t?.event_type === 'MAJOR') ?? tourneys[0];
+  const { data: tournaments } = await supabase
+    .from('tournaments')
+    .select('id, name, status, event_type, flight_id')
+    .eq('flight_id', flight_id);
+
+  const major = (tournaments ?? []).find((t: any) => t.event_type === 'MAJOR') ?? (tournaments ?? [])[0];
+  if (!major) return { picks: [], flight: null };
 
   const summary: ArchiveFlightSummary = {
     flight_id: (flight as any).id,
@@ -81,7 +106,6 @@ export async function getFlightPicks(flight_id: number): Promise<{ picks: Archiv
     champion_name: null,
   };
 
-  // Champion lookup
   const { data: championBonus } = await supabase
     .from('bonuses')
     .select('golfer_id, golfers(full_name)')
@@ -90,13 +114,11 @@ export async function getFlightPicks(flight_id: number): Promise<{ picks: Archiv
     .maybeSingle();
   summary.champion_name = (championBonus as any)?.golfers?.full_name ?? null;
 
-  // Rosters joined to owners and golfers
   const { data: rosterRows } = await supabase
     .from('rosters')
     .select('owner_id, golfer_id, purchase_price, is_keeper, keeper_stage, owners(name), golfers(full_name)')
     .eq('flight_id', flight_id);
 
-  // Bonus points - all bonuses for this flight's primary major
   const { data: bonusRows } = await supabase
     .from('bonuses')
     .select('owner_id, golfer_id, points')
@@ -120,4 +142,26 @@ export async function getFlightPicks(flight_id: number): Promise<{ picks: Archiv
   }));
 
   return { picks, flight: summary };
+}
+
+// Draft history: chronological auction picks for a flight (active = winning bids only)
+export async function getFlightDraftHistory(flight_id: number): Promise<ArchiveBid[]> {
+  const { data: bids } = await supabase
+    .from('auction_bids')
+    .select('id, owner_id, golfer_id, amount, is_keeper, pick_order, created_at, owners(name), golfers(full_name)')
+    .eq('flight_id', flight_id)
+    .eq('is_active', true)
+    .order('created_at', { ascending: true });
+
+  return ((bids ?? []) as any[]).map((b) => ({
+    bid_id: b.id,
+    owner_id: b.owner_id,
+    owner_name: b.owners?.name ?? 'Unknown',
+    golfer_id: b.golfer_id,
+    golfer_name: b.golfers?.full_name ?? 'Unknown',
+    amount: Number(b.amount),
+    is_keeper: b.is_keeper,
+    pick_order: b.pick_order,
+    created_at: b.created_at,
+  }));
 }
