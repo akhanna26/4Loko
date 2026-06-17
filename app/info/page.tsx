@@ -18,7 +18,9 @@ const FAQS: FAQ[] = [
   { category: 'Scoring', question: 'How does daily scoring work at majors?',
     answer: 'For each day, your team scores = sum of your top-N golfers\u2019 stroke counts vs. par (inverted to points-up). On Thursday and Friday, the top 4 golfers count. On Saturday and Sunday, only the top 2 count. Remaining roster spots don\u2019t contribute that day.' },
   { category: 'Scoring', question: 'How does scoring work at elevated events?',
-    answer: 'Elevated events (RBC Heritage, Memorial, Travelers, FedEx) use top-finish tier scoring instead of daily funnel. You score points for each rostered golfer who finishes top 1 / top 10 / top 20 in the real-world tournament. Plus standard bonuses (daily lows, HIO, champion) stack on top.' },
+    answer: 'Elevated events (RBC Heritage, Memorial, Travelers, FedEx) use top-finish tier scoring instead of daily funnel. You score: +5 for any rostered golfer finishing 1st (Champion), +3 for top 10, +1 for top 20. Tiers do NOT stack \u2014 a champion scores +5 only, not +5+3+1. Ties at a cutoff (e.g., T-10) share the higher tier. Daily-low and HIO bonuses do NOT apply at elevated events.' },
+  { category: 'Scoring', question: 'Do bonus tiers stack at elevated events?',
+    answer: 'No. The top-finish tiers at elevated events are non-stacking. The champion earns +5 only. Top 10 finishers earn +3 (not +3+1). Top 20 finishers earn +1. If multiple golfers tie at a tier cutoff, they share the higher tier.' },
   { category: 'Scoring', question: 'What happens to golfers who miss the cut?',
     answer: 'Starting in 2025: missed-cut golfers receive the field-worst score for the missed weekend days. In 2024 and before, they simply dropped out and contributed nothing.' },
   { category: 'Scoring', question: 'Are scores stored as strokes or points?',
@@ -52,9 +54,9 @@ const FAQS: FAQ[] = [
   { category: 'Payouts', question: 'What does it cost to play a full season?',
     answer: 'Base cost in 2026: $125 (Masters) + $100 \u00d7 3 (other majors) + $40 (4 \u00d7 $10 major-winner pool entries) + $75 (year-long buy-in) = $540 minimum. Add keeper fees on top.' },
   { category: 'Bonuses', question: 'What bonuses can I earn?',
-    answer: 'Three kinds: +1 point for each rostered golfer who shoots the day\u2019s low score; +1 point for each rostered golfer with a hole-in-one during the event; +3 points if you have the actual tournament winner on your roster ("Champion bonus").' },
+    answer: 'At majors: +1 point for each rostered golfer who shoots the day\u2019s low score; +1 point for each rostered golfer with a hole-in-one during the event; +3 points if you have the actual tournament winner on your roster ("Champion bonus"). These bonuses stack with normal scoring at majors. At elevated events, only the top-finish tiers (+5 / +3 / +1) apply \u2014 see the Scoring section.' },
   { category: 'Bonuses', question: 'Do bonuses apply at elevated events?',
-    answer: 'Yes \u2014 bonuses (daily low, HIO, Champion) earn points at both majors and elevated events. Same rules.' },
+    answer: 'No \u2014 daily-low and HIO bonuses apply ONLY at majors. At elevated events, the only scoring is the top-finish tier system (+5 champion / +3 top 10 / +1 top 20), and those tiers don\u2019t stack.' },
   { category: 'Bonuses', question: 'Can multiple owners earn the same daily-low bonus?',
     answer: 'Yes. If two golfers tie for the day\u2019s low score, both their owners get +1 each.' },
 ];
@@ -168,7 +170,6 @@ export default function RulesPage() {
                   onClick={() => setActiveCategory(cat)}
                   className="text-[10px] uppercase tabular px-3 py-1.5 border transition-colors"
                   style={{
-                    letterSpacing: '0.18em',
                     background: activeCategory === cat ? 'var(--green-deep)' : 'white',
                     color: activeCategory === cat ? 'white' : 'var(--green-forest)',
                     borderColor: activeCategory === cat ? 'var(--green-deep)' : 'rgba(42,70,54,0.2)',

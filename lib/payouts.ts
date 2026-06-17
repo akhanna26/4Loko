@@ -39,6 +39,24 @@ export type OwnerBalance = {
   net_balance: number;
 };
 
+export type KeeperFeeLine = {
+  flight_id: number;
+  flight_number: number;
+  tournament_name: string;
+  golfer_name: string;
+  keeper_price: number;
+  keeper_stage: number;
+};
+
+export type OwnerKeeperFees = {
+  owner_id: number;
+  owner_name: string;
+  lines: KeeperFeeLine[];
+  total: number;
+  is_paid: boolean;
+  payment_id: number | null;
+};
+
 // Fetch a single major's payout card data
 export async function getMajorPayoutCard(season_year: number, tournament_id: number): Promise<MajorPayoutCard | null> {
   const { data: tournament } = await supabase
@@ -78,7 +96,7 @@ export async function getMajorPayoutCard(season_year: number, tournament_id: num
     .sort((a, b) => a.owner_name.localeCompare(b.owner_name));
   const place_payouts = rows
     .filter((r) => r.entry_kind === 'MAJOR_PAYOUT')
-    .sort((a, b) => b.amount - a.amount); // largest = 1st
+    .sort((a, b) => b.amount - a.amount);
   const winner_payout = rows.find((r) => r.entry_kind === 'MAJOR_WINNER_PAYOUT') ?? null;
 
   const buyin_per_owner = buyins.length > 0 ? Math.abs(buyins[0].amount) : 0;
@@ -97,6 +115,65 @@ export async function getMajorPayoutCard(season_year: number, tournament_id: num
     place_payouts,
     winner_payout,
   };
+}
+
+// Live keeper fees from keeper_declarations, joined to keeper_fee_payments for paid state
+export async function getKeeperFeesByOwner(season_year: number): Promise<OwnerKeeperFees[]> {
+  const { data: owners } = await supabase
+    .from('owners')
+    .select('id, name')
+    .eq('is_active', true)
+    .order('name');
+
+  if (!owners) return [];
+
+  // All keeper declarations for the season's flights
+  const { data: declarations } = await supabase
+    .from('keeper_declarations')
+    .select('owner_id, golfer_id, keeper_price, keeper_stage, flight_id, flights!inner(id, flight_number, year, tournaments(name, event_type)), golfers(full_name)')
+    .eq('flights.year', season_year);
+
+  // Paid state per owner
+  const { data: payments } = await supabase
+    .from('keeper_fee_payments')
+    .select('id, owner_id, is_paid')
+    .eq('season_year', season_year);
+
+  const paidByOwner = new Map<number, { id: number; is_paid: boolean }>();
+  for (const p of (payments ?? []) as any[]) {
+    paidByOwner.set(p.owner_id, { id: p.id, is_paid: p.is_paid });
+  }
+
+  const linesByOwner = new Map<number, KeeperFeeLine[]>();
+  for (const d of (declarations ?? []) as any[]) {
+    if (!linesByOwner.has(d.owner_id)) linesByOwner.set(d.owner_id, []);
+    const flight = Array.isArray(d.flights) ? d.flights[0] : d.flights;
+    const tourneys = Array.isArray(flight?.tournaments) ? flight.tournaments : (flight?.tournaments ? [flight.tournaments] : []);
+    const major = tourneys.find((t: any) => t.event_type === 'MAJOR') ?? tourneys[0];
+
+    linesByOwner.get(d.owner_id)!.push({
+      flight_id: d.flight_id,
+      flight_number: flight?.flight_number ?? 0,
+      tournament_name: major?.name ?? `Flight ${flight?.flight_number ?? '?'}`,
+      golfer_name: d.golfers?.full_name ?? 'Unknown',
+      keeper_price: Number(d.keeper_price),
+      keeper_stage: d.keeper_stage,
+    });
+  }
+
+  return owners.map((o: any) => {
+    const lines = (linesByOwner.get(o.id) ?? []).sort((a, b) => a.flight_number - b.flight_number);
+    const total = lines.reduce((sum, l) => sum + l.keeper_price, 0);
+    const payment = paidByOwner.get(o.id);
+    return {
+      owner_id: o.id,
+      owner_name: o.name,
+      lines,
+      total,
+      is_paid: payment?.is_paid ?? false,
+      payment_id: payment?.id ?? null,
+    };
+  });
 }
 
 // Compute per-owner net balance across all 2026 ledger entries
@@ -127,18 +204,14 @@ export async function getOwnerBalances(season_year: number): Promise<OwnerBalanc
     const b = byOwner.get(owner_id)!;
 
     if (amount < 0) {
-      // Owner owes money in
       b.total_owed += Math.abs(amount);
       if (r.is_paid) b.total_paid_in += Math.abs(amount);
     } else {
-      // Owner is owed money out
       b.total_winnings_owed += amount;
       if (r.is_paid) b.total_winnings_received += amount;
     }
   }
 
-  // Net balance: what owner has received MINUS what they've paid
-  // Positive = they should net receive money; negative = they net owe
   for (const b of byOwner.values()) {
     b.net_balance = b.total_winnings_received - b.total_paid_in;
   }
@@ -155,6 +228,19 @@ export async function toggleLedgerPaid(ledger_id: number, new_is_paid: boolean):
       paid_at: new_is_paid ? new Date().toISOString() : null,
     })
     .eq('id', ledger_id);
+
+  if (error) throw error;
+}
+
+// Toggle the keeper_fee_payments row for an owner-season
+export async function toggleKeeperFeePaid(payment_id: number, new_is_paid: boolean): Promise<void> {
+  const { error } = await supabase
+    .from('keeper_fee_payments')
+    .update({
+      is_paid: new_is_paid,
+      paid_at: new_is_paid ? new Date().toISOString() : null,
+    })
+    .eq('id', payment_id);
 
   if (error) throw error;
 }
