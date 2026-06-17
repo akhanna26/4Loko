@@ -7,6 +7,7 @@ const LINKS = [
   { href: '/hall-of-fame', label: 'Hall of Fame', mobileLabel: 'HOF' },
   { href: '/keepers', label: 'Keepers', mobileLabel: 'Keepers' },
   { href: '/draft', label: 'Draft', mobileLabel: 'Draft' },
+  { href: '/archive', label: 'Archive', mobileLabel: 'Archive' },
   { href: '/payouts', label: 'Payouts', mobileLabel: 'Payouts' },
   { href: '/info', label: 'Rules', mobileLabel: 'Rules' },
 ];
@@ -15,14 +16,13 @@ export default function HeaderNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  // Close menu when the route changes
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
 
   return (
     <>
-      {/* Desktop: flat nav, tight spacing */}
+      {/* Desktop */}
       <nav className="hidden sm:flex items-center gap-3 text-[10px] uppercase text-[color:var(--green-forest)] whitespace-nowrap" style={{ letterSpacing: '0.14em' }}>
         {LINKS.map((link, i) => (
           <span key={link.href} className="flex items-center gap-3">
@@ -34,7 +34,7 @@ export default function HeaderNav() {
         ))}
       </nav>
 
-      {/* Mobile: hamburger */}
+      {/* Mobile hamburger */}
       <div className="sm:hidden relative">
         <button
           aria-label="Menu"
@@ -66,7 +66,7 @@ export default function HeaderNav() {
             }}
           >
             {LINKS.map((link) => (
-              <a
+              
                 key={link.href}
                 href={link.href}
                 className="block px-4 py-3 text-[11px] uppercase text-[color:var(--green-forest)] hover:bg-[color:var(--cream-deep)] hover:text-[color:var(--green-deep)] transition-colors border-b border-[color:var(--green-forest)]/10 last:border-b-0"
