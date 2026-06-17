@@ -22,7 +22,6 @@ export default function HeaderNav() {
 
   return (
     <>
-      {/* Desktop */}
       <nav className="hidden sm:flex items-center gap-3 text-[10px] uppercase text-[color:var(--green-forest)] whitespace-nowrap" style={{ letterSpacing: '0.14em' }}>
         {LINKS.map((link, i) => (
           <span key={link.href} className="flex items-center gap-3">
@@ -34,7 +33,6 @@ export default function HeaderNav() {
         ))}
       </nav>
 
-      {/* Mobile hamburger */}
       <div className="sm:hidden relative">
         <button
           aria-label="Menu"
@@ -66,7 +64,7 @@ export default function HeaderNav() {
             }}
           >
             {LINKS.map((link) => (
-              
+              <a
                 key={link.href}
                 href={link.href}
                 className="block px-4 py-3 text-[11px] uppercase text-[color:var(--green-forest)] hover:bg-[color:var(--cream-deep)] hover:text-[color:var(--green-deep)] transition-colors border-b border-[color:var(--green-forest)]/10 last:border-b-0"
