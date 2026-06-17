@@ -77,6 +77,7 @@ export default function KeeperForm({
         {sortedRoster.map((g) => {
           const isSelected = selected === g.golfer_id;
           const { price } = computeKeeperPrice(g.was_keeper ? g.keeper_stage : 0);
+          const priceLabel = g.was_keeper ? 'Kept' : 'Drafted';
           return (
             <label
               key={g.golfer_id}
@@ -104,12 +105,12 @@ export default function KeeperForm({
                   {g.full_name}
                 </div>
                 <div className="text-[10px] sm:text-xs text-[color:var(--green-moss)] mt-0.5 tabular">
-                  Keeper fee: <span className="text-[color:var(--green-deep)] font-semibold">${price}</span>{g.was_keeper && ` · stage ${g.keeper_stage} keep`}
+                  Keeper fee: <span className="text-[color:var(--green-deep)] font-semibold">${price}</span>{g.was_keeper && ` · stage ${g.keeper_stage + 1} keep`}
                 </div>
               </div>
               <div className="text-right shrink-0">
                 <div className="text-[9px] sm:text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.14em' }}>
-                  Drafted
+                  {priceLabel}
                 </div>
                 <div className="serif text-lg sm:text-2xl text-[color:var(--green-deep)] tabular font-semibold">${g.purchase_price}</div>
               </div>
