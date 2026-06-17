@@ -20,7 +20,6 @@ export default async function PayoutsPage() {
   ]);
   const validCards = cards.filter((c): c is MajorPayoutCard => c !== null);
 
-  // Total keeper fees across all owners (year-long pot contribution)
   const totalKeeperFees = keeperFees.reduce((sum, o) => sum + o.total, 0);
   const totalKeeperFeesPaid = keeperFees.filter((o) => o.is_paid).reduce((sum, o) => sum + o.total, 0);
 
@@ -39,25 +38,7 @@ export default async function PayoutsPage() {
         </p>
       </div>
 
-      {/* Keeper Fees (NEW, top section) */}
-      <section className="mb-12">
-        <div className="flex items-baseline justify-between mb-4 gap-3 flex-wrap">
-          <h2 className="serif text-xl text-[color:var(--green-deep)] font-semibold">Keeper Fees</h2>
-          <div className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.14em' }}>
-            ${totalKeeperFeesPaid.toFixed(0)} / ${totalKeeperFees.toFixed(0)} collected · flows to year-long pot
-          </div>
-        </div>
-        <div className="space-y-3">
-          {keeperFees.map((o) => (
-            <KeeperFeeCard key={o.owner_id} owner={o} />
-          ))}
-        </div>
-        <p className="text-[10px] sm:text-xs text-[color:var(--green-moss)] serif italic mt-4 text-center">
-          Stage 1 = $10, stage 2 = $20, stage 3 = $30 for consecutive re-keeps of the same golfer. Resets when keeper changes.
-        </p>
-      </section>
-
-      {/* Per-Major */}
+      {/* Per-Major - primary content */}
       <section className="mb-12">
         <h2 className="serif text-xl text-[color:var(--green-deep)] mb-4 font-semibold">Per-Major</h2>
         <div className="space-y-5">
@@ -67,8 +48,8 @@ export default async function PayoutsPage() {
         </div>
       </section>
 
-      {/* Owner Net Balance (collapsed) */}
-      <section className="mb-12">
+      {/* Owner Net Balance - collapsed */}
+      <section className="mb-6">
         <details className="group">
           <summary className="cursor-pointer list-none flex items-center gap-2 text-[10px] uppercase text-[color:var(--green-moss)] hover:text-[color:var(--green-deep)] transition-colors" style={{ letterSpacing: '0.18em' }}>
             <svg className="w-3 h-3 transition-transform group-open:rotate-90" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -76,7 +57,7 @@ export default async function PayoutsPage() {
             </svg>
             <span>Owner Net Balance</span>
           </summary>
-          <div className="mt-4 overflow-x-auto border shadow-sm" style={{ background: 'white', borderColor: 'rgba(14, 42, 74, 0.18)' }}>
+          <div className="mt-3 overflow-x-auto border shadow-sm" style={{ background: 'white', borderColor: 'rgba(14, 42, 74, 0.18)' }}>
             <table className="w-full min-w-[600px]">
               <thead>
                 <tr style={{ background: 'var(--cream-deep)', borderBottom: '1px solid rgba(42,70,54,0.1)' }}>
@@ -104,74 +85,70 @@ export default async function PayoutsPage() {
               </tbody>
             </table>
           </div>
+        </details>
+      </section>
+
+      {/* Keeper Fees - collapsed compact table */}
+      <section className="mb-6">
+        <details className="group">
+          <summary className="cursor-pointer list-none flex items-center gap-2 text-[10px] uppercase text-[color:var(--green-moss)] hover:text-[color:var(--green-deep)] transition-colors" style={{ letterSpacing: '0.18em' }}>
+            <svg className="w-3 h-3 transition-transform group-open:rotate-90" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 2 L8 6 L4 10" />
+            </svg>
+            <span>Keeper Fees</span>
+            <span className="ml-2 text-[color:var(--green-deep)]/70 normal-case tracking-normal" style={{ letterSpacing: '0.04em' }}>
+              ${totalKeeperFeesPaid.toFixed(0)} / ${totalKeeperFees.toFixed(0)} collected
+            </span>
+          </summary>
+          <div className="mt-3 overflow-x-auto border shadow-sm" style={{ background: 'white', borderColor: 'rgba(14, 42, 74, 0.18)' }}>
+            <table className="w-full min-w-[500px]">
+              <thead>
+                <tr style={{ background: 'var(--cream-deep)', borderBottom: '1px solid rgba(42,70,54,0.1)' }}>
+                  <th className="text-left px-3 py-2 text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>Owner</th>
+                  <th className="text-left px-3 py-2 text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>Declarations</th>
+                  <th className="text-right px-3 py-2 text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>Total</th>
+                  <th className="text-center px-3 py-2 text-[9px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>Paid</th>
+                </tr>
+              </thead>
+              <tbody>
+                {keeperFees.map((o, i) => (
+                  <tr key={o.owner_id} style={{ borderTop: i === 0 ? 'none' : '1px solid rgba(42,70,54,0.08)' }}>
+                    <td className="px-3 py-2 serif text-sm text-[color:var(--green-deep)] whitespace-nowrap">{o.owner_name}</td>
+                    <td className="px-3 py-2 text-xs text-[color:var(--green-moss)]">
+                      {o.lines.length === 0 ? (
+                        <span className="italic">—</span>
+                      ) : (
+                        o.lines.map((l, idx) => (
+                          <span key={`${l.flight_id}-${idx}`}>
+                            {idx > 0 && <span className="text-[color:var(--green-moss)]/40 mx-1">+</span>}
+                            <span className="text-[color:var(--green-deep)]">{l.golfer_name}</span>
+                            <span className="text-[color:var(--green-moss)]"> {l.tournament_name.replace(/Tournament|Championship|The /g, '').trim()} </span>
+                            <span className="tabular text-[color:var(--green-deep)] font-semibold">${l.keeper_price.toFixed(0)}</span>
+                          </span>
+                        ))
+                      )}
+                    </td>
+                    <td className="text-right px-3 py-2 tabular text-sm font-semibold text-[color:var(--green-deep)] whitespace-nowrap">
+                      {o.total > 0 ? `$${o.total.toFixed(0)}` : '—'}
+                    </td>
+                    <td className="text-center px-3 py-2">
+                      {o.payment_id !== null && o.total > 0 ? (
+                        <KeeperFeeToggle paymentId={o.payment_id} initialPaid={o.is_paid} />
+                      ) : (
+                        <span className="text-[color:var(--green-moss)]/40 text-xs">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           <p className="text-[10px] sm:text-xs text-[color:var(--green-moss)] serif italic mt-3 text-center">
-            Year-long buy-ins and keeper fees not yet included in net balance.
+            Stage 1 = $10, stage 2 = $20, stage 3 = $30 for consecutive re-keeps of the same golfer. Flows into year-long pot.
           </p>
         </details>
       </section>
     </main>
-  );
-}
-
-function KeeperFeeCard({ owner }: { owner: OwnerKeeperFees }) {
-  const hasLines = owner.lines.length > 0;
-  return (
-    <div
-      className="border shadow-sm overflow-hidden"
-      style={{
-        background: 'white',
-        borderColor: 'rgba(14, 42, 74, 0.18)',
-      }}
-    >
-      <div
-        className="px-4 sm:px-5 py-3 flex items-baseline justify-between gap-3 flex-wrap"
-        style={{ background: 'var(--cream-deep)', borderBottom: '1px solid rgba(42,70,54,0.1)' }}
-      >
-        <h3 className="serif text-base text-[color:var(--green-deep)] font-semibold">
-          {owner.owner_name}
-        </h3>
-        <div className="flex items-center gap-4">
-          <span className="tabular text-sm font-semibold text-[color:var(--green-deep)]">
-            ${owner.total.toFixed(0)}
-          </span>
-          {owner.payment_id !== null && hasLines && (
-            <KeeperFeeToggle paymentId={owner.payment_id} initialPaid={owner.is_paid} />
-          )}
-        </div>
-      </div>
-      <div className="p-4 sm:p-5">
-        {hasLines ? (
-          <>
-            <div className="space-y-1.5">
-              {owner.lines.map((line, i) => (
-                <div key={`${line.flight_id}-${i}`} className="flex items-center justify-between gap-3">
-                  <div className="flex items-baseline gap-3 min-w-0">
-                    <span className="serif text-sm text-[color:var(--green-deep)] truncate">{line.golfer_name}</span>
-                    <span className="text-[10px] uppercase text-[color:var(--green-moss)] shrink-0" style={{ letterSpacing: '0.14em' }}>
-                      {line.tournament_name}
-                    </span>
-                  </div>
-                  <div className="flex items-baseline gap-2 shrink-0">
-                    <span className="text-[10px] text-[color:var(--green-moss)] tabular">stage {line.keeper_stage}</span>
-                    <span className="tabular text-sm font-semibold text-[color:var(--green-deep)] w-10 text-right">${line.keeper_price.toFixed(0)}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-3 pt-3 border-t border-[color:var(--green-forest)]/10 flex items-baseline justify-between">
-              <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.14em' }}>
-                {owner.lines.map((l) => `$${l.keeper_price.toFixed(0)}`).join(' + ')}
-              </span>
-              <span className="tabular text-sm font-semibold text-[color:var(--green-deep)]">= ${owner.total.toFixed(0)}</span>
-            </div>
-          </>
-        ) : (
-          <p className="text-xs text-[color:var(--green-moss)] serif italic text-center py-1">
-            No keepers declared yet.
-          </p>
-        )}
-      </div>
-    </div>
   );
 }
 

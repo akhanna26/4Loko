@@ -57,7 +57,6 @@ export type OwnerKeeperFees = {
   payment_id: number | null;
 };
 
-// Fetch a single major's payout card data
 export async function getMajorPayoutCard(season_year: number, tournament_id: number): Promise<MajorPayoutCard | null> {
   const { data: tournament } = await supabase
     .from('tournaments')
@@ -117,7 +116,6 @@ export async function getMajorPayoutCard(season_year: number, tournament_id: num
   };
 }
 
-// Live keeper fees from keeper_declarations, joined to keeper_fee_payments for paid state
 export async function getKeeperFeesByOwner(season_year: number): Promise<OwnerKeeperFees[]> {
   const { data: owners } = await supabase
     .from('owners')
@@ -127,13 +125,44 @@ export async function getKeeperFeesByOwner(season_year: number): Promise<OwnerKe
 
   if (!owners) return [];
 
-  // All keeper declarations for the season's flights
+  // Fixed: column is season_year, not year
+  const { data: flights } = await supabase
+    .from('flights')
+    .select('id, flight_number, season_year')
+    .eq('season_year', season_year);
+
+  const flightIds = (flights ?? []).map((f: any) => f.id);
+  const flightById = new Map<number, { flight_number: number }>();
+  for (const f of (flights ?? []) as any[]) {
+    flightById.set(f.id, { flight_number: f.flight_number });
+  }
+
+  if (flightIds.length === 0) {
+    return owners.map((o: any) => ({
+      owner_id: o.id,
+      owner_name: o.name,
+      lines: [],
+      total: 0,
+      is_paid: false,
+      payment_id: null,
+    }));
+  }
+
+  const { data: tournaments } = await supabase
+    .from('tournaments')
+    .select('id, name, event_type, flight_id')
+    .in('flight_id', flightIds);
+
+  const majorByFlight = new Map<number, string>();
+  for (const t of (tournaments ?? []) as any[]) {
+    if (t.event_type === 'MAJOR') majorByFlight.set(t.flight_id, t.name);
+  }
+
   const { data: declarations } = await supabase
     .from('keeper_declarations')
-    .select('owner_id, golfer_id, keeper_price, keeper_stage, flight_id, flights!inner(id, flight_number, year, tournaments(name, event_type)), golfers(full_name)')
-    .eq('flights.year', season_year);
+    .select('owner_id, golfer_id, keeper_price, keeper_stage, flight_id, golfers(full_name)')
+    .in('flight_id', flightIds);
 
-  // Paid state per owner
   const { data: payments } = await supabase
     .from('keeper_fee_payments')
     .select('id, owner_id, is_paid')
@@ -147,14 +176,13 @@ export async function getKeeperFeesByOwner(season_year: number): Promise<OwnerKe
   const linesByOwner = new Map<number, KeeperFeeLine[]>();
   for (const d of (declarations ?? []) as any[]) {
     if (!linesByOwner.has(d.owner_id)) linesByOwner.set(d.owner_id, []);
-    const flight = Array.isArray(d.flights) ? d.flights[0] : d.flights;
-    const tourneys = Array.isArray(flight?.tournaments) ? flight.tournaments : (flight?.tournaments ? [flight.tournaments] : []);
-    const major = tourneys.find((t: any) => t.event_type === 'MAJOR') ?? tourneys[0];
+    const flightInfo = flightById.get(d.flight_id);
+    const tournamentName = majorByFlight.get(d.flight_id) ?? `Flight ${flightInfo?.flight_number ?? '?'}`;
 
     linesByOwner.get(d.owner_id)!.push({
       flight_id: d.flight_id,
-      flight_number: flight?.flight_number ?? 0,
-      tournament_name: major?.name ?? `Flight ${flight?.flight_number ?? '?'}`,
+      flight_number: flightInfo?.flight_number ?? 0,
+      tournament_name: tournamentName,
       golfer_name: d.golfers?.full_name ?? 'Unknown',
       keeper_price: Number(d.keeper_price),
       keeper_stage: d.keeper_stage,
@@ -176,7 +204,6 @@ export async function getKeeperFeesByOwner(season_year: number): Promise<OwnerKe
   });
 }
 
-// Compute per-owner net balance across all 2026 ledger entries
 export async function getOwnerBalances(season_year: number): Promise<OwnerBalance[]> {
   const { data: ledgerRows } = await supabase
     .from('ledger')
@@ -219,7 +246,6 @@ export async function getOwnerBalances(season_year: number): Promise<OwnerBalanc
   return [...byOwner.values()].sort((a, b) => a.owner_name.localeCompare(b.owner_name));
 }
 
-// Toggle a ledger row's is_paid flag (server action target)
 export async function toggleLedgerPaid(ledger_id: number, new_is_paid: boolean): Promise<void> {
   const { error } = await supabase
     .from('ledger')
@@ -232,7 +258,6 @@ export async function toggleLedgerPaid(ledger_id: number, new_is_paid: boolean):
   if (error) throw error;
 }
 
-// Toggle the keeper_fee_payments row for an owner-season
 export async function toggleKeeperFeePaid(payment_id: number, new_is_paid: boolean): Promise<void> {
   const { error } = await supabase
     .from('keeper_fee_payments')
