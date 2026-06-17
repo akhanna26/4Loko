@@ -44,14 +44,52 @@ export async function getKeeperDeclaration(flight_id: number, owner_id: number) 
   return data;
 }
 
-// Get all keeper declarations for a flight (for spectator view)
+// Get all keeper declarations for a flight (for spectator view).
+// Enriches with cap_price = purchase_price from the previous flight's roster for that owner+golfer.
 export async function getAllKeeperDeclarations(flight_id: number) {
-  const { data, error } = await supabase
+  // Step 1: look up this flight's flight_number so we can compute previous
+  const { data: thisFlight } = await supabase
+    .from('flights')
+    .select('id, flight_number, season_year')
+    .eq('id', flight_id)
+    .single();
+
+  // Step 2: declarations themselves
+  const { data: declarations, error: declErr } = await supabase
     .from('keeper_declarations')
     .select('id, owner_id, golfer_id, keeper_price, keeper_stage, owners(name), golfers(full_name)')
     .eq('flight_id', flight_id);
-  if (error) throw error;
-  return (data ?? []).map((d: any) => ({
+  if (declErr) throw declErr;
+
+  // Step 3: previous flight id (same season, flight_number - 1)
+  let prevFlightId: number | null = null;
+  if (thisFlight && thisFlight.flight_number > 1) {
+    const { data: prev } = await supabase
+      .from('flights')
+      .select('id')
+      .eq('season_year', thisFlight.season_year)
+      .eq('flight_number', thisFlight.flight_number - 1)
+      .single();
+    prevFlightId = prev?.id ?? null;
+  }
+
+  // Step 4: cap = purchase_price from previous flight roster for each (owner, golfer)
+  const capByOwnerGolfer = new Map<string, number>();
+  if (prevFlightId !== null && declarations && declarations.length > 0) {
+    const ownerIds = [...new Set(declarations.map((d: any) => d.owner_id))];
+    const golferIds = [...new Set(declarations.map((d: any) => d.golfer_id))];
+    const { data: rosters } = await supabase
+      .from('rosters')
+      .select('owner_id, golfer_id, purchase_price')
+      .eq('flight_id', prevFlightId)
+      .in('owner_id', ownerIds)
+      .in('golfer_id', golferIds);
+    for (const r of (rosters ?? []) as any[]) {
+      capByOwnerGolfer.set(`${r.owner_id}:${r.golfer_id}`, Number(r.purchase_price));
+    }
+  }
+
+  return (declarations ?? []).map((d: any) => ({
     id: d.id,
     owner_id: d.owner_id,
     owner_name: d.owners?.name ?? '',
@@ -59,6 +97,7 @@ export async function getAllKeeperDeclarations(flight_id: number) {
     golfer_name: d.golfers?.full_name ?? '',
     keeper_price: d.keeper_price,
     keeper_stage: d.keeper_stage,
+    cap_price: capByOwnerGolfer.get(`${d.owner_id}:${d.golfer_id}`) ?? null,
   }));
 }
 

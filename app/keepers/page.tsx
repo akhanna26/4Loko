@@ -82,9 +82,17 @@ export default async function KeepersIndex() {
                     )}
                   </div>
                   {isDeclared && (
-                    <div className="text-[10px] sm:text-xs text-[color:var(--green-moss)] serif italic truncate">
-                      Keeping {decl.golfer_name} · ${decl.keeper_price}
-                    </div>
+                    <>
+                      <div className="text-[11px] sm:text-sm text-[color:var(--green-deep)] serif truncate">
+                        Keeping {decl.golfer_name}
+                        {decl.cap_price !== null && (
+                          <span className="tabular font-semibold ml-1">· ${decl.cap_price}</span>
+                        )}
+                      </div>
+                      <div className="text-[10px] sm:text-xs text-[color:var(--green-moss)] italic">
+                        Keeper cost: ${decl.keeper_price}
+                      </div>
+                    </>
                   )}
                 </div>
               </Link>
