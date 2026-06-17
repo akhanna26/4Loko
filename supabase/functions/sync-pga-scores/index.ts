@@ -8,6 +8,7 @@ const ESPN_TOURNAMENT_MAP: Record<string, { dbId: number; par: number; flightId:
   'The Masters': { dbId: 2, par: 72, flightId: 1 },
   'RBC Heritage': { dbId: 1, par: 71, flightId: 1 },
   'Memorial Tournament': { dbId: 3, par: 72, flightId: 2 },
+  'the Memorial Tournament pres. by Workday': { dbId: 3, par: 72, flightId: 2 },
   'Travelers Championship': { dbId: 5, par: 70, flightId: 3 },
   'FedEx St. Jude Championship': { dbId: 7, par: 70, flightId: 4 },
 }
@@ -148,7 +149,12 @@ serve(async (req) => {
     // current scores. Whoever holds a round's field-low right now gets it.
     // As the round progresses the bonus moves automatically; once the round
     // ends it's permanent because scores stop changing.
-    const bonusReport: Record<number, { lowScore: number | null; golfers: string[] }> = {}
+    // Elevated events don't award daily-low bonuses — only top-finish tiers + champion.
+    const isMajor = tournament.event_type === 'MAJOR'
+
+    let bonusReport: Record<number, { lowScore: number | null; golfers: string[] }> = {}
+
+    if (isMajor) {
 
     await supabase
       .from('bonuses')
@@ -212,6 +218,7 @@ serve(async (req) => {
           ignoreDuplicates: true,
         })
     }
+    } // end if (isMajor)
 
     return new Response(JSON.stringify({
       processed,
