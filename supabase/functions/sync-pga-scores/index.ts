@@ -61,7 +61,7 @@ serve(async (req) => {
 
     const { data: tournament } = await supabase
       .from('tournaments')
-      .select('status, name, id')
+      .select('status, name, id, event_type')
       .eq('id', tournamentId)
       .single()
 
