@@ -381,7 +381,7 @@ function YearLongSection({ projection }: { projection: YearLongProjection }) {
               </div>
             )}
             <div className="pt-3 border-t border-[color:var(--green-forest)]/10 text-[10px] text-[color:var(--green-moss)] serif italic">
-              Pool: $900 ($75 × 12 owners). Payout 75/25 to 1st/2nd. Ties share combined pool.
+              Pool: ${projection.total_pool.toFixed(0)} — ${projection.base_pool.toFixed(0)} base + ${projection.keeper_pool.toFixed(0)} keeper fees. Split 75/25 to 1st/2nd. Ties share combined pool.
             </div>
           </div>
         </div>

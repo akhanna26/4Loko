@@ -285,6 +285,9 @@ export type YearLongProjection = {
   second_place_payout: number;
   first_place_owners: YearLongStanding[];
   second_place_owners: YearLongStanding[];
+  base_pool: number;
+  keeper_pool: number;
+  total_pool: number;
 };
 
 export async function getYearLongStandings(season_year: number): Promise<YearLongStanding[]> {
@@ -312,14 +315,28 @@ export async function getYearLongProjection(season_year: number): Promise<YearLo
   const events_final_count = tourneys?.length ?? 0;
   const events_total = 8;
 
-  const PAYOUT_1ST = 675;
-  const PAYOUT_2ND = 225;
+  // Pool = $75 × 12 base + accumulated keeper fees.
+  // Recomputed on every load so it updates as new keepers get declared.
+  const BASE_POOL_PER_OWNER = 75;
+  const N_OWNERS = 12;
+  const basePool = BASE_POOL_PER_OWNER * N_OWNERS;
+
+  const { data: keeperFees } = await supabase
+    .from('keeper_declarations')
+    .select('keeper_price, flights!inner(season_year)')
+    .eq('flights.season_year', season_year);
+  const keeperPool = (keeperFees ?? []).reduce((sum: number, k: any) => sum + Number(k.keeper_price), 0);
+  const totalPool = basePool + keeperPool;
+
+  const PAYOUT_1ST = totalPool * 0.75;
+  const PAYOUT_2ND = totalPool * 0.25;
 
   if (standings.length === 0) {
     return {
       standings, events_final_count, events_total,
       first_place_payout: 0, second_place_payout: 0,
       first_place_owners: [], second_place_owners: [],
+      base_pool: basePool, keeper_pool: keeperPool, total_pool: totalPool,
     };
   }
 
@@ -350,5 +367,8 @@ export async function getYearLongProjection(season_year: number): Promise<YearLo
     second_place_payout,
     first_place_owners: rank1Owners,
     second_place_owners,
+    base_pool: basePool,
+    keeper_pool: keeperPool,
+    total_pool: totalPool,
   };
 }
