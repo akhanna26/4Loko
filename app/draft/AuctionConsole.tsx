@@ -8,7 +8,7 @@ import {
   setNominationOrder, shuffleArray,
   getCurrentNominator, getUpcomingNominators,
   applyKeepersToAuction, shortName,
-  getFullSnakeOrder,
+  getFullSnakeOrder, finalizeDraft,
 } from '../../lib/auction';
 import { getFlight } from '../../lib/draft';
 import { Owner } from '../../lib/queries';
@@ -317,6 +317,19 @@ export default function AuctionConsole({
         const result = await applyKeepersToAuction(flightId, prevFlight.id);
         setInfo(`Applied ${result.applied} keeper${result.applied === 1 ? '' : 's'}.`);
         setTimeout(() => setInfo(null), 4000);
+      } catch (e: any) { setError(e.message); }
+    });
+  };
+  const handleFinalizeDraft = async () => {
+    if (!isDriver) return;
+    const activeBids = bids.filter((b) => b.is_active).length;
+    if (!confirm(`Finalize draft? This materializes ${activeBids} bids as rosters and locks the session as final. Idempotent (safe to run multiple times).`)) return;
+    startTransition(async () => {
+      try {
+        const result = await finalizeDraft(flightId, sessionId);
+        setSession((s) => ({ ...s, status: 'final' as const }));
+        setInfo(`Draft finalized. ${result.materialized} rosters written.`);
+        setTimeout(() => setInfo(null), 5000);
       } catch (e: any) { setError(e.message); }
     });
   };

@@ -347,3 +347,49 @@ export function getFullSnakeOrder(
   }
   return result;
 }
+// Materialize rosters from active auction bids for a flight.
+// Idempotent: wipes existing rosters for the flight first.
+// Preserves keeper_stage from keeper_declarations.
+export async function materializeRosters(flight_id: number) {
+  const { data: bids, error: bidsErr } = await supabase
+    .from('auction_bids')
+    .select('owner_id, golfer_id, amount, is_keeper')
+    .eq('flight_id', flight_id)
+    .eq('is_active', true);
+  if (bidsErr) throw bidsErr;
+  if (!bids || bids.length === 0) throw new Error('No active bids to materialize');
+
+  const { data: keeperDecls, error: kErr } = await supabase
+    .from('keeper_declarations')
+    .select('owner_id, golfer_id, keeper_stage')
+    .eq('flight_id', flight_id);
+  if (kErr) throw kErr;
+
+  const stageMap = new Map<string, number>();
+  for (const d of (keeperDecls ?? []) as any[]) {
+    stageMap.set(`${d.owner_id}-${d.golfer_id}`, d.keeper_stage);
+  }
+
+  await supabase.from('rosters').delete().eq('flight_id', flight_id);
+
+  const rosterRows = (bids as any[]).map((b) => ({
+    flight_id,
+    owner_id: b.owner_id,
+    golfer_id: b.golfer_id,
+    purchase_price: b.amount,
+    is_keeper: b.is_keeper,
+    keeper_stage: b.is_keeper ? (stageMap.get(`${b.owner_id}-${b.golfer_id}`) ?? 1) : 0,
+  }));
+
+  const { error: insErr } = await supabase.from('rosters').insert(rosterRows);
+  if (insErr) throw insErr;
+
+  return { materialized: rosterRows.length };
+}
+
+// One-click "finalize draft" - materializes rosters + sets session status to final
+export async function finalizeDraft(flight_id: number, session_id: number) {
+  const result = await materializeRosters(flight_id);
+  await setSessionStatus(session_id, 'final');
+  return result;
+}
