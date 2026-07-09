@@ -767,6 +767,13 @@ export default function AuctionConsole({
                     undo
                   </button>
                   <span className="text-[color:var(--green-forest)]/30">·</span>
+                  <button onClick={handleFinalizeDraft}
+                    disabled={session.status === 'final' || bids.filter(b => b.is_active).length === 0}
+                    className="text-[9px] sm:text-[10px] uppercase font-semibold text-[color:var(--green-forest)] hover:text-[color:var(--green-deep)] disabled:opacity-30"
+                    style={{ letterSpacing: '0.18em' }}>
+                    {session.status === 'final' ? '✓ finalized' : 'finalize draft'}
+                  </button>
+                  <span className="text-[color:var(--green-forest)]/30">·</span>
                   <button onClick={() => handleFlipTournamentStatus('live')}
                     className="text-[9px] sm:text-[10px] uppercase font-semibold transition-all"
                     style={{
