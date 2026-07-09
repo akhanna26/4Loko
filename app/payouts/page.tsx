@@ -1,4 +1,4 @@
-import { getMajorPayoutCard, getOwnerBalances, getKeeperFeesByOwner, MajorPayoutCard, OwnerKeeperFees } from '../../lib/payouts';
+import { getMajorPayoutCard, getOwnerBalances, getKeeperFeesByOwner, getYearLongProjection, MajorPayoutCard, OwnerKeeperFees, YearLongProjection } from '../../lib/payouts';
 import PayoutToggle, { MultiPayoutToggle, KeeperFeeToggle } from './PayoutToggle';
 
 export const dynamic = 'force-dynamic';
@@ -13,10 +13,11 @@ const MAJORS = [
 ];
 
 export default async function PayoutsPage() {
-  const [cards, balances, keeperFees] = await Promise.all([
+  const [cards, balances, keeperFees, yearLong] = await Promise.all([
     Promise.all(MAJORS.map((m) => getMajorPayoutCard(SEASON, m.id))),
     getOwnerBalances(SEASON),
     getKeeperFeesByOwner(SEASON),
+    getYearLongProjection(SEASON),
   ]);
   const validCards = cards.filter((c): c is MajorPayoutCard => c !== null);
 
@@ -37,6 +38,8 @@ export default async function PayoutsPage() {
           Treasurer's ledger. Tap a checkbox when money changes hands.
         </p>
       </div>
+
+      <YearLongSection projection={yearLong} />
 
       {/* Per-Major - primary content */}
       <section className="mb-12">
@@ -291,3 +294,99 @@ function MajorCard({ card }: { card: MajorPayoutCard }) {
     </div>
   );
 }
+
+function YearLongSection({ projection }: { projection: YearLongProjection }) {
+  const enoughData = projection.events_final_count >= 3;
+  const opacity = enoughData ? 1 : 0.6;
+  const eventsRemaining = projection.events_total - projection.events_final_count;
+
+  return (
+    <section className="mb-12" style={{ opacity }}>
+      <div className="flex items-baseline justify-between mb-4 gap-3 flex-wrap">
+        <div>
+          <h2 className="serif text-xl text-[color:var(--green-deep)] font-semibold">Year-Long · Projected</h2>
+          <p className="text-[10px] uppercase text-[color:var(--green-moss)] mt-0.5" style={{ letterSpacing: '0.14em' }}>
+            {projection.events_final_count} of {projection.events_total} events final
+            {eventsRemaining > 0 && ` · ${eventsRemaining} to go`}
+          </p>
+        </div>
+        {!enoughData && (
+          <span className="text-[10px] italic text-[color:var(--green-moss)] serif">
+            Projections stabilize after 3+ events
+          </span>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="border shadow-sm" style={{ background: 'white', borderColor: 'rgba(14, 42, 74, 0.18)' }}>
+          <div className="px-4 py-2.5" style={{ background: 'var(--cream-deep)', borderBottom: '1px solid rgba(42,70,54,0.1)' }}>
+            <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>
+              Current Standings
+            </span>
+          </div>
+          <div className="p-2">
+            {projection.standings.map((s) => (
+              <div
+                key={s.owner_id}
+                className="flex items-center justify-between px-2 py-1.5"
+                style={{ borderBottom: '1px solid rgba(42,70,54,0.04)' }}
+              >
+                <div className="flex items-baseline gap-2 min-w-0">
+                  <span className="text-[10px] uppercase text-[color:var(--green-moss)] tabular shrink-0" style={{ letterSpacing: '0.14em', width: '24px' }}>
+                    {s.season_rank}
+                  </span>
+                  <span className="serif text-sm text-[color:var(--green-deep)] truncate">{s.owner_name}</span>
+                </div>
+                <span className="serif text-sm font-semibold text-[color:var(--green-deep)] tabular shrink-0">+{s.season_score}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="border shadow-sm" style={{ background: 'white', borderColor: 'rgba(14, 42, 74, 0.18)' }}>
+          <div className="px-4 py-2.5" style={{ background: 'var(--cream-deep)', borderBottom: '1px solid rgba(42,70,54,0.1)' }}>
+            <span className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.16em' }}>
+              Projected Payouts
+            </span>
+          </div>
+          <div className="p-4 space-y-3">
+            {projection.first_place_owners.length > 0 && (
+              <div>
+                <div className="text-[10px] uppercase text-[color:var(--gold-masters)] mb-1" style={{ letterSpacing: '0.16em' }}>
+                  {projection.first_place_owners.length > 1 ? `T-1st (${projection.first_place_owners.length})` : '1st'}
+                </div>
+                {projection.first_place_owners.map((o) => (
+                  <div key={o.owner_id} className="flex items-center justify-between gap-3">
+                    <span className="serif text-base text-[color:var(--green-deep)] font-semibold truncate">{o.owner_name}</span>
+                    <span className="tabular text-base font-semibold text-[color:var(--green-deep)] shrink-0">
+                      ${projection.first_place_payout.toFixed(0)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {projection.second_place_owners.length > 0 && (
+              <div>
+                <div className="text-[10px] uppercase text-[color:var(--silver)] mb-1" style={{ letterSpacing: '0.16em' }}>
+                  {projection.second_place_owners.length > 1 ? `T-2nd (${projection.second_place_owners.length})` : '2nd'}
+                </div>
+                {projection.second_place_owners.map((o) => (
+                  <div key={o.owner_id} className="flex items-center justify-between gap-3">
+                    <span className="serif text-sm text-[color:var(--green-deep)] truncate">{o.owner_name}</span>
+                    <span className="tabular text-sm font-semibold text-[color:var(--green-deep)] shrink-0">
+                      ${projection.second_place_payout.toFixed(0)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="pt-3 border-t border-[color:var(--green-forest)]/10 text-[10px] text-[color:var(--green-moss)] serif italic">
+              Pool: $900 ($75 × 12 owners). Payout 75/25 to 1st/2nd. Ties share combined pool.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+

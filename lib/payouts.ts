@@ -269,3 +269,86 @@ export async function toggleKeeperFeePaid(payment_id: number, new_is_paid: boole
 
   if (error) throw error;
 }
+
+export type YearLongStanding = {
+  owner_id: number;
+  owner_name: string;
+  season_score: number;
+  season_rank: number;
+};
+
+export type YearLongProjection = {
+  standings: YearLongStanding[];
+  events_final_count: number;
+  events_total: number;
+  first_place_payout: number;
+  second_place_payout: number;
+  first_place_owners: YearLongStanding[];
+  second_place_owners: YearLongStanding[];
+};
+
+export async function getYearLongStandings(season_year: number): Promise<YearLongStanding[]> {
+  const { data, error } = await supabase
+    .from('v_yearlong_standings')
+    .select('owner_id, owner_name, season_score, season_rank')
+    .eq('season_year', season_year)
+    .order('season_rank', { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map((r: any) => ({
+    owner_id: r.owner_id,
+    owner_name: r.owner_name,
+    season_score: Number(r.season_score),
+    season_rank: Number(r.season_rank),
+  }));
+}
+
+export async function getYearLongProjection(season_year: number): Promise<YearLongProjection> {
+  const standings = await getYearLongStandings(season_year);
+
+  const { data: tourneys } = await supabase
+    .from('tournaments')
+    .select('id, status')
+    .in('status', ['final']);
+  const events_final_count = tourneys?.length ?? 0;
+  const events_total = 8;
+
+  const PAYOUT_1ST = 675;
+  const PAYOUT_2ND = 225;
+
+  if (standings.length === 0) {
+    return {
+      standings, events_final_count, events_total,
+      first_place_payout: 0, second_place_payout: 0,
+      first_place_owners: [], second_place_owners: [],
+    };
+  }
+
+  const rank1Owners = standings.filter((s) => s.season_rank === 1);
+  const rank2Owners = standings.filter((s) => s.season_rank === 2);
+
+  let first_place_payout = 0;
+  let second_place_payout = 0;
+  let second_place_owners: YearLongStanding[] = [];
+
+  if (rank1Owners.length >= 2) {
+    first_place_payout = (PAYOUT_1ST + PAYOUT_2ND) / rank1Owners.length;
+    second_place_payout = 0;
+    second_place_owners = [];
+  } else {
+    first_place_payout = PAYOUT_1ST;
+    if (rank2Owners.length > 0) {
+      second_place_payout = PAYOUT_2ND / rank2Owners.length;
+      second_place_owners = rank2Owners;
+    }
+  }
+
+  return {
+    standings,
+    events_final_count,
+    events_total,
+    first_place_payout,
+    second_place_payout,
+    first_place_owners: rank1Owners,
+    second_place_owners,
+  };
+}
