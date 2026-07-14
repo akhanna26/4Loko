@@ -1,5 +1,5 @@
 import { getActiveOwners } from '../../../lib/queries';
-import { getFlight, getOwnerPrevRoster, getKeeperDeclaration } from '../../../lib/draft';
+import { getFlight, getOwnerPrevRoster, getKeeperDeclaration, getMajorForFlight } from '../../../lib/draft';
 import KeeperForm from './KeeperForm';
 
 export const dynamic = 'force-dynamic';
@@ -33,8 +33,12 @@ export default async function OwnerKeeperPage({ params }: { params: Promise<{ ow
   const prevFlight = await getFlight(2026, 3);
   if (!currentFlight || !prevFlight) return <main className="p-8">Flights not configured.</main>;
 
-  const roster = await getOwnerPrevRoster(ownerId, prevFlight.id);
-  const currentDecl = await getKeeperDeclaration(currentFlight.id, ownerId);
+  const [currentMajor, prevMajor, roster, currentDecl] = await Promise.all([
+    getMajorForFlight(currentFlight.id),
+    getMajorForFlight(prevFlight.id),
+    getOwnerPrevRoster(ownerId, prevFlight.id),
+    getKeeperDeclaration(currentFlight.id, ownerId),
+  ]);
 
   return (
     <main className="max-w-3xl mx-auto px-6 pt-10 pb-16">
