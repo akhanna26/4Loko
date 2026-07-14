@@ -554,10 +554,10 @@ export default function AuctionConsole({
                   {nominatedGolfer.full_name}
                 </h2>
                 {nominatedGolfer.odds && (
-                  <span className="text-lg sm:text-2xl tabular text-[color:var(--gold-masters)]">{nominatedGolfer.odds}</span>
+                  <span className="text-lg sm:text-2xl tabular text-[color:var(--gold-masters)]">{`+${nominatedGolfer.odds}`}</span>
                 )}
                 {(() => {
-                  const oddsToNum = (o: string | null | undefined) => o ? parseInt(o.replace('+', '')) : 999999;
+                  const oddsToNum = (o: number | null | undefined) => o ?? 999999;
                   const sortedByOdds = [...pool].sort((a, b) => oddsToNum(a.odds) - oddsToNum(b.odds));
                   const rankIdx = sortedByOdds.findIndex(g => g.golfer_id === nominatedGolfer.golfer_id);
                   if (rankIdx < 0) return null;
@@ -914,7 +914,7 @@ export default function AuctionConsole({
                             <span className="text-[color:var(--green-moss)]">{shortName(bid.owner_name)}</span>
                           </span>
                         ) : g.odds ? (
-                          <span className="text-[10px] tabular text-[color:var(--green-moss)]/60 shrink-0">{g.odds}</span>
+                          <span className="text-[10px] tabular text-[color:var(--green-moss)]/60 shrink-0">{`+${g.odds}`}</span>
                         ) : null}
                       </button>
                       {orderedOwners.map((o) => {

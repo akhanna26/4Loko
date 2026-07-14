@@ -39,7 +39,7 @@ export type GolferPoolEntry = {
   golfer_id: number;
   full_name: string;
   is_available: boolean;
-  odds: string | null;
+  odds: number | null;
   sold_to_owner_id: number | null;
   sold_to_owner_name: string | null;
   sold_for_amount: number | null;
@@ -124,8 +124,8 @@ export async function getGolferPool(flight_id: number): Promise<GolferPoolEntry[
     })
     .sort((a, b) => {
       // Sort by odds (favorites first), then by name
-      const oddsA = a.odds ? parseInt(a.odds.replace('+', ''), 10) : 99999;
-      const oddsB = b.odds ? parseInt(b.odds.replace('+', ''), 10) : 99999;
+      const oddsA = a.odds ?? 99999;
+      const oddsB = b.odds ?? 99999;
       if (oddsA !== oddsB) return oddsA - oddsB;
       return a.full_name.localeCompare(b.full_name);
     });
