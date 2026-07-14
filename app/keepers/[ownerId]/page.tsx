@@ -40,7 +40,7 @@ export default async function OwnerKeeperPage({ params }: { params: Promise<{ ow
     <main className="max-w-3xl mx-auto px-6 pt-10 pb-16">
       <div className="text-center mb-8">
         <p className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.24em' }}>
-          U.S. Open Keeper · {owner.name}
+          {currentMajor?.name ?? ''} Keeper · {owner.name}
         </p>
       </div>
 
@@ -50,13 +50,13 @@ export default async function OwnerKeeperPage({ params }: { params: Promise<{ ow
         </h1>
         <div className="divider-rule mt-5 mb-3 max-w-[160px] mx-auto" />
         <p className="text-sm text-[color:var(--green-moss)] italic serif">
-          Choose one PGA Championship golfer to keep, or none.
+          Choose one {prevMajor?.name ?? 'previous major'} golfer to keep, or none.
         </p>
       </section>
 
       {roster.length === 0 ? (
         <p className="text-center text-sm text-[color:var(--green-moss)] serif italic">
-          No PGA Championship roster found for {owner.name}. Cannot select a keeper.
+          No {prevMajor?.name ?? 'previous major'} roster found for {owner.name}. Cannot select a keeper.
         </p>
       ) : (
         <KeeperForm
