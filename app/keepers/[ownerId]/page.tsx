@@ -67,6 +67,7 @@ export default async function OwnerKeeperPage({ params }: { params: Promise<{ ow
           ownerId={ownerId}
           ownerName={owner.name}
           flightId={currentFlight.id}
+          prevMajorName={prevMajor?.name ?? 'Previous Major'}
           roster={roster}
           currentDeclaration={currentDecl ? {
             golfer_id: currentDecl.golfer_id,
