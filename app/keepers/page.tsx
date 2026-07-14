@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function KeepersIndex() {
   const owners = await getActiveOwners();
-  const flight = await getFlight(2026, 3);
+  const flight = await getFlight(2026, 4);
   if (!flight) return <main className="p-8">U.S. Open flight not found.</main>;
 
   const declarations = await getAllKeeperDeclarations(flight.id);

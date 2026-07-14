@@ -11,7 +11,7 @@ import { getActiveOwners, getOwnerRanks } from '../../lib/queries';
 export const dynamic = 'force-dynamic';
 
 export default async function DraftPage() {
-  const flight = await getFlight(2026, 3); // U.S. Open
+  const flight = await getFlight(2026, 4); // The Open Championship
   if (!flight) {
     return (
       <main className="max-w-4xl mx-auto px-6 pt-10">

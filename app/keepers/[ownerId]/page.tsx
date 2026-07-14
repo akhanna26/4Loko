@@ -29,8 +29,8 @@ export default async function OwnerKeeperPage({ params }: { params: Promise<{ ow
     );
   }
 
-  const currentFlight = await getFlight(2026, 3);
-  const prevFlight = await getFlight(2026, 2);
+  const currentFlight = await getFlight(2026, 4);
+  const prevFlight = await getFlight(2026, 3);
   if (!currentFlight || !prevFlight) return <main className="p-8">Flights not configured.</main>;
 
   const roster = await getOwnerPrevRoster(ownerId, prevFlight.id);
