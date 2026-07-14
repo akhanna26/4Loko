@@ -1,6 +1,6 @@
 import { getOwnerTheme } from '../../lib/owner-themes';
 import { getActiveOwners } from '../../lib/queries';
-import { getFlight, getAllKeeperDeclarations } from '../../lib/draft';
+import { getFlight, getAllKeeperDeclarations, getMajorForFlight, formatDateRange } from '../../lib/draft';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
@@ -10,7 +10,12 @@ export default async function KeepersIndex() {
   const flight = await getFlight(2026, 4);
   if (!flight) return <main className="p-8">Flight not found.</main>;
 
-  const declarations = await getAllKeeperDeclarations(flight.id);
+  const [major, declarations] = await Promise.all([
+    getMajorForFlight(flight.id),
+    getAllKeeperDeclarations(flight.id),
+  ]);
+  const prevFlight = await getFlight(2026, 3);
+  const prevMajor = prevFlight ? await getMajorForFlight(prevFlight.id) : null;
   const declaredByOwner = new Map(declarations.map((d) => [d.owner_id, d]));
 
   return (
