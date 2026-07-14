@@ -8,12 +8,14 @@ export default function KeeperForm({
   ownerId,
   ownerName,
   flightId,
+  prevMajorName,
   roster,
   currentDeclaration,
 }: {
   ownerId: number;
   ownerName: string;
   flightId: number;
+  prevMajorName: string;
   roster: RosterEntry[];
   currentDeclaration: { golfer_id: number; keeper_price: number; keeper_stage: number } | null;
 }) {
@@ -66,7 +68,7 @@ export default function KeeperForm({
       }}>
       <div className="px-4 sm:px-5 py-3 border-b border-[color:var(--green-forest)]/15 flex items-baseline justify-between" style={{ background: `${theme.primary}10` }}>
         <p className="text-[10px] uppercase text-[color:var(--green-deep)] font-semibold" style={{ letterSpacing: '0.18em' }}>
-          PGA Championship Roster
+          {prevMajorName} Roster
         </p>
         <p className="text-[10px] uppercase text-[color:var(--green-moss)]" style={{ letterSpacing: '0.18em' }}>
           {sortedRoster.length} golfers

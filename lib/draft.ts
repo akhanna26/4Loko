@@ -132,3 +132,31 @@ export async function clearKeeperDeclaration(flight_id: number, owner_id: number
     .eq('owner_id', owner_id);
   if (error) throw error;
 }
+
+// Get the MAJOR-type tournament for a flight (used for display headers)
+export async function getMajorForFlight(flight_id: number) {
+  const { data, error } = await supabase
+    .from('tournaments')
+    .select('id, name, venue, start_date, end_date, event_type')
+    .eq('flight_id', flight_id)
+    .eq('event_type', 'MAJOR')
+    .single();
+  if (error) return null;
+  return data;
+}
+
+// Format a date range for display: "July 16–19" or "June 30–July 3"
+export function formatDateRange(start: string | null, end: string | null): string {
+  if (!start || !end) return '';
+  const s = new Date(start + 'T00:00:00');
+  const e = new Date(end + 'T00:00:00');
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const startMonth = monthNames[s.getMonth()];
+  const endMonth = monthNames[e.getMonth()];
+  const startDay = s.getDate();
+  const endDay = e.getDate();
+  if (startMonth === endMonth) {
+    return `${startMonth} ${startDay}–${endDay}`;
+  }
+  return `${startMonth} ${startDay}–${endMonth} ${endDay}`;
+}
