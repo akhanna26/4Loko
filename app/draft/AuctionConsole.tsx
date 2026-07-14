@@ -876,7 +876,7 @@ export default function AuctionConsole({
             <div className="bg-[color:var(--cream-tint)]/70 grid gap-0 min-w-[900px]"
                  style={{ gridTemplateColumns: `220px repeat(${owners.length}, minmax(60px, 1fr))` }}>
               {(() => {
-                const oddsToNum = (o: string | null | undefined) => o ? parseInt(o.replace('+', '')) : 999999;
+                const oddsToNum = (o: number | null | undefined) => o ?? 999999;
                 const sortedByOdds = [...pool].sort((a, b) => oddsToNum(a.odds) - oddsToNum(b.odds));
                 const rankMap = new Map(sortedByOdds.map((g, i) => [g.golfer_id, i + 1]));
                 return filteredPool.map((g) => {
