@@ -5,6 +5,7 @@ const ESPN_TOURNAMENT_MAP: Record<string, { dbId: number; par: number; flightId:
   'PGA Championship': { dbId: 4, par: 70, flightId: 2 },
   'U.S. Open': { dbId: 6, par: 70, flightId: 3 },
   'The Open Championship': { dbId: 8, par: 71, flightId: 4 },
+  'The Open': { dbId: 8, par: 71, flightId: 4 },
   'The Masters': { dbId: 2, par: 72, flightId: 1 },
   'RBC Heritage': { dbId: 1, par: 71, flightId: 1 },
   'Memorial Tournament': { dbId: 3, par: 72, flightId: 2 },
