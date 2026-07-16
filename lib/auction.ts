@@ -387,9 +387,17 @@ export async function materializeRosters(flight_id: number) {
   return { materialized: rosterRows.length };
 }
 
-// One-click "finalize draft" - materializes rosters + sets session status to final
+// One-click "finalize draft" - materializes rosters + sets session status to final.
+// Calls server-side API route because rosters table has RLS enabled.
 export async function finalizeDraft(flight_id: number, session_id: number) {
-  const result = await materializeRosters(flight_id);
-  await setSessionStatus(session_id, 'final');
-  return result;
+  const res = await fetch('/api/finalize-draft', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ flight_id, session_id }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'unknown' }));
+    throw new Error(err.error || `HTTP ${res.status}`);
+  }
+  return await res.json();
 }
